@@ -64,12 +64,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
 }
 .mark { font: 400 1.35rem/1 var(--serif); letter-spacing: 0; padding-left: 12px; }
-/* the mark: an eye mid-blink, the moment of seeing; it blinks once on arrival and when hovered */
-.eye { width: 22px; height: 22px; overflow: visible; }
-.eye path { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; transform-origin: 16px 16px; animation: blink 1.4s 0.6s var(--ease) both; }
-.eye circle { fill: var(--accent); transform-origin: 16px 16px; animation: blink 1.4s 0.6s var(--ease) both; }
-@keyframes blink { 0%, 100% { scale: 1 1; } 35% { scale: 1 0.08; } }
-@media (hover: hover) { .mark:hover .eye :is(path, circle) { animation: blink 0.9s var(--ease); } }
+/* the mark: a camera shutter. It irises open on arrival; hovering turns it one blade (60deg looks identical, so it never jumps) */
+.mark em { color: var(--accent); }
+.mark .ur { font: 400 0.95rem/1 "Noto Nastaliq Urdu", serif; opacity: 0.55; padding-left: 10px; margin-left: 2px; border-left: 1px solid rgb(244 243 239 / 0.25); height: 18px; display: inline-flex; align-items: center; overflow: visible; }
+@media (max-width: 520px) { .mark .ur { display: none; } }
+.ap { width: 22px; height: 22px; flex: none; animation: iris 1.6s 0.3s var(--ease) backwards; transition: rotate 0.9s var(--ease); }
+.ap .pupil { fill: var(--accent); transform-origin: 32px 32px; animation: pupil 1.6s 0.3s var(--ease) backwards; }
+@keyframes iris { from { rotate: -120deg; } }
+@keyframes pupil { from { scale: 0; } }
+@media (hover: hover) { .mark:hover .ap { rotate: 60deg; } }
 .back { font-size: 0.92rem; transition: transform 0.4s var(--ease); }
 .back:active { transform: scale(0.95); transition-duration: 0.1s; }
 .back svg { width: 8px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
