@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkr5we';
-import * as data from './data.js?v=mvvkr5we';
-import { decode } from './vendor/blurhash.js?v=mvvkr5we';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvmn2mi';
+import * as data from './data.js?v=mvvmn2mi';
+import { decode } from './vendor/blurhash.js?v=mvvmn2mi';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -165,19 +165,25 @@ function rise() {
   root.hidden = false;
   document.documentElement.classList.add('viewing');
   S.closeBtn.focus({ preventScroll: true });
-  const tile = S.tileFor(photo());
+  const tile = S.tileFor(photo()), s0 = S;
   if (S.from && tile) {
     const t = overTile(S.from);
     S.zx.set(t.x); S.zy.set(t.y); S.zs.set(t.s);
     S.ci = t.crop; S.clip.set(1);
-    tile.classList.add('away');
   } else S.zs.set(0.94);
   render();
-  // A slow, settled rise — no overshoot on something the user didn't throw. The crop opens with it.
-  S.zx.to(0, { response: 0.55 }); S.zy.to(0, { response: 0.55 }); S.zs.to(1, { response: 0.55 });
-  S.clip.to(0, { response: 0.55 });
-  S.scrim.to(1, { response: 0.5 });
+  // Phones need a frame or two to put a newly shown layer on screen. Until then the photo sits exactly
+  // over its tile and both are visible, so there is never a frame with neither; only then does it lift.
+  afterPaint(() => {
+    if (S !== s0 || S.closing) return;
+    tile?.classList.add('away');
+    // A slow, settled rise — no overshoot on something the user didn't throw. The crop opens with it.
+    S.zx.to(0, { response: 0.55 }); S.zy.to(0, { response: 0.55 }); S.zs.to(1, { response: 0.55 });
+    S.clip.to(0, { response: 0.55 });
+    S.scrim.to(1, { response: 0.5 });
+  });
 }
+const afterPaint = fn => requestAnimationFrame(() => requestAnimationFrame(fn));
 
 function goTo(i, velocity = 0) {
   i = clamp(i, 0, S.photos.length - 1);
@@ -201,13 +207,18 @@ export function closeViewer(animated, velocity = {}) {
   const tile = s.tileFor(photo());
   const teardown = () => {
     if (S !== s) return;
-    tile?.classList.remove('away');
-    root.hidden = true; root.replaceChildren();
-    document.documentElement.classList.remove('viewing');
     for (const sp of [s.track, s.zx, s.zy, s.zs, s.scrim, s.clip]) sp.stop();
-    S = null;
-    s.returnFocus?.focus?.({ preventScroll: true });
-    s.onClose();
+    // the tile comes back first and is painted under the photo resting on it; then the photo goes
+    tile?.classList.remove('away');
+    const finish = () => {
+      if (S !== s) return;
+      root.hidden = true; root.replaceChildren();
+      document.documentElement.classList.remove('viewing');
+      S = null;
+      s.returnFocus?.focus?.({ preventScroll: true });
+      s.onClose();
+    };
+    animated && tile ? afterPaint(finish) : finish();
   };
   if (!animated || reducedMotion.matches) return teardown();
 

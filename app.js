@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=mvvkr5we';
-import * as data from './data.js?v=mvvkr5we';
-import * as auth from './auth.js?v=mvvkr5we';
-import { openViewer, closeViewer } from './viewer.js?v=mvvkr5we';
-import './mesh.js?v=mvvkr5we';
-import { openReel, reelSupported } from './reel.js?v=mvvkr5we';
+import { decode } from './vendor/blurhash.js?v=mvvmn2mi';
+import * as data from './data.js?v=mvvmn2mi';
+import * as auth from './auth.js?v=mvvmn2mi';
+import { openViewer, closeViewer } from './viewer.js?v=mvvmn2mi';
+import './mesh.js?v=mvvmn2mi';
+import { openReel, reelSupported } from './reel.js?v=mvvmn2mi';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
