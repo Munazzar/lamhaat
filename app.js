@@ -140,7 +140,7 @@ async function renderHome() {
   const headline = h('h1', { className: 'headline' },
     h('span', { className: 'w' }, 'Every'), ' ', h('span', { className: 'w' }, 'moment,'), ' ', h('em', { className: 'w' }, 'kept.'));
   const cine = h('section', { className: 'stagehead' },
-    h('p', { className: 'mono kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحہ'), h('span', {}, `Lamha — ${total} photographs`)),
+    h('p', { className: 'mono kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحات'), h('span', {}, `Lamhaat — ${total} photographs`)),
     headline,
     stage,
     h('div', { className: 'ctas' },
@@ -152,8 +152,8 @@ async function renderHome() {
 
   // 2. manifesto
   const manifesto = h('section', { className: 'manifesto' },
-    h('p', { className: 'kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحہ'), h('span', {}, 'lamha, noun')),
-    h('p', { className: 'statement' }, 'Urdu for ', h('em', {}, 'a moment'), ' — the blink between seeing a thing and keeping it. These are the ones I kept.'),
+    h('p', { className: 'kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحات'), h('span', {}, 'lamhaat, noun')),
+    h('p', { className: 'statement' }, 'Urdu for ', h('em', {}, 'moments'), ' — the blinks between seeing a thing and keeping it. These are the ones I kept.'),
     h('p', { className: 'fine' }, `${total} photographs  ·  ${albums.length} ${albums.length === 1 ? 'album' : 'albums'}  ·  ${years({ dateStart: albums.at(-1)?.dateStart, dateEnd: first?.dateEnd })}`));
 
   // 3. a loose, layered scatter of photographs drifting at their own speeds
@@ -184,12 +184,11 @@ async function renderHome() {
         media);
     }));
 
-  const foot = footer();
-  view.replaceChildren(cine, manifesto, scatter, list, foot);
+  view.replaceChildren(cine, manifesto, scatter, list);
   if (auth.user()) view.append(h('button', { className: 'quiet', type: 'button', onclick: () => auth.signOut().then(() => location.replace(location.pathname)) }, 'Sign out'));
   parallax(floats);
   reveal(view.querySelectorAll('.manifesto > *, .spot, .row, .eyebrow'));
-  watchBar(headline, 'Lamha');
+  watchBar(headline, 'Lamhaat');
 }
 
 // Cards sit on the inside of a cylinder, so the edges lean toward you. Drag to turn it; a flick
@@ -250,12 +249,6 @@ function spin(stage, cards) {
   stage.addEventListener('click', e => { if (moved) e.preventDefault(); }, true);
   addEventListener('resize', size);
   cleanup.push(() => { cancelAnimationFrame(raf); removeEventListener('resize', size); });
-}
-
-function footer() {
-  const phrase = ['Lamha', 'لمحہ', 'a moment, held'];
-  const run = () => h('span', {}, Array.from({ length: 4 }, () => phrase.map(t => h('b', {}, t))));
-  return h('footer', { className: 'marquee', 'aria-hidden': 'true' }, h('div', { className: 'track' }, run(), run()));
 }
 
 // Elements rise into place the first time they scroll into view.
@@ -329,7 +322,6 @@ async function renderAlbum(id) {
     chips,
     ...sections,
     h('p', { className: 'empty', hidden: true }, 'No photographs match.'),
-    footer(),
   );
   watchBar(title, entry.title);
   layout();
@@ -484,7 +476,7 @@ async function start() {
     const user = await auth.init(cfg.firebase).catch(() => null);
     if (!user) return gate('signin', cfg);
     let who;
-    try { who = await data.me(); } catch (err) { return view.replaceChildren(message('Lamha is not reachable right now.', err.message)); }
+    try { who = await data.me(); } catch (err) { return view.replaceChildren(message('Lamhaat is not reachable right now.', err.message)); }
     if (!who.owner && !who.groups.length) return gate('denied', cfg, who.email);
   }
   ready = true;
@@ -506,8 +498,8 @@ function gate(kind, cfg, email) {
     finally { button.disabled = false; }
   };
   view.replaceChildren(h('section', { className: 'gate-intro' },
-    h('h1', { className: 'giant solo' }, 'Lamha'),
-    h('p', { className: 'urdu' , lang: 'ur', dir: 'rtl' }, 'لمحہ'),
+    h('h1', { className: 'giant solo' }, 'Lamhaat'),
+    h('p', { className: 'urdu' , lang: 'ur', dir: 'rtl' }, 'لمحات'),
     note, button));
 }
 

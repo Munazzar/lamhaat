@@ -3,7 +3,7 @@
 // Static (no config.json): public albums next to the site (GitHub Pages), or the export staging folder via scripts/dev.js.
 import { idToken } from './auth.js';
 
-const MEDIA = 'media'; // relative: works at / locally and under /lamha-site/ on Pages
+const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 const TOKEN_TTL = 50 * 60e3; // album tokens last 1 h; refresh before that
 let cfg = null;
 const tokens = new Map(); // albumId -> { t, at }
