@@ -24,12 +24,14 @@ setTheme(document.documentElement.dataset.theme || 'light');
 themeBtn.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   if (!document.startViewTransition || reduced.matches) return setTheme(next);
-  const r = themeBtn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-  const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  // Percentages, not px: the transition snapshot can be scaled on high-density screens, so px would land off the button.
+  const r = themeBtn.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  const x = r.left + r.width / 2, y = r.top + r.height / 2, at = `at ${(x / W) * 100}% ${(y / H) * 100}%`;
+  const end = (Math.hypot(Math.max(x, W - x), Math.max(y, H - y)) / (Math.hypot(W, H) / Math.SQRT2)) * 100; // % of the reference radius
   document.documentElement.classList.add('theming');
   const t = document.startViewTransition(() => setTheme(next));
   t.ready.then(() => document.documentElement.animate(
-    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+    { clipPath: [`circle(0% ${at})`, `circle(${end}% ${at})`] },
     { duration: 1300, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
   t.finished.finally(() => document.documentElement.classList.remove('theming'));
 });
