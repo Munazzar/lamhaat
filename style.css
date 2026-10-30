@@ -14,8 +14,23 @@
   --sans: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --gutter: 16px;
+  --dot: rgb(21 21 20 / 0.13);
+  --pill: rgb(21 21 20 / 0.9);
   color-scheme: light;
   transition: --amb 2.4s var(--ease);
+}
+:root[data-theme="dark"] {
+  --canvas: #111110;
+  --paper: #1b1a18;
+  --ink: #edebe5;
+  --ink-2: #b4b1a8;
+  --ink-3: #8a877e;
+  --line: rgb(237 235 229 / 0.13);
+  --accent: #ee7a43;
+  --tile: #2a2926;
+  --dot: rgb(237 235 229 / 0.09);
+  --pill: rgb(44 43 40 / 0.88);
+  color-scheme: dark;
 }
 @media (min-width: 720px) { :root { --gutter: 40px; } }
 
@@ -25,10 +40,9 @@ html.viewing { overflow: hidden; }
 body {
   margin: 0; min-height: 100svh; color: var(--ink); overflow-x: hidden;
   font: 400 1rem/1.5 var(--sans); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-  /* a wash of light borrowed from the photographs, over a fine dot grid */
+  /* a wash of light borrowed from the photographs; the dot grid over it is drawn live by mesh.js */
   background:
     radial-gradient(1100px 620px at 50% -8%, color-mix(in srgb, var(--amb) 30%, transparent), transparent 72%),
-    radial-gradient(circle at 1px 1px, rgb(21 21 20 / 0.13) 1px, transparent 1.3px) 0 0 / 22px 22px,
     var(--canvas);
   background-attachment: fixed;
 }
@@ -39,7 +53,24 @@ body::after {
   animation: grain 1.2s steps(6) infinite;
 }
 @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } }
+[data-theme="dark"] body::after { mix-blend-mode: screen; opacity: 0.05; }
 html.viewing body::after { opacity: 0.04; mix-blend-mode: screen; }
+
+/* night and day: the sun sets below the horizon line, then the moon rises; the page changes in a widening circle */
+.theme {
+  margin-left: 10px; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none;
+  background: var(--pill); color: #f4f3ef; box-shadow: 0 8px 24px -10px rgb(0 0 0 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); transition: transform 0.4s var(--ease);
+}
+.search[hidden] + .theme { margin-left: auto; }
+.theme:active { transform: scale(0.94); transition-duration: 0.1s; }
+.theme svg { width: 22px; height: 22px; overflow: visible; }
+.theme .sun { fill: #f2b544; stroke: #f2b544; stroke-width: 1.6; stroke-linecap: round; transition: translate 0.9s var(--ease) 0.25s, rotate 1.2s var(--ease) 0.25s, fill 0.9s, stroke 0.9s; transform-origin: 12px 12px; }
+.theme .moon { fill: #f4f3ef; translate: 0 13px; transition: translate 0.9s var(--ease); }
+.theme .horizon { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; opacity: 0.55; }
+[data-theme="dark"] .theme .sun { translate: 0 13px; rotate: 90deg; fill: var(--accent); stroke: var(--accent); transition-delay: 0s; }
+[data-theme="dark"] .theme .moon { translate: 0 0; transition-delay: 0.45s; }
+html.theming::view-transition-old(root), html.theming::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -60,21 +91,21 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .bar > * { pointer-events: auto; }
 .mark, .back, .bar-title {
   display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 12px;
-  background: rgb(21 21 20 / 0.9); color: #f4f3ef; box-shadow: 0 8px 24px -10px rgb(0 0 0 / 0.45);
+  background: var(--pill); color: #f4f3ef; box-shadow: 0 8px 24px -10px rgb(0 0 0 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.06);
   -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
 }
 .mark { font: 400 1.35rem/1 var(--serif); letter-spacing: 0; padding-left: 12px; }
 /* the mark: a camera shutter. It irises open on arrival; hovering turns it one blade (60deg looks identical, so it never jumps) */
-/* the name is two layers: Urdu in orange behind, English in front. The pill clips the Nastaliq's tall strokes. */
-.mark { overflow: hidden; }
-.word { display: inline-grid; place-items: center; }
-.word > * { grid-area: 1 / 1; }
-.word .ur { font: 400 1.9rem/1 "Noto Nastaliq Urdu", serif; color: var(--accent); opacity: 0.62; translate: 2px 5px; white-space: nowrap; pointer-events: none; }
-.word .lat { position: relative; text-shadow: 0 0 10px rgb(21 21 20 / 0.7); }
+/* the name is two layers: لمحات in Naskh calligraphy (Amiri) runs end to end behind everything in the button,
+   big enough that the button crops it; the English sits on top */
+.mark { position: relative; overflow: hidden; }
+.mark > :not(.callig) { position: relative; }
+.callig { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.callig .script { font: 700 3.1rem/1 Amiri, serif; color: var(--accent); opacity: 0.38; white-space: nowrap; translate: 0 6px; }
 .mark em { font-style: italic; }
 @supports (animation-timeline: scroll()) {
-  .word .ur { animation: drift linear both; animation-timeline: scroll(root); }
-  @keyframes drift { from { transform: translateX(6px); } to { transform: translateX(-10px); } }
+  .callig .script { animation: drift linear both; animation-timeline: scroll(root); }
+  @keyframes drift { from { transform: translateX(4px); } to { transform: translateX(-4px); } }
 }
 .ap { width: 22px; height: 22px; flex: none; animation: iris 1.6s 0.3s var(--ease) backwards; transition: rotate 0.9s var(--ease); }
 .ap .pupil { fill: var(--accent); transform-origin: 32px 32px; animation: pupil 1.6s 0.3s var(--ease) backwards; }
@@ -104,7 +135,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @media (max-width: 520px) { .bar-title { display: none; } }
 .search {
   margin-left: auto; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 12px;
-  background: rgb(246 245 241 / 0.82); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%);
+  background: color-mix(in srgb, var(--paper) 82%, transparent); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%);
   box-shadow: 0 0 0 1px var(--line), 0 8px 24px -14px rgb(0 0 0 / 0.35); width: min(220px, 40vw);
   transition: width 0.6s var(--ease), box-shadow 0.3s;
 }
@@ -193,10 +224,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 @media (hover: none) { .row .card-media { position: relative; right: auto; top: auto; translate: none; scale: 1; opacity: 1; rotate: 0deg; grid-column: 1 / -1; width: 100%; } }
 
-#view { padding-bottom: 14vh; }
+#view { position: relative; z-index: 1; padding-bottom: 14vh; }
+.mesh { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .quiet { display: block; margin: 24px auto; font: 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ---------- album ---------- */
+.card3d.away { opacity: 0 !important; }
+.gridtop { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: calc(96px + env(safe-area-inset-top)) var(--gutter) 0; max-width: 1440px; margin: 0 auto; }
+.gridtitle { margin: 0; font: 400 clamp(2.6rem, 7vw, 5.6rem)/0.95 var(--serif); letter-spacing: -0.02em; animation: rise 1.4s var(--ease) both; }
 .hero {
   position: relative; height: min(84svh, 940px); min-height: 440px; margin: 10px; border-radius: 26px; overflow: hidden;
   box-shadow: 0 40px 80px -50px rgb(0 0 0 / 0.7);
@@ -237,7 +272,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .chip:active { transform: scale(0.95); transition-duration: 0.1s; }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--canvas); box-shadow: none; }
-@media (hover: hover) { .chip:not([aria-pressed="true"]):hover { color: var(--ink); background: #fff; } }
+@media (hover: hover) { .chip:not([aria-pressed="true"]):hover { color: var(--ink); background: var(--paper); } }
 
 .chapter { max-width: 1520px; margin: 0 auto; padding: 12vh var(--gutter) 0; }
 .ch-head { display: grid; grid-template-columns: 3rem 1fr auto; align-items: end; gap: 6px 16px; padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
@@ -276,7 +311,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .note { max-width: 34ch; margin: 1.2rem auto 2rem; color: var(--ink-2); line-height: 1.55; animation: rise 2s 0.6s var(--ease) both; }
 .google {
   display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 26px; border-radius: 10px;
-  background: var(--ink); color: #fff; font-weight: 500; animation: rise 2s 0.9s var(--ease) both; transition: transform 0.5s var(--ease), opacity 0.3s;
+  background: var(--ink); color: var(--canvas); font-weight: 500; animation: rise 2s 0.9s var(--ease) both; transition: transform 0.5s var(--ease), opacity 0.3s;
 }
 .google:active { transform: scale(0.96); transition-duration: 0.1s; }
 .google:disabled { opacity: 0.6; }

@@ -2,6 +2,7 @@ import { decode } from './vendor/blurhash.js';
 import * as data from './data.js';
 import * as auth from './auth.js';
 import { openViewer, closeViewer } from './viewer.js';
+import './mesh.js';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -10,6 +11,28 @@ const barTitle = bar.querySelector('.bar-title');
 const search = bar.querySelector('.search');
 const searchInput = search.querySelector('input');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+// Night and day. The new theme spreads from the button in a circle while the icon's sun sets and moon rises.
+const themeBtn = document.querySelector('.theme');
+function setTheme(next) {
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('theme', next); } catch {}
+  document.querySelector('meta[name="theme-color"]').content = next === 'dark' ? '#111110' : '#e8e6e1';
+  themeBtn.setAttribute('aria-label', next === 'dark' ? 'Switch to day' : 'Switch to night');
+}
+setTheme(document.documentElement.dataset.theme || 'light');
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  if (!document.startViewTransition || reduced.matches) return setTheme(next);
+  const r = themeBtn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  document.documentElement.classList.add('theming');
+  const t = document.startViewTransition(() => setTheme(next));
+  t.ready.then(() => document.documentElement.animate(
+    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+    { duration: 1300, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
+  t.finished.finally(() => document.documentElement.classList.remove('theming'));
+});
 
 const h = (tag, attrs = {}, ...kids) => {
   const el = document.createElement(tag);
@@ -140,7 +163,7 @@ async function renderHome() {
   const headline = h('h1', { className: 'headline' },
     h('span', { className: 'w' }, 'Every'), ' ', h('span', { className: 'w' }, 'moment,'), ' ', h('em', { className: 'w' }, 'kept.'));
   const cine = h('section', { className: 'stagehead' },
-    h('p', { className: 'mono kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحات'), h('span', {}, `Lamhaat — ${total} photographs`)),
+    h('p', { className: 'mono kicker' }, `Lamhaat — ${total} photographs`),
     headline,
     stage,
     h('div', { className: 'ctas' },
@@ -149,12 +172,6 @@ async function renderHome() {
     h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn'));
   spin(stage, cards);
   if (slides[0]) ambient(avg(slides[0].blurhash));
-
-  // 2. manifesto
-  const manifesto = h('section', { className: 'manifesto' },
-    h('p', { className: 'kicker' }, h('span', { lang: 'ur', dir: 'rtl', className: 'urdu' }, 'لمحات'), h('span', {}, 'lamhaat, noun')),
-    h('p', { className: 'statement' }, 'Urdu for ', h('em', {}, 'moments'), ' — the blinks between seeing a thing and keeping it. These are the ones I kept.'),
-    h('p', { className: 'fine' }, `${total} photographs  ·  ${albums.length} ${albums.length === 1 ? 'album' : 'albums'}  ·  ${years({ dateStart: albums.at(-1)?.dateStart, dateEnd: first?.dateEnd })}`));
 
   // 3. a loose, layered scatter of photographs drifting at their own speeds
   const scatterPicks = slides.slice(0, 5); // the highlights, loosely pinned
@@ -184,10 +201,10 @@ async function renderHome() {
         media);
     }));
 
-  view.replaceChildren(cine, manifesto, scatter, list);
+  view.replaceChildren(cine, scatter, list);
   if (auth.user()) view.append(h('button', { className: 'quiet', type: 'button', onclick: () => auth.signOut().then(() => location.replace(location.pathname)) }, 'Sign out'));
   parallax(floats);
-  reveal(view.querySelectorAll('.manifesto > *, .spot, .row, .eyebrow'));
+  reveal(view.querySelectorAll('.spot, .row, .eyebrow'));
   watchBar(headline, 'Lamhaat');
 }
 
@@ -246,7 +263,7 @@ function spin(stage, cards) {
   };
   stage.addEventListener('pointerup', end);
   stage.addEventListener('pointercancel', end);
-  stage.addEventListener('click', e => { if (moved) e.preventDefault(); }, true);
+  stage.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
   addEventListener('resize', size);
   cleanup.push(() => { cancelAnimationFrame(raf); removeEventListener('resize', size); });
 }
@@ -281,13 +298,8 @@ async function renderAlbum(id) {
   for (const p of ordered) (chapters.find(c => !c.tags.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
   const used = chapters.filter(c => c.photos.length);
 
-  const coverImg = h('img', { alt: '', src: entry.cover ? data.src(entry.cover, id) : '', decoding: 'async' });
-  const heroMedia = h('div', { className: 'hero-media' }, entry.cover ? blurCanvas(entry.cover.blurhash) : null, coverImg);
-  heroMedia.style.viewTransitionName = `cover-${id}`;
-  whenReady(coverImg, () => heroMedia.classList.add('ready'));
   if (entry.cover) ambient(avg(entry.cover.blurhash));
 
-  const title = h('h1', {}, entry.title);
   const toc = h('ol', { className: 'toc' }, used.map((c, i) =>
     h('li', {}, h('button', { type: 'button', onclick: () => c.el.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' }) },
       h('span', { className: 'rn' }, ROMAN[i]), h('span', { className: 't' }, c.title), h('span', { className: 'c' }, String(c.photos.length))))));
@@ -298,7 +310,7 @@ async function renderAlbum(id) {
   const chips = h('div', { className: 'chips', role: 'group', 'aria-label': 'Filter by subject' },
     ['All', ...topTags].map((t, i) => h('button', { className: 'chip', type: 'button', 'aria-pressed': String(i === 0) }, t)));
 
-  current = { entry, chapters: used, photos: ordered, tiles: new Map() };
+  current = { entry, chapters: used, photos: ordered, tiles: new Map(), grid: false };
   for (const p of ordered) current.tiles.set(p.h, tile(p));
   const sections = used.map((c, i) => {
     c.grid = h('div', { className: 'grid' }, c.photos.map(p => current.tiles.get(p.h)));
@@ -313,19 +325,49 @@ async function renderAlbum(id) {
     return c.el;
   });
 
-  view.replaceChildren(
-    h('section', { className: 'hero' }, heroMedia,
-      h('div', { className: 'hero-text' },
-        h('p', { className: 'kicker' }, `${years(entry)}  ·  ${entry.count} photographs`),
-        title)),
+  // It opens like the home page: a ribbon of the album's photographs. "Expand into grid" lays them all out.
+  const step = Math.max(1, Math.floor(ordered.length / 30));
+  const ringPhotos = ordered.filter((_, i) => i % step === 0).slice(0, 30);
+  const cards = new Map(ringPhotos.map(p => {
+    const img = h('img', { alt: '', decoding: 'async', draggable: false, src: data.src(p.v.thumb, id) });
+    const card = h('button', { className: 'card3d', type: 'button', 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
+    card.addEventListener('click', () => open(current.photos.indexOf(p), card));
+    whenReady(img, () => card.classList.add('ready'));
+    return [p.h, card];
+  }));
+  const ribbon = h('div', { className: 'ribbon' }, [...cards.values()]);
+  const title = h('h1', { className: 'headline' }, entry.title);
+  const stage = h('section', { className: 'stagehead' },
+    h('p', { className: 'mono kicker' }, `${years(entry)}  ·  ${entry.count} photographs`),
+    title,
+    ribbon,
+    h('div', { className: 'ctas' },
+      h('button', { className: 'btn accent', type: 'button', onclick: () => setMode(true) }, 'Expand into grid'),
+      h('a', { className: 'btn ghost', href: '#/' }, 'All albums')),
+    h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn  ·  tap to open'));
+  spin(ribbon, [...cards.values()]);
+
+  const gridView = h('div', { className: 'gridview', hidden: true },
+    h('div', { className: 'gridtop' },
+      h('h1', { className: 'gridtitle' }, entry.title),
+      h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon')),
     h('section', { className: 'contents' }, h('p', { className: 'eyebrow' }, 'Contents'), toc),
     chips,
     ...sections,
-    h('p', { className: 'empty', hidden: true }, 'No photographs match.'),
-  );
+    h('p', { className: 'empty', hidden: true }, 'No photographs match.'));
+  view.replaceChildren(stage, gridView);
+
+  // The viewer flies back to whatever the photo is showing as right now: its tile, or its card if it's on the ribbon.
+  current.tileFor = p => current.grid ? current.tiles.get(p.h) : (c => c?.style.visibility !== 'hidden' ? c : null)(cards.get(p.h));
+  const setMode = grid => transition(() => {
+    current.grid = grid;
+    stage.hidden = grid; gridView.hidden = !grid; search.hidden = !grid;
+    scrollTo(0, 0);
+    if (grid) { layout(); reveal(view.querySelectorAll('.contents, .ch-head')); }
+    watchBar(grid ? gridView.querySelector('.gridtitle') : title, entry.title);
+  });
+  search.hidden = true;
   watchBar(title, entry.title);
-  layout();
-  reveal(view.querySelectorAll('.contents, .ch-head'));
 
   // Ambient light shifts to each chapter's colours as it takes the screen.
   const amb = new IntersectionObserver(es => {
@@ -375,22 +417,15 @@ function tile(p) {
   return el;
 }
 
-// Justified rows: every photo keeps its full frame, rows fill the width exactly.
-function justify(photos, width, target, gap) {
-  const out = [];
-  let row = [], sum = 0, y = 0;
-  const flush = (full) => {
-    const hgt = full ? (width - gap * (row.length - 1)) / sum : Math.min(target, (width - gap * (row.length - 1)) / sum);
-    let x = 0;
-    for (const p of row) { const w = (p.w / p.hgt) * hgt; out.push({ p, x, y, w, h: hgt }); x += w + gap; }
-    y += hgt + gap; row = []; sum = 0;
-  };
+// Masonry: every photo keeps its full frame and drops into the shortest column.
+function masonry(photos, width, cols, gap) {
+  const w = (width - gap * (cols - 1)) / cols, tops = Array(cols).fill(0), out = [];
   for (const p of photos) {
-    row.push(p); sum += p.w / p.hgt;
-    if (sum * target + gap * (row.length - 1) >= width) flush(true);
+    const c = tops.indexOf(Math.min(...tops)), hgt = w * (p.hgt / p.w);
+    out.push({ p, x: c * (w + gap), y: tops[c], w, h: hgt });
+    tops[c] += hgt + gap;
   }
-  if (row.length) flush(false);
-  return { boxes: out, height: Math.max(0, y - gap) };
+  return { boxes: out, height: Math.max(0, Math.max(...tops) - gap) };
 }
 
 let revealQueue = [], revealTimer = 0;
@@ -411,14 +446,14 @@ function layout(animate = false) {
   const width = current.chapters[0]?.grid.clientWidth;
   if (!width) return;
   const small = width < 640;
-  const gap = small ? 3 : 10;
-  const target = small ? Math.max(120, width / 2.6) : Math.min(360, Math.max(220, width / 4.4));
+  const gap = small ? 4 : 12;
+  const cols = small ? 2 : width < 1100 ? 3 : 4;
   current.photos = [];
   for (const c of current.chapters) {
     const shown = c.shown || c.photos;
     current.photos.push(...shown);
     c.el.hidden = !shown.length;
-    const { boxes, height } = justify(shown, width, target, gap);
+    const { boxes, height } = masonry(shown, width, cols, gap);
     c.grid.classList.toggle('animate', animate);
     c.grid.style.height = `${height}px`;
     const on = new Set();
@@ -442,7 +477,7 @@ function open(i, fromEl) {
   history.pushState({ viewer: true }, '', `#/a/${current.entry.id}/${current.photos[i].h}`);
   openViewer({
     photos: current.photos, index: i, from: fromEl,
-    tileFor: p => current.tiles.get(p.h),
+    tileFor: current.tileFor,
     onIndex: p => history.replaceState({ viewer: true }, '', `#/a/${current.entry.id}/${p.h}`),
     onClose: () => { if (history.state?.viewer) history.back(); else history.replaceState(null, '', `#/a/${current.entry.id}`); },
     fmtDate,
@@ -450,7 +485,7 @@ function open(i, fromEl) {
 }
 function openFromHash(hsh) {
   const i = current?.photos.findIndex(p => p.h === hsh);
-  if (i >= 0) openViewer({ photos: current.photos, index: i, from: null, tileFor: p => current.tiles.get(p.h),
+  if (i >= 0) openViewer({ photos: current.photos, index: i, from: null, tileFor: current.tileFor,
     onIndex: p => history.replaceState(null, '', `#/a/${current.entry.id}/${p.h}`),
     onClose: () => history.replaceState(null, '', `#/a/${current.entry.id}`), fmtDate });
 }
