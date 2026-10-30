@@ -4,6 +4,85 @@
  "title": "Portfolio",
  "encrypted": false,
  "embedModel": null,
+ "chapters": [
+  {
+   "title": "The City",
+   "sub": "Chicago, in winter light",
+   "tags": [
+    "chicago"
+   ]
+  },
+  {
+   "title": "Inland Sea",
+   "sub": "Pictured Rocks and Lake Superior, from a kayak",
+   "tags": [
+    "pictured rocks",
+    "lake superior",
+    "kayak"
+   ]
+  },
+  {
+   "title": "Red Earth",
+   "sub": "Desert roads and canyons of the Southwest",
+   "tags": [
+    "desert",
+    "canyon"
+   ]
+  },
+  {
+   "title": "High Country",
+   "sub": "Mountains, mist and alpine lakes",
+   "tags": [
+    "mountains",
+    "fog"
+   ]
+  },
+  {
+   "title": "The Turning",
+   "sub": "When the leaves go",
+   "tags": [
+    "autumn"
+   ]
+  },
+  {
+   "title": "Water & Light",
+   "sub": "Shores, falls and the last of the sun",
+   "tags": [
+    "waterfall",
+    "sunset",
+    "sunrise",
+    "lake",
+    "beach",
+    "moon"
+   ]
+  },
+  {
+   "title": "Small Lives",
+   "sub": "Animals, birds and the tiny things",
+   "tags": [
+    "animal",
+    "insect",
+    "bird",
+    "spider",
+    "reptile"
+   ]
+  },
+  {
+   "title": "Quiet Things",
+   "sub": "Flowers, tables and everything in between",
+   "tags": []
+  }
+ ],
+ "highlights": [
+  "kayakers-lovers-leap-arch",
+  "horseshoe-bend",
+  "marina-city-river-night",
+  "misty-lake-red-maple",
+  "union-station-grand-staircase",
+  "waterfall-mossy-gorge",
+  "grand-canyon-clouds",
+  "autumn-lake-cabin-reflection"
+ ],
  "photos": [
   {
    "h": "cbfbe83236f935a3688ef54c24107aea",

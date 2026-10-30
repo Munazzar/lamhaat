@@ -61,7 +61,9 @@ function build() {
   S.caption = el('div', 'lb-caption');
   const chrome = el('div', 'lb-chrome');
   chrome.append(top, S.prevBtn, S.nextBtn, S.caption);
-  root.append(el('div', 'lb-scrim'), S.trackEl, chrome);
+  // Ambient glow: the photo's own colours, blurred into the dark around it.
+  S.glow = el('div', 'lb-glow');
+  root.append(el('div', 'lb-scrim'), S.glow, S.trackEl, chrome);
 
   S.closeBtn.onclick = () => closeViewer(true);
   S.infoBtn.onclick = () => root.classList.toggle('details');
@@ -100,8 +102,20 @@ function ensureSlides() {
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function glow(p) {
+  const img = new Image(); img.alt = ''; img.src = data.src(p.v.thumb);
+  img.decode().catch(() => {}).then(() => {
+    if (!S) return;
+    S.glow.append(img);
+    requestAnimationFrame(() => img.classList.add('on'));
+    const old = [...S.glow.children].slice(0, -1);
+    setTimeout(() => old.forEach(o => o.remove()), 1600);
+  });
+}
+
 function caption() {
   const p = photo();
+  glow(p);
   S.count.textContent = `${S.index + 1} of ${S.photos.length}`;
   const settings = [p.f && `ƒ/${p.f}`, p.shutter, p.iso && `ISO ${p.iso}`].filter(Boolean).join('  ·  ');
   const rows = [['Camera', p.camera], ['Lens', p.lens], ['Exposure', settings], ['Size', `${p.w} × ${p.hgt}`]].filter(r => r[1]);
