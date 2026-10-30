@@ -70,6 +70,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @media (max-width: 520px) { .mark .ur { display: none; } }
 .ap { width: 22px; height: 22px; flex: none; animation: iris 1.6s 0.3s var(--ease) backwards; transition: rotate 0.9s var(--ease); }
 .ap .pupil { fill: var(--accent); transform-origin: 32px 32px; animation: pupil 1.6s 0.3s var(--ease) backwards; }
+.ap .iris { transform-origin: 32px 32px; }
+/* scrolling turns the shutter and opens it: top of the page nearly shut, the end wide open.
+   Uses transform, so it stacks on the arrival/hover `rotate` and `scale` above. */
+@supports (animation-timeline: scroll()) {
+  .ap { animation: iris 1.6s 0.3s var(--ease) backwards, turn linear both; animation-timeline: auto, scroll(root); }
+  .ap :is(.iris, .pupil) { animation: pupil 1.6s 0.3s var(--ease) backwards, aperture linear both; animation-timeline: auto, scroll(root); }
+  .ap .iris { animation: aperture linear both; animation-timeline: scroll(root); }
+  @keyframes turn { from { transform: rotate(0deg); } to { transform: rotate(300deg); } }
+  @keyframes aperture { from { transform: scale(0.55); } to { transform: scale(1.7); } }
+}
 @keyframes iris { from { rotate: -120deg; } }
 @keyframes pupil { from { scale: 0; } }
 @media (hover: hover) { .mark:hover .ap { rotate: 60deg; } }
