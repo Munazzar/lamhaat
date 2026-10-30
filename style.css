@@ -65,9 +65,17 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .mark { font: 400 1.35rem/1 var(--serif); letter-spacing: 0; padding-left: 12px; }
 /* the mark: a camera shutter. It irises open on arrival; hovering turns it one blade (60deg looks identical, so it never jumps) */
-.mark em { color: var(--accent); }
-.mark .ur { font: 400 0.95rem/1 "Noto Nastaliq Urdu", serif; opacity: 0.55; padding-left: 10px; margin-left: 2px; border-left: 1px solid rgb(244 243 239 / 0.25); height: 18px; display: inline-flex; align-items: center; overflow: visible; }
-@media (max-width: 520px) { .mark .ur { display: none; } }
+/* the name is two layers: Urdu in orange behind, English in front. The pill clips the Nastaliq's tall strokes. */
+.mark { overflow: hidden; }
+.word { display: inline-grid; place-items: center; }
+.word > * { grid-area: 1 / 1; }
+.word .ur { font: 400 1.9rem/1 "Noto Nastaliq Urdu", serif; color: var(--accent); opacity: 0.62; translate: 2px 5px; white-space: nowrap; pointer-events: none; }
+.word .lat { position: relative; text-shadow: 0 0 10px rgb(21 21 20 / 0.7); }
+.mark em { font-style: italic; }
+@supports (animation-timeline: scroll()) {
+  .word .ur { animation: drift linear both; animation-timeline: scroll(root); }
+  @keyframes drift { from { transform: translateX(6px); } to { transform: translateX(-10px); } }
+}
 .ap { width: 22px; height: 22px; flex: none; animation: iris 1.6s 0.3s var(--ease) backwards; transition: rotate 0.9s var(--ease); }
 .ap .pupil { fill: var(--accent); transform-origin: 32px 32px; animation: pupil 1.6s 0.3s var(--ease) backwards; }
 .ap .iris { transform-origin: 32px 32px; }
