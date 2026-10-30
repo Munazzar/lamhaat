@@ -3,6 +3,7 @@ import * as data from './data.js';
 import * as auth from './auth.js';
 import { openViewer, closeViewer } from './viewer.js';
 import './mesh.js';
+import { openReel, reelSupported } from './reel.js';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -233,10 +234,16 @@ function spin(stage, cards) {
   const N = cards.length;
   if (!N) return;
   const drift = reduced.matches ? 0 : -4; // degrees per second
-  let W, R, Z0, P, angle = 0, vel = drift, raf = 0, last = 0, drag = null, moved = false;
+  // On a phone the cylinder is tighter than the full ring would be, so the curve stays visible with big
+  // cards: the cards then run along a longer strip that wraps around (L degrees) rather than one circle.
+  let W, R, Z0, P, spacing, L, angle = 0, vel = drift, raf = 0, last = 0, drag = null, moved = false;
   const size = () => {
-    W = Math.min(320, Math.max(150, innerWidth * 0.2));
-    R = ((W * 1.18) * N) / (2 * Math.PI);
+    const phone = innerWidth < 700;
+    W = phone ? innerWidth * 0.6 : Math.min(320, Math.max(150, innerWidth * 0.2));
+    const ring = ((W * 1.18) * N) / (2 * Math.PI);
+    R = phone ? Math.min(ring, innerWidth * 0.95) : ring;
+    spacing = R < ring ? (W * 1.12 / R) * (180 / Math.PI) : 360 / N;
+    L = spacing * N;
     Z0 = R * 0.9; P = R * 1.0;
     stage.style.perspective = `${P}px`;
     stage.style.height = `${W * 1.33 * 1.75}px`;
@@ -244,7 +251,7 @@ function spin(stage, cards) {
   };
   const place = () => {
     cards.forEach((c, i) => {
-      let a = ((i * 360) / N + angle) % 360; if (a > 180) a -= 360; if (a < -180) a += 360;
+      let a = (((i * spacing + angle) % L) + L) % L; if (a >= L / 2) a -= L;
       const r = (a * Math.PI) / 180, x = R * Math.sin(r), z = Z0 - R * Math.cos(r);
       const visible = Math.abs(a) < 88 && z < P * 0.62;
       c.style.visibility = visible ? 'visible' : 'hidden';
@@ -487,6 +494,10 @@ async function renderAlbum(id) {
     return c.el;
   });
 
+  // Reel: the album one photograph at a time, travelling up through a fixed frame.
+  function reelBtn() {
+    return reelSupported ? h('button', { className: 'btn ghost', type: 'button', onclick: () => openReel({ photos: current.photos, index: 0, src: v => data.src(v, id), title: entry.title }) }, 'Reel') : null;
+  }
   // It opens like the home page: a ribbon of the album's photographs. "Expand into grid" lays them all out.
   const step = Math.max(1, Math.floor(ordered.length / 30));
   const ringPhotos = ordered.filter((_, i) => i % step === 0).slice(0, 30);
@@ -505,6 +516,7 @@ async function renderAlbum(id) {
     ribbon,
     h('div', { className: 'ctas' },
       h('button', { className: 'btn accent', type: 'button', onclick: () => setMode(true) }, 'Expand into grid'),
+      reelBtn(),
       h('a', { className: 'btn ghost', href: '#/' }, 'All albums')),
     h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn  ·  tap to open'));
   spin(ribbon, [...cards.values()]);
@@ -512,7 +524,7 @@ async function renderAlbum(id) {
   const gridView = h('div', { className: 'gridview', hidden: true },
     h('div', { className: 'gridtop' },
       h('h1', { className: 'gridtitle' }, entry.title),
-      h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon')),
+      h('div', { className: 'ctas tight' }, reelBtn(), h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon'))),
     h('section', { className: 'contents' }, h('p', { className: 'eyebrow' }, 'Contents'), toc),
     chips,
     ...sections,
