@@ -1,7 +1,7 @@
 // Where the gallery gets catalog, manifests and image URLs.
 // Live (config.json present): the Cloudflare Worker, with the viewer's Firebase ID token.
 // Static (no config.json): public albums next to the site (GitHub Pages), or the export staging folder via scripts/dev.js.
-import { idToken } from './auth.js';
+import { idToken } from './auth.js?v=mvvkby6r';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 const TOKEN_TTL = 50 * 60e3; // album tokens last 1 h; refresh before that

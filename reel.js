@@ -3,7 +3,7 @@
 // settles. Each photograph arrives in black and white and fills with colour grain by grain, like sand,
 // as it comes to rest in the frame; it drains back to grey as it leaves.
 // Everything moving is drawn in one WebGL canvas, so nothing is re-laid-out mid-motion and nothing flickers.
-import { Spring, project, rubberband, reducedMotion } from './spring.js';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkby6r';
 
 export const reelSupported = (() => {
   try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; }
