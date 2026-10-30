@@ -14,16 +14,22 @@ in vec2 a;
 uniform vec4 rect;   // x, y, w, h in css px, y down
 uniform vec2 view;   // canvas size in css px
 out vec2 uv;
+out vec2 pix;        // position on the stage, css px
 void main() {
   uv = a;
-  vec2 p = (rect.xy + a * rect.zw) / view * 2.0 - 1.0;
+  pix = rect.xy + a * rect.zw;
+  vec2 p = pix / view * 2.0 - 1.0;
   gl_Position = vec4(p.x, -p.y, 0.0, 1.0);
 }`;
 
 const FRAG = `#version 300 es
 precision highp float;
 in vec2 uv;
+in vec2 pix;
 uniform sampler2D tex;
+uniform vec2 view;
+uniform vec4 win;     // the frame's window on the stage: x, y, w, h (css px)
+uniform float winR, faint;
 uniform int mode;     // 0 shadow, 1 flat placeholder, 2 photograph
 uniform vec2 size;    // rect size in css px
 uniform float radius, fill, alpha, grain, seed, shade;
@@ -32,23 +38,32 @@ float hash(vec2 p) { p = fract(p * vec2(234.34, 435.345) + seed); p += dot(p, p 
 float box(vec2 q, vec2 hs, float r) { vec2 d = abs(q) - (hs - r); return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r; }
 void main() {
   vec2 q = uv * size - size * 0.5;
+  // inside the frame a photograph is at full strength; outside it shows faintly, in black and white,
+  // fading out further from the frame
+  float dw = box(pix - (win.xy + win.zw * 0.5), win.zw * 0.5, winR);
+  float inside = clamp(0.5 - dw, 0.0, 1.0);
+  float k = mix(faint * (1.0 - smoothstep(0.0, view.y * 0.42, dw)), 1.0, inside);
   if (mode == 0) {                       // a soft contact shadow, drawn on a larger rect
     float d = box(q - vec2(0.0, size.y * 0.035), size * 0.5 / 1.18, radius);
     float s = 1.0 - smoothstep(-size.y * 0.02, size.y * 0.09, d);
-    o = vec4(0.0, 0.0, 0.0, s * 0.34 * alpha);
+    o = vec4(0.0, 0.0, 0.0, s * 0.34 * alpha * inside);
     return;
   }
   float edge = clamp(0.5 - box(q, size * 0.5, radius), 0.0, 1.0);
-  if (mode == 1) { o = vec4(vec3(shade), 1.0) * edge * alpha; return; }
+  if (mode == 1) { o = vec4(vec3(shade), 1.0) * edge * alpha * k; return; }
   vec3 c = texture(tex, uv).rgb;
   float g = dot(c, vec3(0.2126, 0.7152, 0.0722));
   // grains: one random threshold per tiny cell, nudged so the colour settles in from the bottom up
   float h = hash(floor(uv * size / grain)) * 0.84 + (1.0 - uv.y) * 0.16;
-  float p = fill * 1.04;
-  float on = step(h, p);
-  float glint = on * (1.0 - smoothstep(0.0, 0.05, p - h)) * (1.0 - fill); // a grain sparkles as it lands
-  vec3 col = mix(vec3(g), c, on) + glint * 0.22;
-  o = vec4(col, 1.0) * edge * alpha;
+  // fill runs 0..1.5: grains land up to 1, then their glow cools until 1.5
+  float p = min(fill, 1.0) * 1.04;
+  float on = step(h, p) * inside;
+  float age = fill * 1.04 - h;                                   // how long ago this grain landed
+  float glow = on * exp(-max(age, 0.0) / 0.2) * (1.0 - smoothstep(1.2, 1.5, fill));
+  float spark = 1.0 - smoothstep(0.1, 0.75, length(fract(uv * size / grain) - 0.5)); // each grain glows from its centre
+  vec3 col = mix(vec3(g), c, on);
+  col = min(col + glow * (0.5 * spark + 0.12) * (0.55 + 0.7 * c), vec3(1.0)); // lit in its own colour, cooling to the original
+  o = vec4(col, 1.0) * edge * alpha * k;
 }`;
 
 let R = null; // the open reel
@@ -63,7 +78,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
   root.setAttribute('aria-label', `${title} reel`);
   root.innerHTML = `
     <div class="reel-halo" aria-hidden="true"></div>
-    <div class="reel-frame"><canvas></canvas></div>
+    <div class="reel-frame"></div><canvas class="reel-canvas"></canvas>
     <div class="reel-cap" aria-live="polite"><p class="reel-t"></p><p class="reel-n"></p></div>
     <button class="reel-close" type="button" aria-label="Close reel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg></button>
     <p class="reel-hint" aria-hidden="true">Swipe up</p>`;
@@ -99,7 +114,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     const loc = gl.getAttribLocation(prog, 'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade']) S.u[n] = gl.getUniformLocation(prog, n);
+    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade', 'win', 'winR', 'faint']) S.u[n] = gl.getUniformLocation(prog, n);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     S.prog = prog;
@@ -111,8 +126,11 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
   // ---- sizing ----
   const resize = () => {
     S.dpr = Math.min(devicePixelRatio || 1, 2.5);
-    S.W = frameEl.clientWidth; S.H = frameEl.clientHeight; // layout size: the frame's opening zoom must not skew the canvas
-    canvas.width = Math.round(S.W * S.dpr); canvas.height = Math.round(S.H * S.dpr);
+    // layout boxes, not on-screen ones, so nothing animating can skew the drawing
+    S.W = frameEl.clientWidth; S.H = frameEl.clientHeight;          // the frame
+    S.X = frameEl.offsetLeft; S.Y = frameEl.offsetTop;              // its place on the stage
+    S.SW = root.clientWidth; S.SH = root.clientHeight;              // the stage
+    canvas.width = Math.round(S.SW * S.dpr); canvas.height = Math.round(S.SH * S.dpr);
     draw(); // redraw in the same frame the canvas was cleared, so a resize never blinks
   };
   const ro = new ResizeObserver(resize);
@@ -164,13 +182,16 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform2f(S.u.view, S.W, S.H);
-    const pos = S.pos.value, D = S.H;
-    const lo = Math.max(0, Math.floor(pos - 1)), hi = Math.min(N - 1, Math.ceil(pos + 1));
+    gl.uniform2f(S.u.view, S.SW, S.SH);
+    gl.uniform4f(S.u.win, S.X, S.Y, S.W, S.H);
+    gl.uniform1f(S.u.winR, 24);
+    gl.uniform1f(S.u.faint, 0.2);
+    const pos = S.pos.value, D = S.H, reach = Math.ceil(S.SH / D) + 1;
+    const lo = Math.max(0, Math.floor(pos - reach)), hi = Math.min(N - 1, Math.ceil(pos + reach));
     for (let i = Math.max(lo, S.floor); i <= hi; i++) {
       const s = S.slides[i], [w, h] = fit(photos[i]);
-      const cx = S.W / 2, cy = S.H / 2 + (i - pos) * D;
-      if (cy + h / 2 < -4 || cy - h / 2 > S.H + 4) continue;
+      const cx = S.X + S.W / 2, cy = S.Y + S.H / 2 + (i - pos) * D;
+      if (cy + h / 2 < -4 || cy - h / 2 > S.SH + 4) continue;
       const x = cx - w / 2, y = cy - h / 2, r = Math.min(10, w * 0.02);
       gl.uniform1f(S.u.radius, r);
       gl.uniform1f(S.u.alpha, 1);
@@ -214,8 +235,9 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
       const off = Math.abs(i - pos);
       if (off > 2.5 && s.fill === 0) return;
       // colour follows how settled the photo is in the frame: slowly in, quicker out
-      const target = Math.max(0, Math.min(1, 1 - off * 1.6));
-      const rate = reducedMotion.matches ? 99 : target > s.fill ? 0.62 : 2.4;
+      // 0..1 grains land, 1..1.5 their glow cools; settling a photo takes about two seconds
+      const target = Math.max(0, Math.min(1, 1 - off * 1.6)) * 1.5;
+      const rate = reducedMotion.matches ? 99 : target > s.fill ? 0.72 : 3.4;
       const next = target > s.fill ? Math.min(target, s.fill + rate * dt) : Math.max(target, s.fill - rate * dt);
       if (next !== s.fill) { s.fill = next; busy = true; }
       if (s.tex && s.show < 1) { s.show = Math.min(1, s.show + dt / 0.28); busy = true; }
@@ -326,7 +348,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
   }
 
   // ---- open ----
-  ro.observe(frameEl);
+  ro.observe(frameEl); ro.observe(root);
   resize();
   manage(index);
   caption(index);
