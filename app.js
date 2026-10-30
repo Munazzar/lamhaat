@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=mvvkby6r';
-import * as data from './data.js?v=mvvkby6r';
-import * as auth from './auth.js?v=mvvkby6r';
-import { openViewer, closeViewer } from './viewer.js?v=mvvkby6r';
-import './mesh.js?v=mvvkby6r';
-import { openReel, reelSupported } from './reel.js?v=mvvkby6r';
+import { decode } from './vendor/blurhash.js?v=mvvkr5we';
+import * as data from './data.js?v=mvvkr5we';
+import * as auth from './auth.js?v=mvvkr5we';
+import { openViewer, closeViewer } from './viewer.js?v=mvvkr5we';
+import './mesh.js?v=mvvkr5we';
+import { openReel, reelSupported } from './reel.js?v=mvvkr5we';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -163,6 +163,22 @@ async function renderHome() {
     return card;
   });
   const stage = h('div', { className: 'ribbon' }, cards);
+  // Tapping a card opens the photo right here, growing out of the card, rather than navigating first
+  // (a page swap under an opening photo is what made it flicker). The phone's back gesture closes it.
+  const homePhotos = [...pool].sort((x, y) => (x.n ?? 0) - (y.n ?? 0));
+  const cardOf = new Map(ringPhotos.map((p, i) => [p.h, cards[i]]));
+  cards.forEach((card, i) => card.addEventListener('click', e => {
+    e.preventDefault();
+    const pop = () => { removeEventListener('popstate', pop); closeViewer(true); };
+    history.pushState({ viewer: true }, '', location.href);
+    addEventListener('popstate', pop);
+    openViewer({
+      photos: homePhotos, index: homePhotos.indexOf(ringPhotos[i]), from: card,
+      tileFor: p => (c => c && c.style.visibility !== 'hidden' ? c : null)(cardOf.get(p.h)),
+      onIndex: () => {}, fmtDate,
+      onClose: () => { removeEventListener('popstate', pop); if (history.state?.viewer) history.back(); },
+    });
+  }));
   const headline = h('h1', { className: 'headline' },
     h('span', { className: 'w' }, 'Every'), ' ', h('span', { className: 'w' }, 'moment,'), ' ', h('em', { className: 'w' }, 'kept.'));
   const cine = h('section', { className: 'stagehead' },
@@ -260,14 +276,22 @@ function spin(stage, cards) {
       c.style.opacity = Math.min(1, (P * 0.62 - z) / (P * 0.25)).toFixed(3);
     });
   };
+  let onScreen = true;
   const frame = t => {
     const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
     if (!drag) { angle += vel * dt; vel = drift + (vel - drift) * Math.exp(-dt * 1.6); }
     place();
-    raf = stage.isConnected ? requestAnimationFrame(frame) : 0;
+    const idle = !onScreen || document.documentElement.classList.contains('viewing');
+    raf = stage.isConnected && !idle ? requestAnimationFrame(frame) : 0;
   };
+  const resume = () => { if (!raf && stage.isConnected) raf = requestAnimationFrame(t => { last = t; frame(t); }); };
+  const seen = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) resume(); });
+  seen.observe(stage);
+  const afterView = new MutationObserver(() => { if (!document.documentElement.classList.contains('viewing')) resume(); });
+  afterView.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  cleanup.push(() => { seen.disconnect(); afterView.disconnect(); });
   size(); place();
-  raf = requestAnimationFrame(t => { last = t; frame(t); });
+  resume();
   const degPerPx = () => 180 / (Math.PI * R) * 1.4;
   stage.addEventListener('pointerdown', e => {
     drag = { x: e.clientX, a: angle, samples: [{ x: e.clientX, t: performance.now() }] }; moved = false;
@@ -406,6 +430,7 @@ function swayLoop(ps) {
   // scrolling jostles the wall: frames swing against the direction of travel, each a little differently
   const onScroll = () => {
     const dy = scrollY - lastY; lastY = scrollY;
+    if (!ps[0].el.getClientRects().length) return; // the wall view isn't showing
     ps.forEach((p, i) => kick(p, Math.max(-6, Math.min(6, -dy * 0.05 * (0.7 + ((i * 13) % 5) / 8)))));
   };
   addEventListener('scroll', onScroll, { passive: true });

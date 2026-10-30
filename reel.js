@@ -3,7 +3,7 @@
 // settles. Each photograph arrives in black and white and fills with colour grain by grain, like sand,
 // as it comes to rest in the frame; it drains back to grey as it leaves.
 // Everything moving is drawn in one WebGL canvas, so nothing is re-laid-out mid-motion and nothing flickers.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkby6r';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkr5we';
 
 export const reelSupported = (() => {
   try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; }
@@ -29,7 +29,7 @@ in vec2 pix;
 uniform sampler2D tex;
 uniform vec2 view;
 uniform vec4 win;     // the frame's window on the stage: x, y, w, h (css px)
-uniform float winR, faint;
+uniform float winR, faint, pad;  // pad: how far the shadow's quad reaches past the photo (css px)
 uniform int mode;     // 0 shadow, 1 flat placeholder, 2 photograph
 uniform vec2 size;    // rect size in css px
 uniform float radius, fill, alpha, grain, seed, shade;
@@ -43,10 +43,10 @@ void main() {
   float dw = box(pix - (win.xy + win.zw * 0.5), win.zw * 0.5, winR);
   float inside = clamp(0.5 - dw, 0.0, 1.0);
   float k = mix(faint * (1.0 - smoothstep(0.0, view.y * 0.42, dw)), 1.0, inside);
-  if (mode == 0) {                       // a soft contact shadow, drawn on a larger rect
-    float d = box(q - vec2(0.0, size.y * 0.035), size * 0.5 / 1.18, radius);
-    float s = 1.0 - smoothstep(-size.y * 0.02, size.y * 0.09, d);
-    o = vec4(0.0, 0.0, 0.0, s * 0.34 * alpha * inside);
+  if (mode == 0) {                       // a soft drop shadow, fading to nothing well inside its quad
+    float d = box(q - vec2(0.0, pad * 0.3), size * 0.5 - pad, radius);
+    float s = 1.0 - smoothstep(-pad * 0.25, pad * 0.7, d);
+    o = vec4(0.0, 0.0, 0.0, s * s * 0.42 * alpha * inside);
     return;
   }
   float edge = clamp(0.5 - box(q, size * 0.5, radius), 0.0, 1.0);
@@ -114,7 +114,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     const loc = gl.getAttribLocation(prog, 'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade', 'win', 'winR', 'faint']) S.u[n] = gl.getUniformLocation(prog, n);
+    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade', 'win', 'winR', 'faint', 'pad']) S.u[n] = gl.getUniformLocation(prog, n);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     S.prog = prog;
@@ -197,8 +197,10 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
       gl.uniform1f(S.u.alpha, 1);
       // shadow
       gl.uniform1i(S.u.mode, 0);
-      gl.uniform4f(S.u.rect, x - w * 0.09, y - h * 0.09, w * 1.18, h * 1.18);
-      gl.uniform2f(S.u.size, w * 1.18, h * 1.18);
+      const pad = Math.min(48, Math.max(24, w * 0.09));
+      gl.uniform1f(S.u.pad, pad);
+      gl.uniform4f(S.u.rect, x - pad, y - pad, w + pad * 2, h + pad * 2);
+      gl.uniform2f(S.u.size, w + pad * 2, h + pad * 2);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       gl.uniform4f(S.u.rect, x, y, w, h);
       gl.uniform2f(S.u.size, w, h);
@@ -254,7 +256,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     capT.textContent = p.title || '';
     capN.textContent = `${String(i + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
     const [r, g, b] = p._rgb ??= rgbOf(p);
-    halo.style.backgroundColor = `rgb(${r} ${g} ${b})`;
+    halo.style.setProperty('--halo', `rgb(${r} ${g} ${b})`);
   }
 
   // ---- moving ----

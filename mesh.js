@@ -17,7 +17,7 @@ const ctx = cv.getContext('2d');
 let W, H, cols, rows, d, dpr, dot = '', accent = '', px = -1e4, py = -1e4, prevOff = 0;
 
 function build() {
-  dpr = Math.min(devicePixelRatio || 1, 2);
+  dpr = Math.min(devicePixelRatio || 1, 1.5);
   W = innerWidth; H = innerHeight;
   cv.width = W * dpr; cv.height = H * dpr;
   cols = Math.ceil(W / S) + 1; rows = Math.ceil(H / S) + 2;
@@ -34,9 +34,13 @@ function colors() {
   accent = cs.getPropertyValue('--accent').trim();
 }
 
+// The loop only runs while something is happening: the pointer moving, a scroll, dust settling.
+let raf = 0, busyUntil = 0, moving = false;
+function wake(ms = 1400) { busyUntil = Math.max(busyUntil, performance.now() + ms); if (!raf) raf = requestAnimationFrame(frame); }
 function frame(t) {
-  requestAnimationFrame(frame);
-  if (root.classList.contains('viewing')) return; // the photo viewer covers everything
+  raf = 0;
+  if (root.classList.contains('viewing')) { busyUntil = 0; return; } // the photo viewer covers everything
+  moving = false;
   const sy = scrollY;
   const off = -((sy * 0.12) % S);               // the grid slides at an eighth of the page's speed
   if (Math.abs(off - prevOff) > S / 2) {        // it wrapped by one row: move everyone with it, invisibly
@@ -67,7 +71,8 @@ function frame(t) {
     d[i + 4] = (d[i + 4] + (tx - d[i + 2]) * k) * damp;
     d[i + 5] = (d[i + 5] + (ty - d[i + 3]) * k) * damp;
     if (still) { d[i + 2] = tx; d[i + 3] = ty; } else { d[i + 2] += d[i + 4]; d[i + 3] += d[i + 5]; }
-    if (d[i + 6] > 0) d[i + 6] = Math.max(0, d[i + 6] - 0.0055); // about three seconds to come home
+    if (d[i + 6] > 0) { d[i + 6] = Math.max(0, d[i + 6] - 0.0055); moving = true; } // about three seconds to come home
+    if (!moving && (Math.abs(d[i + 4]) > 0.02 || Math.abs(d[i + 5]) > 0.02)) moving = true;
 
     const x = d[i + 2], y = d[i + 3];
     if (d[i + 6] > 0.04) { const s = 0.5 + (1 - d[i + 6]) * 0.6; dust.rect(x - s / 2, y - s / 2, s, s); }
@@ -84,6 +89,7 @@ function frame(t) {
   ctx.fillStyle = dot; ctx.fill(calm);
   ctx.strokeStyle = dot; ctx.lineWidth = 0.8; ctx.stroke(threads);
   ctx.globalAlpha = 0.7; ctx.fillStyle = accent; ctx.fill(dust); ctx.globalAlpha = 1;
+  if (moving || t < busyUntil) raf = requestAnimationFrame(frame);
 }
 
 function burst(x, y) {
@@ -98,7 +104,8 @@ function burst(x, y) {
   }
 }
 
-addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; }, { passive: true });
+addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; wake(); }, { passive: true });
+addEventListener('scroll', () => wake(), { passive: true });
 addEventListener('pointerleave', () => { px = py = -1e4; });
 document.addEventListener('pointerout', e => { if (!e.relatedTarget) px = py = -1e4; });
 addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') px = py = -1e4; });
@@ -106,10 +113,11 @@ addEventListener('pointerdown', e => {
   if (reduced.matches || e.button !== 0) return;
   if (e.target.closest('a, button, input, label, img, canvas:not(.mesh), .ribbon, .lb, .tile, .float, .row, .track, .hangs, .pullout, .timeline, .seg')) return;
   burst(e.clientX, e.clientY);
+  wake(3500);
 });
-addEventListener('resize', build);
-new MutationObserver(colors).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+addEventListener('resize', () => { build(); wake(); });
+new MutationObserver(() => { colors(); wake(); }).observe(root, { attributes: true, attributeFilter: ['data-theme', 'class'] });
 
 build();
 colors();
-requestAnimationFrame(frame);
+wake(2000);

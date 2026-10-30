@@ -1,8 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkby6r';
-import * as data from './data.js?v=mvvkby6r';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=mvvkr5we';
+import * as data from './data.js?v=mvvkr5we';
+import { decode } from './vendor/blurhash.js?v=mvvkr5we';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -12,7 +13,11 @@ const render = () => {
   if (!S) return;
   S.trackEl.style.transform = `translate3d(${S.track.value}px,0,0)`;
   const cur = S.slides.get(S.index);
-  if (cur) cur.frame.style.transform = `translate3d(${S.zx.value}px,${S.zy.value}px,0) scale(${S.zs.value})`;
+  if (cur) {
+    cur.frame.style.transform = `translate3d(${S.zx.value}px,${S.zy.value}px,0) scale(${S.zs.value})`;
+    const c = S.clip.value;
+    cur.frame.style.clipPath = c > 0.001 ? `inset(${(S.ci.y * c).toFixed(2)}px ${(S.ci.x * c).toFixed(2)}px round ${(S.ci.r * c).toFixed(2)}px)` : '';
+  }
   root.style.setProperty('--scrim', S.scrim.value.toFixed(3));
 };
 
@@ -31,7 +36,10 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 // Transform that puts the fitted photo exactly over a tile on the page.
 function overTile(tile) {
   const r = tile.getBoundingClientRect(), f = fit(photo());
-  return { x: r.left + r.width / 2 - f.cx, y: r.top + r.height / 2 - f.cy, s: r.width / f.w };
+  const s = Math.max(r.width / f.w, r.height / f.h);
+  const radius = parseFloat(getComputedStyle(tile).borderTopLeftRadius) || parseFloat(getComputedStyle(tile.firstElementChild || tile).borderTopLeftRadius) || 0;
+  return { x: r.left + r.width / 2 - f.cx, y: r.top + r.height / 2 - f.cy, s,
+    crop: { x: Math.max(0, (f.w - r.width / s) / 2), y: Math.max(0, (f.h - r.height / s) / 2), r: radius / s } };
 }
 
 function whenAll(springs, done) {
@@ -102,15 +110,22 @@ function ensureSlides() {
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// A 12px picture of the photo's colours, deepened and stretched over the screen: soft without a blur filter.
 function glow(p) {
-  const img = new Image(); img.alt = ''; img.src = data.src(p.v.thumb);
-  img.decode().catch(() => {}).then(() => {
-    if (!S) return;
-    S.glow.append(img);
-    requestAnimationFrame(() => img.classList.add('on'));
-    const old = [...S.glow.children].slice(0, -1);
-    setTimeout(() => old.forEach(o => o.remove()), 1600);
-  });
+  const c = document.createElement('canvas'); c.width = c.height = 12;
+  try {
+    const px = decode(p.blurhash, 12, 12), g = c.getContext('2d'), im = g.createImageData(12, 12);
+    for (let i = 0; i < px.length; i += 4) {
+      const l = (px[i] + px[i + 1] + px[i + 2]) / 3;
+      for (let k = 0; k < 3; k++) im.data[i + k] = Math.max(0, Math.min(255, (l + (px[i + k] - l) * 1.7) * 0.65)); // saturate, darken
+      im.data[i + 3] = 255;
+    }
+    g.putImageData(im, 0, 0);
+  } catch { return; }
+  S.glow.append(c);
+  requestAnimationFrame(() => c.classList.add('on'));
+  const old = [...S.glow.children].slice(0, -1);
+  setTimeout(() => old.forEach(o => o.remove()), 1600);
 }
 
 function caption() {
@@ -135,23 +150,32 @@ export function openViewer(opts) {
   S.zy = new Spring(0, { precision: 0.2, onUpdate: render });
   S.zs = new Spring(1, { precision: 0.0005, onUpdate: render });
   S.scrim = new Spring(0, { precision: 0.002, onUpdate: render });
+  S.clip = new Spring(0, { precision: 0.0005, onUpdate: render }); // 1 = cropped to the tile's shape, 0 = whole photo
+  S.ci = { x: 0, y: 0, r: 0 };
   build();
-  root.hidden = false;
   root.classList.remove('bare', 'details');
-  document.documentElement.classList.add('viewing');
   ensureSlides(); caption();
   S.returnFocus = document.activeElement;
-  S.closeBtn.focus({ preventScroll: true });
+  const s0 = S;
+  const first = S.slides.get(S.index).frame.querySelector('img');
+  Promise.race([first.decode().catch(() => {}), new Promise(r => setTimeout(r, 250))]).then(() => { if (S === s0 && !S.closing) rise(); });
+}
 
+function rise() {
+  root.hidden = false;
+  document.documentElement.classList.add('viewing');
+  S.closeBtn.focus({ preventScroll: true });
   const tile = S.tileFor(photo());
   if (S.from && tile) {
     const t = overTile(S.from);
     S.zx.set(t.x); S.zy.set(t.y); S.zs.set(t.s);
+    S.ci = t.crop; S.clip.set(1);
     tile.classList.add('away');
   } else S.zs.set(0.94);
   render();
-  // A slow, settled rise — no overshoot on something the user didn't throw.
+  // A slow, settled rise — no overshoot on something the user didn't throw. The crop opens with it.
   S.zx.to(0, { response: 0.55 }); S.zy.to(0, { response: 0.55 }); S.zs.to(1, { response: 0.55 });
+  S.clip.to(0, { response: 0.55 });
   S.scrim.to(1, { response: 0.5 });
 }
 
@@ -160,9 +184,10 @@ function goTo(i, velocity = 0) {
   if (i !== S.index) {
     S.tileFor(photo())?.classList.remove('away');
     const old = S.slides.get(S.index);
+    if (old) old.frame.style.clipPath = '';
     S.index = i;
     S.tileFor(photo())?.classList.add('away');
-    S.zx.set(0); S.zy.set(0); S.zs.set(1);
+    S.zx.set(0); S.zy.set(0); S.zs.set(1); S.clip.set(0);
     ensureSlides(); caption();
     S.onIndex(photo());
     S.track.to(-i * step(), { velocity, response: 0.5, onRest: () => old && (old.frame.style.transform = '') });
@@ -179,7 +204,7 @@ export function closeViewer(animated, velocity = {}) {
     tile?.classList.remove('away');
     root.hidden = true; root.replaceChildren();
     document.documentElement.classList.remove('viewing');
-    for (const sp of [s.track, s.zx, s.zy, s.zs, s.scrim]) sp.stop();
+    for (const sp of [s.track, s.zx, s.zy, s.zs, s.scrim, s.clip]) sp.stop();
     S = null;
     s.returnFocus?.focus?.({ preventScroll: true });
     s.onClose();
@@ -194,8 +219,9 @@ export function closeViewer(animated, velocity = {}) {
     t = overTile(tile);
   }
   if (t) {
+    s.ci = t.crop;
     whenAll([[s.zx, t.x, { velocity: velocity.x, response: 0.5 }], [s.zy, t.y, { velocity: velocity.y, response: 0.5 }],
-      [s.zs, t.s, { response: 0.5 }], [s.scrim, 0, { response: 0.42 }]], teardown);
+      [s.zs, t.s, { response: 0.5 }], [s.clip, 1, { response: 0.5 }], [s.scrim, 0, { response: 0.42 }]], teardown);
   } else {
     root.classList.add('fading');
     whenAll([[s.zs, 0.9, { response: 0.4 }], [s.scrim, 0, { response: 0.4 }]], teardown);
