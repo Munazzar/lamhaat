@@ -163,7 +163,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .ribbon.grabbing { cursor: grabbing; }
 .card3d {
   position: absolute; left: 50%; top: 50%; border-radius: 14px; overflow: hidden; background: var(--tile);
-  box-shadow: 0 30px 50px -28px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(0 0 0 / 0.04); will-change: transform; -webkit-user-drag: none;
+  box-shadow: 0 50px 70px -30px rgb(0 0 0 / 0.75), 0 18px 28px -14px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(0 0 0 / 0.05); will-change: transform; -webkit-user-drag: none;
 }
 .card3d img, .float img, .card-media img, .hero-media img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; -webkit-user-drag: none;
@@ -380,3 +380,115 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .search { background: var(--paper); backdrop-filter: none; }
   .lb-btn, .lb-nav { background: #2a2a2d; backdrop-filter: none; }
 }
+
+/* ---------- shelves: every album is a shelf, its chapters stand on it ---------- */
+:root { --plank: #f8f7f3; --plank-edge: rgb(21 21 20 / 0.12); }
+:root[data-theme="dark"] { --plank: #2e2d2a; --plank-edge: rgb(0 0 0 / 0.5); }
+.shelves { max-width: 1440px; margin: 0 auto 10vh; padding: 0 var(--gutter); }
+.shelf { margin: 0 0 8vh; }
+.shelf-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.shelf-head .num { font: 0.78rem var(--mono); color: var(--ink-3); }
+.shelf-head h3 { margin: 0; font: 400 clamp(2.2rem, 5vw, 3.8rem)/1 var(--serif); letter-spacing: -0.02em; }
+.shelf-head .meta { margin-left: auto; font: 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+/* the shelf board is painted on the scroller's own background, so it runs as far right as the books do */
+.track {
+  display: flex; align-items: flex-end; gap: clamp(18px, 2.4vw, 34px); overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 64px 6px 40px; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(to bottom, transparent calc(100% - 40px), var(--plank) calc(100% - 40px), var(--plank) calc(100% - 27px), var(--plank-edge) calc(100% - 27px), transparent calc(100% - 22px)) local,
+    radial-gradient(60% 70% at 50% 85%, color-mix(in srgb, var(--paper) 70%, transparent), transparent 70%) local;
+}
+.track::-webkit-scrollbar { display: none; }
+.book {
+  flex: none; width: clamp(150px, 19vw, 250px); aspect-ratio: 4 / 5; scroll-snap-align: start; transform-origin: 50% 100%;
+  filter: drop-shadow(0 16px 14px rgb(0 0 0 / 0.28)); transition: transform 0.7s var(--ease), opacity 0.3s;
+}
+.book .face { position: relative; display: block; width: 100%; height: 100%; border-radius: 6px; overflow: hidden; background: var(--tile); }
+.book .face > canvas, .book .face > img, .pb-front > canvas, .pb-front > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.book .face > img { opacity: 0; transition: opacity 0.9s var(--ease); }
+.book.ready .face > img { opacity: 1; }
+.b-title { position: absolute; left: 14px; right: 14px; bottom: 12px; color: #fff; font: 400 clamp(1.25rem, 2vw, 1.7rem)/1.05 var(--serif); text-align: left; text-shadow: 0 2px 14px rgb(0 0 0 / 0.55); }
+.b-title em { display: block; margin-bottom: 4px; font: 500 0.66rem var(--mono); font-style: normal; letter-spacing: 0.12em; color: #fff; opacity: 0.8; }
+@media (hover: hover) { .book:hover { transform: translateY(-12px) rotate(-1.5deg); } }
+.book:active { transform: translateY(-4px) scale(0.97); transition-duration: 0.15s; }
+.book.lifted { opacity: 0; }
+/* books pop up as the shelf scrolls them in from the right */
+@supports (animation-timeline: view()) {
+  .book { animation: pop linear both; animation-timeline: view(inline); animation-range: entry 0% entry 90%; }
+  @keyframes pop { from { scale: 0.55; opacity: 0; translate: 40px 24px; } 72% { scale: 1.05; opacity: 1; translate: 0 -4px; } to { scale: 1; translate: 0 0; } }
+}
+.timeline { display: flex; gap: 32px; overflow-x: auto; scrollbar-width: none; padding: 18px 0 4px; border-top: 1px solid var(--line); }
+.timeline a { flex: none; font: 0.72rem/1.5 var(--mono); letter-spacing: 0.04em; }
+.timeline a span { display: block; color: var(--ink-3); }
+.timeline a b { font-weight: 500; }
+@media (hover: hover) { .timeline a:hover b { color: var(--accent); } }
+
+/* the pulled-out edition: front is the photo, back lists what is inside */
+.pullout {
+  position: fixed; inset: 0; z-index: 45; display: grid; grid-template-rows: 1fr auto; justify-items: center; gap: 18px;
+  padding: calc(76px + env(safe-area-inset-top)) 16px calc(26px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--canvas) 55%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  opacity: 0; transition: opacity 0.5s var(--ease);
+}
+.pullout.on { opacity: 1; }
+.pb-stage { perspective: 1800px; width: 100%; display: grid; place-items: center; min-height: 0; }
+.pb-card { position: relative; width: min(80vw, 54vh, 440px); aspect-ratio: 4 / 5; transform-style: preserve-3d; transition: rotate 1s var(--ease); cursor: pointer; }
+.pb-card.flipped { rotate: y 180deg; }
+.pb-front, .pb-back { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 50px 90px -40px rgb(0 0 0 / 0.7); }
+.pb-front .b-title { font-size: clamp(1.8rem, 4vw, 2.6rem); left: 22px; bottom: 20px; }
+.pb-back { rotate: y 180deg; background: var(--paper); color: var(--ink); padding: 26px 26px 20px; overflow: auto; }
+.pb-back .mono { margin: 0; color: var(--accent); font-size: 0.68rem; }
+.pb-back h3 { margin: 10px 0 0; font: 400 2.4rem/1 var(--serif); letter-spacing: -0.02em; }
+.pb-back .sub { margin: 6px 0 0; font: italic 400 1.15rem var(--serif); color: var(--ink-2); }
+.pb-back ol { margin: 18px 0 0; padding: 0 0 0 1.6em; font: 0.74rem/1.9 var(--mono); color: var(--ink-2); text-transform: capitalize; }
+.pb-back .more { color: var(--ink-3); margin-top: 8px; }
+.pb-actions { display: flex; gap: 10px; }
+.pill-btn { height: 46px; padding: 0 24px; border-radius: 999px; background: var(--paper); color: var(--ink); font: 500 0.92rem var(--sans); box-shadow: 0 0 0 1px var(--line), 0 10px 24px -12px rgb(0 0 0 / 0.4); transition: transform 0.4s var(--ease); }
+.pill-btn.dark { background: var(--ink); color: var(--canvas); }
+.pill-btn:active { transform: scale(0.95); transition-duration: 0.1s; }
+@media (prefers-reduced-motion: reduce) { .pb-card { transition: none; } }
+
+/* ---------- wall: every album is a gallery wall, its chapters hang as framed pictures ---------- */
+.walls { max-width: 1440px; margin: 0 auto 10vh; padding: 0 var(--gutter); }
+.wall { margin: 0 0 10vh; }
+.plaque { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.plaque .num { font: 0.78rem var(--mono); color: var(--ink-3); }
+.plaque h3 { margin: 0; font: 400 clamp(2.2rem, 5vw, 3.8rem)/1 var(--serif); letter-spacing: -0.02em; }
+.plaque .meta { margin-left: auto; font: 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.hangs { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: clamp(28px, 5vw, 72px) clamp(24px, 4vw, 64px); padding: 48px 0 0; }
+.hang { position: relative; width: calc(clamp(130px, 17vw, 230px) * var(--w)); margin-top: var(--drop); display: flex; flex-direction: column; align-items: center; }
+/* a picture light washes the wall above each frame */
+.hang::before { content: ""; position: absolute; left: -30%; right: -30%; top: -20px; height: 85%; pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 10%, color-mix(in srgb, #fff3d6 26%, transparent), transparent 70%); opacity: 0.55; }
+[data-theme="dark"] .hang::before { opacity: 0.22; }
+.nail { position: relative; z-index: 2; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #d9d2c3, #6e665a); box-shadow: 0 2px 3px rgb(0 0 0 / 0.4); }
+.swing { position: relative; display: block; width: 100%; margin-top: -4px; transform-origin: 50% 0; will-change: rotate; }
+.cord { display: block; width: 62%; height: 26px; margin: 0 auto -2px; overflow: visible; }
+.cord path { fill: none; stroke: var(--ink-2); stroke-width: 1.2; vector-effect: non-scaling-stroke; opacity: 0.7; }
+.frame {
+  display: block; padding: 9px; border-radius: 2px;
+  background: linear-gradient(145deg, #3a332b, #16130f 60%, #2a241e); box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset, 0 28px 40px -22px rgb(0 0 0 / 0.65), 0 6px 10px -6px rgb(0 0 0 / 0.5);
+  transition: transform 0.7s var(--ease), box-shadow 0.7s var(--ease);
+}
+.mat { display: block; padding: 12%; background: #f4f2ec; box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.25); }
+.pic { position: relative; display: block; overflow: hidden; background: var(--tile); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.12); }
+.pic > canvas, .pic > img, .pb-front > canvas, .pb-front > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pic > img { opacity: 0; transition: opacity 0.9s var(--ease); }
+.hang.ready .pic > img { opacity: 1; }
+.label { margin-top: 22px; text-align: center; font: 0.68rem/1.6 var(--mono); letter-spacing: 0.04em; color: var(--ink-2); }
+.label em { font-style: normal; color: var(--accent); margin-right: 6px; }
+.label b { font: 400 1.15rem/1.2 var(--serif); letter-spacing: 0; color: var(--ink); }
+.label span { display: block; text-transform: uppercase; color: var(--ink-3); }
+@media (hover: hover) { .hang:hover .frame { transform: translateY(-4px) scale(1.02); box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset, 0 44px 60px -26px rgb(0 0 0 / 0.7), 0 8px 14px -6px rgb(0 0 0 / 0.5); } }
+.hang:active .frame { transform: scale(0.98); transition-duration: 0.15s; }
+.frame.lifted { opacity: 0; }
+@media (max-width: 600px) { .hang { width: calc(38vw * var(--w)); margin-top: calc(var(--drop) / 2); } .label b { font-size: 1rem; } }
+
+/* the album switch: Shelves, Wall, List */
+.albums { padding-top: 2vh; }
+.albums-head { max-width: 1440px; margin: 0 auto 26px; padding: 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.albums-head .eyebrow { margin: 0; }
+.seg { display: inline-flex; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 80%, transparent); box-shadow: 0 0 0 1px var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.seg button { height: 34px; padding: 0 16px; border-radius: 999px; font: 500 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); transition: background 0.4s var(--ease), color 0.4s; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--canvas); }
+@media (hover: hover) { .seg button[aria-pressed="false"]:hover { color: var(--ink); } }

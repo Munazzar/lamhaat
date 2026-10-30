@@ -104,7 +104,7 @@ document.addEventListener('pointerout', e => { if (!e.relatedTarget) px = py = -
 addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') px = py = -1e4; });
 addEventListener('pointerdown', e => {
   if (reduced.matches || e.button !== 0) return;
-  if (e.target.closest('a, button, input, label, img, canvas:not(.mesh), .ribbon, .lb, .tile, .float, .row')) return;
+  if (e.target.closest('a, button, input, label, img, canvas:not(.mesh), .ribbon, .lb, .tile, .float, .row, .track, .hangs, .pullout, .timeline, .seg')) return;
   burst(e.clientX, e.clientY);
 });
 addEventListener('resize', build);

@@ -170,7 +170,7 @@ async function renderHome() {
     stage,
     h('div', { className: 'ctas' },
       first ? h('a', { className: 'btn accent', href: `#/a/${first.id}` }, 'Enter the portfolio') : null,
-      h('a', { className: 'btn ghost', href: '#albums', onclick: e => { e.preventDefault(); view.querySelector('.index')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' }); } }, 'All albums')),
+      h('a', { className: 'btn ghost', href: '#albums', onclick: e => { e.preventDefault(); view.querySelector('.albums')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' }); } }, 'All albums')),
     h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn'));
   spin(stage, cards);
   if (slides[0]) ambient(avg(slides[0].blurhash));
@@ -188,9 +188,9 @@ async function renderHome() {
     return h('div', { className: `spot s${i}` }, inner);
   }));
 
-  // 4. albums, as an index
-  const list = h('section', { className: 'index' },
-    h('h2', { className: 'eyebrow' }, 'Albums'),
+  // 4. albums: on shelves, as gallery walls, or as a plain list. The switch remembers your choice.
+  const [shelf, wall] = await Promise.all([shelves(albums), walls(albums)]);
+  const index = h('section', { className: 'index' },
     albums.map((a, i) => {
       const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', src: a.cover ? data.src(a.cover, a.id) : '' });
       const media = h('div', { className: 'card-media' }, a.cover ? blurCanvas(a.cover.blurhash) : null, img);
@@ -203,10 +203,27 @@ async function renderHome() {
         media);
     }));
 
+  const views = { shelves: ['Shelves', shelf], wall: ['Wall', wall], list: ['List', index] };
+  let mode = 'shelves';
+  try { mode = views[localStorage.getItem('albumsView')] ? localStorage.getItem('albumsView') : mode; } catch {}
+  const seg = h('div', { className: 'seg', role: 'group', 'aria-label': 'Show albums as' },
+    Object.entries(views).map(([k, [label]]) => h('button', { type: 'button', 'aria-pressed': String(k === mode), onclick: () => show(k) }, label)));
+  const paint = () => {
+    for (const [k, [, el]] of Object.entries(views)) el.hidden = k !== mode;
+    [...seg.children].forEach((b, i) => b.setAttribute('aria-pressed', String(Object.keys(views)[i] === mode)));
+  };
+  const show = k => {
+    if (k === mode) return;
+    try { localStorage.setItem('albumsView', k); } catch {}
+    transition(() => { mode = k; paint(); });
+  };
+  paint();
+  const list = h('section', { className: 'albums' }, h('div', { className: 'albums-head' }, h('h2', { className: 'eyebrow' }, 'Albums'), seg), shelf, wall, index);
+
   view.replaceChildren(cine, scatter, list);
   if (auth.user()) view.append(h('button', { className: 'quiet', type: 'button', onclick: () => auth.signOut().then(() => location.replace(location.pathname)) }, 'Sign out'));
   parallax(floats);
-  reveal(view.querySelectorAll('.spot, .row, .eyebrow'));
+  reveal(view.querySelectorAll('.spot, .shelf-head, .plaque, .row, .eyebrow'));
   watchBar(headline, 'Lamhaat');
 }
 
@@ -218,11 +235,11 @@ function spin(stage, cards) {
   const drift = reduced.matches ? 0 : -4; // degrees per second
   let W, R, Z0, P, angle = 0, vel = drift, raf = 0, last = 0, drag = null, moved = false;
   const size = () => {
-    W = Math.min(220, Math.max(108, innerWidth * 0.14));
+    W = Math.min(320, Math.max(150, innerWidth * 0.2));
     R = ((W * 1.18) * N) / (2 * Math.PI);
     Z0 = R * 0.9; P = R * 1.0;
     stage.style.perspective = `${P}px`;
-    stage.style.height = `${W * 1.33 * 1.9}px`;
+    stage.style.height = `${W * 1.33 * 1.75}px`;
     for (const c of cards) Object.assign(c.style, { width: `${W}px`, height: `${W * 1.33}px`, marginLeft: `${-W / 2}px`, marginTop: `${-W * 0.665}px` });
   };
   const place = () => {
@@ -279,6 +296,154 @@ function reveal(els) {
   cleanup.push(() => io.disconnect());
 }
 
+// Chapters: each photo lands in the first chapter whose tags it shares; a tagless chapter catches the rest.
+function chaptersOf(manifest, entry) {
+  const ordered = [...manifest.photos].sort((a, b) => (a.n ?? 0) - (b.n ?? 0));
+  const defs = manifest.chapters?.length ? manifest.chapters : [{ title: entry.title, sub: '', tags: [] }];
+  const chapters = defs.map(d => ({ ...d, photos: [] }));
+  for (const p of ordered) (chapters.find(c => !c.tags.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
+  return { ordered, used: chapters.filter(c => c.photos.length) };
+}
+
+// ---------- shelves ----------
+// Every album is a shelf; its chapters stand on it like editions. Covers pop in as the shelf scrolls
+// sideways. Tap one and it comes off the shelf to the middle of the screen, where it can flip over
+// to show what is inside, or open.
+let pendingChapter = null; // set by "Open" so the album lands on that chapter
+
+async function shelves(albums) {
+  const loaded = (await Promise.all(albums.map(a => data.album(a).then(m => ({ a, m }), () => null)))).filter(Boolean);
+  const shelvesEl = loaded.map(({ a, m }, si) => {
+    const hi = new Set(m.highlights || []);
+    const books = chaptersOf(m, a).used.map((c, ci) => {
+      const cover = c.photos.find(p => hi.has(p.src)) || c.photos[0];
+      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.md, a.id) });
+      const book = h('button', { className: 'book', type: 'button', 'aria-label': `${c.title}, ${c.photos.length} photographs` },
+        h('span', { className: 'face' }, blurCanvas(cover.blurhash, 16, 16), img,
+          h('span', { className: 'b-title' }, h('em', {}, ROMAN[ci]), c.title)));
+      whenReady(img, () => book.classList.add('ready'));
+      book.addEventListener('click', () => pull(book, { album: a, chapter: c, index: ci, cover, img }));
+      return book;
+    });
+    return h('section', { className: 'shelf', id: `shelf-${a.id}` },
+      h('header', { className: 'shelf-head' },
+        h('span', { className: 'num' }, pad(si + 1)),
+        h('h3', {}, a.title),
+        h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`)),
+      h('div', { className: 'track' }, books));
+  });
+  const go = a => e => { e.preventDefault(); document.getElementById(`shelf-${a.id}`)?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'center' }); };
+  const timeline = h('nav', { className: 'timeline', 'aria-label': 'Albums by year' },
+    loaded.map(({ a }) => h('a', { href: `#shelf-${a.id}`, onclick: go(a) }, h('span', {}, years(a)), h('b', {}, a.title))));
+  return h('section', { className: 'shelves' }, shelvesEl, timeline);
+}
+
+const SIZES = [1.25, 0.9, 1.05, 0.8, 1.15, 0.85, 1, 0.95]; // a salon hang mixes sizes
+
+async function walls(albums) {
+  const loaded = (await Promise.all(albums.map(a => data.album(a).then(m => ({ a, m }), () => null)))).filter(Boolean);
+  const pendulums = [];
+  const wallsEl = loaded.map(({ a, m }, wi) => {
+    const hi = new Set(m.highlights || []);
+    const frames = chaptersOf(m, a).used.map((c, ci) => {
+      const cover = c.photos.find(p => hi.has(p.src)) || c.photos[0];
+      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.md, a.id) });
+      const pic = h('span', { className: 'pic' }, blurCanvas(cover.blurhash, 16, 16), img);
+      pic.style.aspectRatio = `${cover.w} / ${cover.hgt}`;
+      const cord = document.createRange().createContextualFragment('<svg class="cord" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 40 50 2 94 40" /></svg>');
+      const swing = h('span', { className: 'swing' }, cord, h('span', { className: 'frame' }, h('span', { className: 'mat' }, pic)));
+      const hang = h('button', { className: 'hang', type: 'button', 'aria-label': `${c.title}, ${c.photos.length} photographs` },
+        h('span', { className: 'nail', 'aria-hidden': 'true' }), swing,
+        h('span', { className: 'label' }, h('em', {}, ROMAN[ci]), h('b', {}, c.title), h('span', {}, `${c.photos.length} photographs`)));
+      hang.style.setProperty('--w', SIZES[ci % SIZES.length]);
+      hang.style.setProperty('--drop', `${[0, 38, 12, 54, 6, 30, 46, 18][ci % 8]}px`);
+      whenReady(img, () => hang.classList.add('ready'));
+      const pend = { el: swing, base: ((ci * 37) % 7 - 3) * 0.45, a: 0, v: 0 }; // each hangs a touch crooked
+      pend.a = pend.base;
+      swing.style.rotate = `${pend.base}deg`;
+      pendulums.push(pend);
+      hang.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') kick(pend, (e.movementX || 4) * 0.35); });
+      hang.addEventListener('click', () => pull(swing.querySelector('.frame'), { album: a, chapter: c, index: ci, cover, img }));
+      return hang;
+    });
+    return h('section', { className: 'wall', id: `wall-${a.id}` },
+      h('header', { className: 'plaque' },
+        h('span', { className: 'num' }, pad(wi + 1)),
+        h('h3', {}, a.title),
+        h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`)),
+      h('div', { className: 'hangs' }, frames));
+  });
+  swayLoop(pendulums);
+  return h('section', { className: 'walls' }, wallsEl);
+}
+
+// Pendulums: a lightly damped spring around each frame's resting tilt. The loop sleeps when everything is still.
+let swayRaf = 0, swayWake = null;
+function kick(p, dv) { if (reduced.matches) return; p.v += dv; swayWake?.(); }
+function swayLoop(ps) {
+  if (reduced.matches || !ps.length) return;
+  const w = (2 * Math.PI) / 1.7, zeta = 0.07; // about 1.7s a swing, settles over several seconds
+  let last = 0, lastY = scrollY;
+  const step = t => {
+    const dt = Math.min(0.033, (t - last) / 1000 || 0.016); last = t;
+    let moving = false;
+    for (const p of ps) {
+      p.v += (-w * w * (p.a - p.base) - 2 * zeta * w * p.v) * dt;
+      p.a += p.v * dt;
+      p.el.style.rotate = `${p.a.toFixed(3)}deg`;
+      if (Math.abs(p.v) > 0.02 || Math.abs(p.a - p.base) > 0.02) moving = true;
+    }
+    swayRaf = moving && ps[0].el.isConnected ? requestAnimationFrame(step) : 0;
+  };
+  swayWake = () => { if (!swayRaf) { last = performance.now(); swayRaf = requestAnimationFrame(step); } };
+  // scrolling jostles the wall: frames swing against the direction of travel, each a little differently
+  const onScroll = () => {
+    const dy = scrollY - lastY; lastY = scrollY;
+    ps.forEach((p, i) => kick(p, Math.max(-6, Math.min(6, -dy * 0.05 * (0.7 + ((i * 13) % 5) / 8)))));
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  cleanup.push(() => { removeEventListener('scroll', onScroll); cancelAnimationFrame(swayRaf); swayRaf = 0; swayWake = null; });
+}
+
+function pull(book, { album, chapter, index, cover, img }) {
+  const from = book.getBoundingClientRect();
+  const backFace = h('div', { className: 'pb-back' },
+    h('p', { className: 'mono' }, `${album.title}  ·  ${ROMAN[index]}`),
+    h('h3', {}, chapter.title),
+    chapter.sub ? h('p', { className: 'sub' }, chapter.sub) : null,
+    h('ol', {}, chapter.photos.slice(0, 12).map(p => h('li', {}, p.title || p.src))),
+    chapter.photos.length > 12 ? h('p', { className: 'mono more' }, `and ${chapter.photos.length - 12} more`) : null);
+  const front = h('div', { className: 'pb-front' }, blurCanvas(cover.blurhash, 16, 16), h('img', { alt: '', src: img.currentSrc || img.src }),
+    h('span', { className: 'b-title' }, h('em', {}, ROMAN[index]), chapter.title));
+  const card = h('div', { className: 'pb-card' }, front, backFace);
+  const flip = h('button', { className: 'pill-btn', type: 'button' }, 'Flip');
+  const openBtn = h('button', { className: 'pill-btn dark', type: 'button' }, 'Open');
+  const layer = h('div', { className: 'pullout', role: 'dialog', 'aria-modal': 'true', 'aria-label': chapter.title },
+    h('div', { className: 'pb-stage' }, card), h('div', { className: 'pb-actions' }, flip, openBtn));
+  document.body.append(layer);
+  book.classList.add('lifted');
+
+  const offset = (a, b) => `translate(${a.left + a.width / 2 - (b.left + b.width / 2)}px, ${a.top + a.height / 2 - (b.top + b.height / 2)}px) scale(${a.width / b.width})`;
+  if (!reduced.matches) card.animate([{ transform: offset(from, card.getBoundingClientRect()) }, { transform: 'none' }], { duration: 760, easing: 'cubic-bezier(0.2, 1.15, 0.3, 1)' });
+  requestAnimationFrame(() => layer.classList.add('on'));
+  flip.focus({ preventScroll: true });
+
+  const finish = () => { removeEventListener('keydown', key); layer.remove(); book.classList.remove('lifted'); };
+  const close = () => {
+    layer.classList.remove('on');
+    card.classList.remove('flipped');
+    if (reduced.matches) return finish();
+    card.animate([{ transform: 'none' }, { transform: offset(book.getBoundingClientRect(), card.getBoundingClientRect()) }],
+      { duration: 520, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }).finished.then(() => { finish(); book.focus({ preventScroll: true }); });
+  };
+  const key = e => { if (e.key === 'Escape') close(); };
+  addEventListener('keydown', key);
+  layer.addEventListener('click', e => { if (e.target === layer || e.target.classList.contains('pb-stage')) close(); });
+  flip.onclick = card.onclick = () => card.classList.toggle('flipped');
+  openBtn.onclick = () => { pendingChapter = index; finish(); location.hash = `#/a/${album.id}`; };
+  cleanup.push(() => layer.isConnected && finish());
+}
+
 // ---------- album ----------
 let current = null; // { entry, chapters: [{ el, grid, photos, shown }], photos (visible, in order), tiles }
 
@@ -293,12 +458,7 @@ async function renderAlbum(id) {
   view.className = 'album';
   back.hidden = false; search.hidden = false; searchInput.value = '';
 
-  const ordered = [...manifest.photos].sort((a, b) => (a.n ?? 0) - (b.n ?? 0));
-  // Chapters: each photo lands in the first chapter whose tags it shares; a tagless chapter catches the rest.
-  const defs = manifest.chapters?.length ? manifest.chapters : [{ title: entry.title, sub: '', tags: [] }];
-  const chapters = defs.map(d => ({ ...d, photos: [] }));
-  for (const p of ordered) (chapters.find(c => !c.tags.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
-  const used = chapters.filter(c => c.photos.length);
+  const { ordered, used } = chaptersOf(manifest, entry);
 
   if (entry.cover) ambient(avg(entry.cover.blurhash));
 
@@ -370,6 +530,13 @@ async function renderAlbum(id) {
   });
   search.hidden = true;
   watchBar(title, entry.title);
+  if (pendingChapter != null) {
+    const c = used[pendingChapter]; pendingChapter = null;
+    current.grid = true; stage.hidden = true; gridView.hidden = false; search.hidden = false;
+    layout(); reveal(view.querySelectorAll('.contents, .ch-head'));
+    watchBar(gridView.querySelector('.gridtitle'), entry.title);
+    requestAnimationFrame(() => c?.el.scrollIntoView({ behavior: 'instant', block: 'start' }));
+  }
 
   // Ambient light shifts to each chapter's colours as it takes the screen.
   const amb = new IntersectionObserver(es => {
