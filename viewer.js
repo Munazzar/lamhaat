@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=d7e7e4e15f';
-import * as data from './data.js?v=d7e7e4e15f';
-import { decode } from './vendor/blurhash.js?v=d7e7e4e15f';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=ac50462a3d';
+import * as data from './data.js?v=ac50462a3d';
+import { decode } from './vendor/blurhash.js?v=ac50462a3d';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -63,7 +63,10 @@ function build() {
   S.closeBtn = el('button', 'lb-btn', icon.close); S.closeBtn.setAttribute('aria-label', 'Close');
   S.count = el('span', 'lb-count');
   S.infoBtn = el('button', 'lb-btn', icon.info); S.infoBtn.setAttribute('aria-label', 'Details');
-  top.append(S.closeBtn, S.count, S.infoBtn);
+  // people and tags under the photo: shown or hidden, remembered on this device
+  S.tagBtn = el('button', 'lb-btn lb-tagbtn', '#'); S.tagBtn.setAttribute('aria-label', 'Show or hide tags');
+  const right = el('div', 'lb-right'); right.append(S.tagBtn, S.infoBtn);
+  top.append(S.closeBtn, S.count, right);
   S.prevBtn = el('button', 'lb-nav prev', icon.prev); S.prevBtn.setAttribute('aria-label', 'Previous photo');
   S.nextBtn = el('button', 'lb-nav next', icon.next); S.nextBtn.setAttribute('aria-label', 'Next photo');
   S.caption = el('div', 'lb-caption');
@@ -75,6 +78,15 @@ function build() {
 
   S.closeBtn.onclick = () => closeViewer(true);
   S.infoBtn.onclick = () => root.classList.toggle('details');
+  const tagsOff = () => { try { return localStorage.getItem('lamhaatTags') === 'off'; } catch { return false; } };
+  root.classList.toggle('tagsoff', tagsOff());
+  S.tagBtn.setAttribute('aria-pressed', String(!tagsOff()));
+  S.tagBtn.onclick = () => {
+    const off = !root.classList.contains('tagsoff');
+    root.classList.toggle('tagsoff', off); S.tagBtn.setAttribute('aria-pressed', String(!off));
+    try { localStorage.setItem('lamhaatTags', off ? 'off' : 'on'); } catch {}
+    fitCaption();
+  };
   S.prevBtn.onclick = () => goTo(S.index - 1);
   S.nextBtn.onclick = () => goTo(S.index + 1);
 }
@@ -134,11 +146,23 @@ function caption() {
   S.count.textContent = `${S.index + 1} of ${S.photos.length}`;
   const settings = [p.f && `ƒ/${p.f}`, p.shutter, p.iso && `ISO ${p.iso}`].filter(Boolean).join('  ·  ');
   const rows = [['Camera', p.camera], ['Lens', p.lens], ['Exposure', settings], ['Size', `${p.w} × ${p.hgt}`]].filter(r => r[1]);
-  S.caption.innerHTML = `<h2>${esc(p.title)}</h2><p>${esc(S.fmtDate(p.taken))}${p.camera ? ` · ${esc(p.camera)}` : ''}</p>` +
+  const chips = [...(p.people || []).map(n => `<span class="chip person">${esc(n)}</span>`), ...(p.tags || []).map(t => `<span class="chip">#${esc(t)}</span>`)];
+  S.caption.innerHTML = (p.title ? `<h2>${esc(p.title)}</h2>` : '') + (p.desc ? `<p class="desc">${esc(p.desc)}</p>` : '') +
+    `<p>${esc(S.fmtDate(p.taken))}${p.camera ? ` · ${esc(p.camera)}` : ''}</p>` +
     `<dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` +
-    (p.tags?.length ? `<p class="tags">${p.tags.map(esc).join('  ·  ')}</p>` : '');
+    (chips.length ? `<p class="tags">${chips.join('')}</p>` : '');
+  S.tagBtn.hidden = !chips.length;
+  fitCaption();
   S.prevBtn.hidden = S.index === 0;
   S.nextBtn.hidden = S.index === S.photos.length - 1;
+}
+
+// everything under the photo stays readable and whole: the text gets smaller rather than cut off
+function fitCaption() {
+  const c = S.caption;
+  if (!c) return;
+  const max = innerHeight * 0.38;
+  for (let size = 1; size >= 0.6; size -= 0.05) { c.style.fontSize = `${size}em`; if (c.scrollHeight <= max) return; }
 }
 
 // ---------- open / navigate / close ----------

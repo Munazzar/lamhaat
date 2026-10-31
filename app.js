@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=d7e7e4e15f';
-import * as data from './data.js?v=d7e7e4e15f';
-import * as auth from './auth.js?v=d7e7e4e15f';
-import { openViewer, closeViewer } from './viewer.js?v=d7e7e4e15f';
-import './mesh.js?v=d7e7e4e15f';
-import { openReel, reelSupported } from './reel.js?v=d7e7e4e15f';
+import { decode } from './vendor/blurhash.js?v=ac50462a3d';
+import * as data from './data.js?v=ac50462a3d';
+import * as auth from './auth.js?v=ac50462a3d';
+import { openViewer, closeViewer } from './viewer.js?v=ac50462a3d';
+import './mesh.js?v=ac50462a3d';
+import { openReel, reelSupported } from './reel.js?v=ac50462a3d';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -238,7 +238,8 @@ async function renderHome() {
   const list = h('section', { className: 'albums' }, h('div', { className: 'albums-head' }, h('h2', { className: 'eyebrow' }, 'Albums'), seg), shelf, wall, index);
 
   view.replaceChildren(cine, scatter, list);
-  if (auth.user()) view.append(h('button', { className: 'quiet', type: 'button', onclick: () => auth.signOut().then(() => location.replace(location.pathname)) }, 'Sign out'));
+  const account = accountLine(await getCatalog());
+  if (account) view.append(account);
   parallax(floats);
   reveal(view.querySelectorAll('.spot, .shelf-head, .plaque, .row, .eyebrow'));
   watchBar(headline, 'Lamhaat');
@@ -336,7 +337,9 @@ function chaptersOf(manifest, entry) {
   const chapters = defs.map(d => ({ ...d, title: d.title || entry.title, photos: [] }));
   const byTime = defs.some(d => 'start' in d);
   const timed = p => { let i = chapters.length - 1; if (p.taken) while (i > 0 && chapters[i].start > p.taken) i--; return chapters[i]; };
-  for (const p of ordered) (byTime ? timed(p) : chapters.find(c => !c.tags?.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
+  // arranged in the desktop app: each photo already says which chapter it belongs to
+  const placed = ordered.length && ordered.every(p => Number.isInteger(p.c) && chapters[p.c]);
+  for (const p of ordered) (placed ? chapters[p.c] : byTime ? timed(p) : chapters.find(c => !c.tags?.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
   return { ordered, used: chapters.filter(c => c.photos.length) };
 }
 
@@ -365,12 +368,47 @@ async function shelves(albums) {
         h('span', { className: 'num' }, pad(si + 1)),
         h('h3', {}, a.title),
         h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`)),
-      h('div', { className: 'track' }, books));
+      slider(h('div', { className: 'track' }, books)));
   });
   const go = a => e => { e.preventDefault(); document.getElementById(`shelf-${a.id}`)?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'center' }); };
   const timeline = h('nav', { className: 'timeline', 'aria-label': 'Albums by year' },
     loaded.map(({ a }) => h('a', { href: `#shelf-${a.id}`, onclick: go(a) }, h('span', {}, years(a)), h('b', {}, a.title))));
   return h('section', { className: 'shelves' }, shelvesEl, timeline);
+}
+
+// A shelf slides sideways by touch, trackpad, Shift + wheel, dragging with the mouse, or the arrows at
+// its ends (shown only while there is more that way). A drag never counts as a click on a book.
+function slider(track) {
+  const prev = h('button', { className: 'slide prev', type: 'button', 'aria-label': 'Earlier on this shelf', hidden: true }, '‹');
+  const next = h('button', { className: 'slide next', type: 'button', 'aria-label': 'Later on this shelf', hidden: true }, '›');
+  const by = d => track.scrollBy({ left: d * track.clientWidth * 0.8, behavior: reduced.matches ? 'auto' : 'smooth' });
+  prev.onclick = () => by(-1); next.onclick = () => by(1);
+  // the shelf rests a little in from its edge (it lines the first book up past the padding), so allow for that
+  const ends = () => { prev.hidden = track.scrollLeft < 40; next.hidden = track.scrollLeft + track.clientWidth > track.scrollWidth - 40; };
+  track.addEventListener('scroll', ends, { passive: true });
+  new ResizeObserver(ends).observe(track);
+  let moved = 0;
+  track.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const x0 = e.clientX, s0 = track.scrollLeft;
+    moved = 0;
+    const move = m => {
+      moved = Math.abs(m.clientX - x0);
+      if (moved < 5) return;
+      track.classList.add('dragging'); // no snapping while held
+      track.scrollLeft = s0 - (m.clientX - x0);
+    };
+    const up = () => {
+      removeEventListener('pointermove', move); removeEventListener('pointerup', up);
+      track.classList.remove('dragging'); // lets it settle on the nearest book
+    };
+    addEventListener('pointermove', move); addEventListener('pointerup', up);
+  });
+  track.addEventListener('click', e => { if (moved >= 5) { e.stopPropagation(); e.preventDefault(); moved = 0; } }, true);
+  track.addEventListener('dragstart', e => e.preventDefault());
+  const body = h('div', { className: 'shelf-body', onpointerenter: ends }, prev, track, next);
+  requestAnimationFrame(ends); // once it is on the page
+  return body;
 }
 
 const SIZES = [1.25, 0.9, 1.05, 0.8, 1.15, 0.85, 1, 0.95]; // a salon hang mixes sizes
@@ -475,8 +513,8 @@ function pull(book, { album, chapter, index, cover, img }) {
   const key = e => { if (e.key === 'Escape') close(); };
   addEventListener('keydown', key);
   layer.addEventListener('click', e => { if (e.target === layer || e.target.classList.contains('pb-stage')) close(); });
-  flip.onclick = card.onclick = () => card.classList.toggle('flipped');
-  openBtn.onclick = () => { pendingChapter = index; finish(); location.hash = `#/a/${album.id}`; };
+  flip.onclick = () => card.classList.toggle('flipped');
+  openBtn.onclick = card.onclick = () => { pendingChapter = index; finish(); location.hash = `#/a/${album.id}`; };
   cleanup.push(() => layer.isConnected && finish());
 }
 
@@ -714,38 +752,32 @@ function message(title, detail) {
   return h('section', { className: 'message' }, h('h1', {}, title), h('p', {}, detail));
 }
 
-// ---------- sign-in gate ----------
+// ---------- signing in, for private albums ----------
+// Public albums need nothing. With a Worker set up, a "Sign in with Google" button shows the private
+// albums this viewer is allowed to see, beside the public ones.
+let siteCfg = null;
 async function start() {
-  const cfg = await data.config();
-  if (cfg) {
-    const user = await auth.init(cfg.firebase).catch(() => null);
-    if (!user) return gate('signin', cfg);
-    let who;
-    try { who = await data.me(); } catch (err) { return view.replaceChildren(message('Lamhaat is not reachable right now.', err.message)); }
-    if (!who.owner && !who.groups.length) return gate('denied', cfg, who.email);
-  }
+  siteCfg = await data.config();
+  if (siteCfg) await auth.init(siteCfg.firebase).catch(() => null);
   ready = true;
   route();
 }
-
-function gate(kind, cfg, email) {
-  view.className = 'gate';
-  back.hidden = true; search.hidden = true;
-  const button = h('button', { className: 'google', type: 'button' },
-    h('span', { className: 'g', 'aria-hidden': 'true' }), kind === 'signin' ? 'Continue with Google' : 'Use another account');
-  const note = h('p', { className: 'note' }, kind === 'signin'
-    ? `A private library. Only people ${cfg.ownerName || 'the owner'} has invited can see these photographs.`
-    : `You’re signed in as ${email}, which isn’t on the list yet. Ask ${cfg.ownerName || 'the owner'} to add you, then come back.`);
-  button.onclick = async () => {
-    button.disabled = true;
-    try { if (kind === 'denied') await auth.signOut(); await auth.signIn(); await start(); }
-    catch (err) { if (err.code !== 'auth/popup-closed-by-user') note.textContent = 'Sign-in didn’t finish. Please try again.'; }
-    finally { button.disabled = false; }
-  };
-  view.replaceChildren(h('section', { className: 'gate-intro' },
-    h('h1', { className: 'giant solo' }, 'Lamhaat'),
-    h('p', { className: 'urdu' , lang: 'ur', dir: 'rtl' }, 'لمحات'),
-    note, button));
+async function signInOut() {
+  try {
+    if (auth.user()) await auth.signOut(); else await auth.signIn();
+    catalogP = null; route();
+  } catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert('Sign-in didn’t finish. Please try again.'); }
+}
+// the line at the foot of the albums: who you are, and what signing in gives
+function accountLine(cat) {
+  if (!siteCfg) return null;
+  const who = cat.who, u = auth.user();
+  const text = !u ? `Family and friends: sign in to see the private albums ${siteCfg.ownerName || 'the owner'} shared with you.`
+    : who?.error ? `Signed in as ${u.email}, but the private albums can’t be reached right now.`
+    : who && !who.owner && !who.groups.length ? `Signed in as ${u.email}, which isn’t on the list yet. Ask ${siteCfg.ownerName || 'the owner'} to add you.`
+    : `Signed in as ${u.email}.`;
+  return h('section', { className: 'account' }, h('p', {}, text),
+    h('button', { className: u ? 'quiet' : 'google', type: 'button', onclick: signInOut }, u ? null : h('span', { className: 'g', 'aria-hidden': 'true' }), u ? 'Sign out' : 'Sign in with Google'));
 }
 
 start();

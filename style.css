@@ -385,26 +385,43 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 
 /* ---------- shelves: every album is a shelf, its chapters stand on it ---------- */
-:root { --plank: #f8f7f3; --plank-edge: rgb(21 21 20 / 0.12); }
-:root[data-theme="dark"] { --plank: #2e2d2a; --plank-edge: rgb(0 0 0 / 0.5); }
+:root { --wood-back: #c7aa80; --wood-top: #dcc39d; --wood-edge: #a9875c; --wood-edge-lo: #87683f; --wood-shadow: rgb(60 40 20 / 0.28); }
+:root[data-theme="dark"] { --wood-back: #33291f; --wood-top: #4a3b2b; --wood-edge: #2b2219; --wood-edge-lo: #1c1610; --wood-shadow: rgb(0 0 0 / 0.55); }
 .shelves { max-width: 1440px; margin: 0 auto 10vh; padding: 0 var(--gutter); }
 .shelf { margin: 0 0 8vh; }
 .shelf-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .shelf-head .num { font: 0.78rem var(--mono); color: var(--ink-3); }
 .shelf-head h3 { margin: 0; font: 400 clamp(2.2rem, 5vw, 3.8rem)/1 var(--serif); letter-spacing: -0.02em; }
 .shelf-head .meta { margin-left: auto; font: 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
-/* the shelf board is painted on the scroller's own background, so it runs as far right as the books do */
+/* The shelf is a wooden board seen a little from above: its top surface (lighter towards the front),
+   its front edge, and the shadow it throws on the wall. It is painted on the scroller's own background,
+   so it runs as far right as the books do; the books stand on the top surface. */
+.shelf-body { position: relative; perspective: 1600px; }
 .track {
   display: flex; align-items: flex-end; gap: clamp(18px, 2.4vw, 34px); overflow-x: auto; scroll-snap-type: x mandatory;
-  padding: 64px 6px 40px; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  padding: 64px 22px 46px; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  transform: rotateX(7deg); transform-origin: 50% 100%; /* the slight downward look */
   background:
-    linear-gradient(to bottom, transparent calc(100% - 40px), var(--plank) calc(100% - 40px), var(--plank) calc(100% - 27px), var(--plank-edge) calc(100% - 27px), transparent calc(100% - 22px)) local,
-    radial-gradient(60% 70% at 50% 85%, color-mix(in srgb, var(--paper) 70%, transparent), transparent 70%) local;
+    linear-gradient(to bottom, var(--wood-back), var(--wood-top)) local 0 calc(100% - 38px) / 100% 28px no-repeat,
+    linear-gradient(to bottom, rgb(255 255 255 / 0.16) 0 1px, var(--wood-edge) 1px, var(--wood-edge-lo)) local 0 calc(100% - 20px) / 100% 18px no-repeat,
+    linear-gradient(to bottom, var(--wood-shadow), transparent) local 0 100% / 100% 20px no-repeat;
 }
+.track.dragging { scroll-snap-type: none; cursor: grabbing; }
+.track.dragging .book { pointer-events: none; }
+@media (hover: hover) and (pointer: fine) { .track { cursor: grab; } }
+.slide { position: absolute; z-index: 3; top: calc(50% - 40px); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font: 400 1.6rem/1 var(--sans); color: var(--ink); background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 0 0 1px var(--line), 0 10px 24px -10px rgb(0 0 0 / 0.45);
+  transition: transform 0.3s var(--ease), opacity 0.3s; }
+.slide[hidden] { display: grid; opacity: 0; pointer-events: none; }
+.slide.prev { left: -6px; } .slide.next { right: -6px; }
+.slide:active { transform: scale(0.92); }
+@media (hover: none) { .slide { display: none !important; } }
 .track::-webkit-scrollbar { display: none; }
 .book {
   flex: none; width: clamp(150px, 19vw, 250px); aspect-ratio: 4 / 5; scroll-snap-align: start; transform-origin: 50% 100%;
-  filter: drop-shadow(0 16px 14px rgb(0 0 0 / 0.28)); transition: transform 0.7s var(--ease), opacity 0.3s;
+  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.3)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.25)); transition: transform 0.7s var(--ease), opacity 0.3s;
+  -webkit-user-drag: none; user-select: none;
 }
 .book .face { position: relative; display: block; width: 100%; height: 100%; border-radius: 6px; overflow: hidden; background: var(--tile); }
 .book .face > canvas, .book .face > img, .pb-front > canvas, .pb-front > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -461,9 +478,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hangs { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: clamp(28px, 5vw, 72px) clamp(24px, 4vw, 64px); padding: 48px 0 0; }
 .hang { position: relative; width: calc(clamp(130px, 17vw, 230px) * var(--w)); margin-top: var(--drop); display: flex; flex-direction: column; align-items: center; }
 /* a picture light washes the wall above each frame */
-.hang::before { content: ""; position: absolute; left: -30%; right: -30%; top: -20px; height: 85%; pointer-events: none;
-  background: radial-gradient(50% 60% at 50% 10%, color-mix(in srgb, #fff3d6 26%, transparent), transparent 70%); opacity: 0.55; }
-[data-theme="dark"] .hang::before { opacity: 0.22; }
+.hang::before { content: ""; position: absolute; left: -35%; right: -35%; top: -70px; height: calc(70% + 70px); pointer-events: none;
+  background: radial-gradient(closest-side at 50% 45%, color-mix(in srgb, #fff3d6 26%, transparent), transparent); opacity: 0.5; }
+[data-theme="dark"] .hang::before { opacity: 0.12; }
 .nail { position: relative; z-index: 2; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #d9d2c3, #6e665a); box-shadow: 0 2px 3px rgb(0 0 0 / 0.4); }
 .swing { position: relative; display: block; width: 100%; margin-top: -4px; transform-origin: 50% 0; will-change: rotate; }
 .cord { display: block; width: 62%; height: 26px; margin: 0 auto -2px; overflow: visible; }
@@ -537,3 +554,19 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .reel.moved .reel-hint { opacity: 0; }
 @keyframes nudge { 0%, 100% { translate: 0 0; } 40% { translate: 0 -6px; } }
 @media (prefers-reduced-motion: reduce) { .reel { transition: none; } .reel-hint { animation: none; } }
+
+/* titles, descriptions, people and tags under a photo; tags can be hidden */
+.lb-right { display: flex; gap: 8px; }
+.lb-tagbtn { font: 600 1.05rem var(--sans); color: #fff; }
+.lb-tagbtn[aria-pressed="false"] { opacity: 0.5; }
+.lb-tagbtn[hidden] { display: none; }
+.lb-caption { overflow: hidden; }
+.lb-caption .desc { margin: 8px 0 0; max-width: 62ch; font: 0.92em/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: rgb(255 255 255 / 0.86); white-space: pre-line; }
+.lb-caption .tags { max-height: none; opacity: 1; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 6px; text-transform: none; letter-spacing: 0; }
+.lb.tagsoff .lb-caption .tags { display: none; }
+.lb-caption .chip { text-transform: none; letter-spacing: 0; padding: 3px 10px; border-radius: 999px; background: rgb(255 255 255 / 0.12); font: 500 0.78em var(--sans); color: #fff; }
+.lb-caption .chip.person { background: rgb(238 122 67 / 0.28); }
+
+/* who you are, and signing in for private albums */
+.account { display: grid; justify-items: center; gap: 12px; margin: 48px auto 24px; padding: 0 16px; max-width: 560px; text-align: center; }
+.account p { margin: 0; color: var(--ink-2, #8a877e); font-size: 0.95rem; }
