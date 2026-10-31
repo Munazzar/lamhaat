@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-30T18:07:31.787Z",
+ "updatedAt": "2026-10-31T03:10:02.462Z",
  "albums": [
   {
    "id": "vzrzrme81h",
@@ -20,7 +20,8 @@
     "lamha-a-vzrzrme81h-media"
    ],
    "encrypted": false,
-   "manifestBlob": "ed66169cb5b1192ae6d852a45c044ce39539770c"
+   "manifestBlob": "bf68dcb59e9e2763b52736cf7b93fa59facc0393",
+   "public": true
   }
  ]
 }

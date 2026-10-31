@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=mvvmn2mi';
-import * as data from './data.js?v=mvvmn2mi';
-import * as auth from './auth.js?v=mvvmn2mi';
-import { openViewer, closeViewer } from './viewer.js?v=mvvmn2mi';
-import './mesh.js?v=mvvmn2mi';
-import { openReel, reelSupported } from './reel.js?v=mvvmn2mi';
+import { decode } from './vendor/blurhash.js?v=d7e7e4e15f';
+import * as data from './data.js?v=d7e7e4e15f';
+import * as auth from './auth.js?v=d7e7e4e15f';
+import { openViewer, closeViewer } from './viewer.js?v=d7e7e4e15f';
+import './mesh.js?v=d7e7e4e15f';
+import { openReel, reelSupported } from './reel.js?v=d7e7e4e15f';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -328,11 +328,15 @@ function reveal(els) {
 }
 
 // Chapters: each photo lands in the first chapter whose tags it shares; a tagless chapter catches the rest.
+// Chapters made in the desktop app have a start time instead: a photo goes in the last one started by
+// the time it was taken (the first starts at the beginning; undated photos go in the last).
 function chaptersOf(manifest, entry) {
   const ordered = [...manifest.photos].sort((a, b) => (a.n ?? 0) - (b.n ?? 0));
   const defs = manifest.chapters?.length ? manifest.chapters : [{ title: entry.title, sub: '', tags: [] }];
-  const chapters = defs.map(d => ({ ...d, photos: [] }));
-  for (const p of ordered) (chapters.find(c => !c.tags.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
+  const chapters = defs.map(d => ({ ...d, title: d.title || entry.title, photos: [] }));
+  const byTime = defs.some(d => 'start' in d);
+  const timed = p => { let i = chapters.length - 1; if (p.taken) while (i > 0 && chapters[i].start > p.taken) i--; return chapters[i]; };
+  for (const p of ordered) (byTime ? timed(p) : chapters.find(c => !c.tags?.length || c.tags.some(t => p.tags?.includes(t))) || chapters.at(-1)).photos.push(p);
   return { ordered, used: chapters.filter(c => c.photos.length) };
 }
 
