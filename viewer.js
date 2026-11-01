@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=bad9d4361d';
-import * as data from './data.js?v=bad9d4361d';
-import { decode } from './vendor/blurhash.js?v=bad9d4361d';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=7fa6bc2730';
+import * as data from './data.js?v=7fa6bc2730';
+import { decode } from './vendor/blurhash.js?v=7fa6bc2730';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -104,17 +104,18 @@ function slide(i) {
   hi.decode().then(() => hi.classList.add('ready')).catch(() => {});
   frame.append(lo, hi);
   s.append(frame);
-  const sl = { el: s, frame, p, full: null };
-  // on a screen bigger than the 1600 px copy, the 3000 px one at once (else it looks soft, stretched)
-  if (f.w * (devicePixelRatio || 1) > 1700 || f.h * (devicePixelRatio || 1) > 1700) loadFull(sl);
-  return sl;
+  return { el: s, frame, p, full: null };
 }
 
+// the photo being looked at, at its own full size (the 3000 px copy if it has none, or it can't be had);
+// only that one: the neighbours wait until they are the one being looked at
 function loadFull(sl) {
-  if (sl.full) return;
+  if (!sl || sl.full) return;
   const img = new Image(); img.decoding = 'async'; img.alt = '';
-  img.src = data.src(sl.p.v.full);
-  img.decode().then(() => img.classList.add('ready')).catch(() => {});
+  const show = () => img.decode().then(() => img.classList.add('ready')).catch(() => {});
+  img.onerror = () => { if (sl.p.v.orig && !img.dataset.fallback) { img.dataset.fallback = '1'; img.src = data.src(sl.p.v.full); show(); } };
+  img.src = data.src(sl.p.v.orig || sl.p.v.full);
+  show();
   sl.full = img; sl.frame.append(img);
 }
 
@@ -182,7 +183,7 @@ export function openViewer(opts) {
   S.ci = { x: 0, y: 0, r: 0 };
   build();
   root.classList.remove('bare', 'details');
-  ensureSlides(); caption();
+  ensureSlides(); caption(); loadFull(S.slides.get(S.index));
   S.returnFocus = document.activeElement;
   const s0 = S;
   const first = S.slides.get(S.index).frame.querySelector('img');
@@ -222,7 +223,7 @@ function goTo(i, velocity = 0) {
     S.index = i;
     S.tileFor(photo())?.classList.add('away');
     S.zx.set(0); S.zy.set(0); S.zs.set(1); S.clip.set(0);
-    ensureSlides(); caption();
+    ensureSlides(); caption(); loadFull(S.slides.get(S.index));
     S.onIndex(photo());
     S.track.to(-i * step(), { velocity, response: 0.5, onRest: () => old && (old.frame.style.transform = '') });
   } else S.track.to(-i * step(), { velocity, response: 0.5 });
@@ -444,5 +445,5 @@ addEventListener('resize', () => {
   if (!S || S.closing) return;
   for (const [i, sl] of S.slides) { sl.el.remove(); S.slides.delete(i); }
   S.zx.set(0); S.zy.set(0); S.zs.set(1); S.track.set(-S.index * step());
-  ensureSlides(); render();
+  ensureSlides(); loadFull(S.slides.get(S.index)); render();
 });

@@ -4,7 +4,7 @@
 // (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
 // they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
 // to the service worker (sw.js), which unseals each photo in the browser as it loads.
-import { idToken, user } from './auth.js?v=bad9d4361d';
+import { idToken, user } from './auth.js?v=7fa6bc2730';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 let cfg = null;
@@ -83,4 +83,7 @@ export async function album(entry) {
 }
 
 // a private album's files are asked for under p/<album>/..., which the service worker unseals
-export const src = (v, albumId = currentAlbum) => sealed.has(albumId) ? `p/${albumId}/${v.repo}/${v.path}` : `${MEDIA}/${v.repo}/${v.path}`;
+// full-size copies live in their own small sites next to this one (lamha-full-N, same address): ../lamha-full-N/...
+export const src = (v, albumId = currentAlbum) => v.site
+  ? (sealed.has(albumId) ? `p/${albumId}/@${v.site}/${v.path}` : `../${v.site}/${v.path}`)
+  : sealed.has(albumId) ? `p/${albumId}/${v.repo}/${v.path}` : `${MEDIA}/${v.repo}/${v.path}`;

@@ -1,6 +1,7 @@
 // The dot grid behind everything, as a live mesh. Dots lean away from the pointer and thread together where they
 // stretch; a click on empty background bursts them into dust that drifts and settles home; scrolling slides the
-// grid a little slower than the page and sends a faint ripple through it.
+// grid a little slower than the page. Scrolling only slides the canvas (on the graphics card): nothing is
+// redrawn while the page scrolls, so scrolling stays smooth.
 const S = 22;            // grid spacing, px
 const R = 120;           // pointer reach
 const BURST = 180;       // click reach
@@ -14,11 +15,11 @@ document.body.prepend(cv);
 const ctx = cv.getContext('2d');
 
 // per dot: home x, home y, x, y, vx, vy, dust (1 = just burst, 0 = settled)
-let W, H, cols, rows, d, dpr, dot = '', accent = '', px = -1e4, py = -1e4, prevOff = 0;
+let W, H, cols, rows, d, dpr, dot = '', accent = '', px = -1e4, py = -1e4;
 
 function build() {
   dpr = Math.min(devicePixelRatio || 1, 1.5);
-  W = innerWidth; H = innerHeight;
+  W = innerWidth; H = innerHeight + S; // a row taller than the screen: the canvas slides by up to one row
   cv.width = W * dpr; cv.height = H * dpr;
   cols = Math.ceil(W / S) + 1; rows = Math.ceil(H / S) + 2;
   d = new Float32Array(cols * rows * 7);
@@ -41,13 +42,7 @@ function frame(t) {
   raf = 0;
   if (root.classList.contains('viewing')) { busyUntil = 0; return; } // the photo viewer covers everything
   moving = false;
-  const sy = scrollY;
-  const off = -((sy * 0.12) % S);               // the grid slides at an eighth of the page's speed
-  if (Math.abs(off - prevOff) > S / 2) {        // it wrapped by one row: move everyone with it, invisibly
-    const shift = off > prevOff ? S : -S;
-    for (let i = 0; i < d.length; i += 7) d[i + 3] += shift;
-  }
-  prevOff = off;
+  const off = 0; // scrolling moves the canvas itself (slide() below), not the dots
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
@@ -57,9 +52,9 @@ function frame(t) {
   for (let i = 0; i < d.length; i += 7) {
     let tx = d[i], ty = d[i + 1] + off, near = false;
     if (!still) {
-      // a slow ripple, nudged along by scrolling
-      tx += Math.sin(d[i + 1] * 0.02 + t * 0.0004 + sy * 0.004) * 1.2;
-      ty += Math.cos(d[i] * 0.017 + t * 0.0003 + sy * 0.003) * 1.2;
+      // a slow ripple
+      tx += Math.sin(d[i + 1] * 0.02 + t * 0.0004) * 1.2;
+      ty += Math.cos(d[i] * 0.017 + t * 0.0003) * 1.2;
       const dx = d[i + 2] - px, dy = d[i + 3] - py, q = dx * dx + dy * dy;
       near = q < R * R * 1.4;
       if (q < R * R && q > 0.01) {
@@ -104,15 +99,19 @@ function burst(x, y) {
   }
 }
 
-addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; wake(); }, { passive: true });
-addEventListener('scroll', () => wake(), { passive: true });
+const shiftY = () => (scrollY * 0.12) % S; // the canvas is slid up by this much (slide)
+addEventListener('pointermove', e => { px = e.clientX; py = e.clientY + shiftY(); wake(); }, { passive: true });
+// the grid slides at an eighth of the page's speed, repeating every row: a transform, not a redraw
+let sliding = 0;
+const slide = () => { sliding = 0; cv.style.transform = `translate3d(0, ${(-((scrollY * 0.12) % S)).toFixed(2)}px, 0)`; };
+addEventListener('scroll', () => { sliding ||= requestAnimationFrame(slide); }, { passive: true });
 addEventListener('pointerleave', () => { px = py = -1e4; });
 document.addEventListener('pointerout', e => { if (!e.relatedTarget) px = py = -1e4; });
 addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') px = py = -1e4; });
 addEventListener('pointerdown', e => {
   if (reduced.matches || e.button !== 0) return;
   if (e.target.closest('a, button, input, label, img, canvas:not(.mesh), .ribbon, .lb, .tile, .float, .row, .track, .hangs, .pullout, .timeline, .seg')) return;
-  burst(e.clientX, e.clientY);
+  burst(e.clientX, e.clientY + shiftY());
   wake(3500);
 });
 addEventListener('resize', () => { build(); wake(); });
@@ -120,4 +119,5 @@ new MutationObserver(() => { colors(); wake(); }).observe(root, { attributes: tr
 
 build();
 colors();
+slide();
 wake(2000);

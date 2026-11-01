@@ -40,17 +40,18 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   const scope = new URL(self.registration.scope).pathname;
-  const m = /^p\/([a-z0-9]{10})\/([\w.-]+)\/(.+)$/.exec(url.pathname.slice(scope.length));
+  const m = /^p\/([a-z0-9]{10})\/(@?[\w.-]+)\/(.+)$/.exec(url.pathname.slice(scope.length));
   if (!m) return;
   e.respondWith((async () => {
     const key = await keyFor(m[1]);
     if (!key) return new Response('This album isn’t shared with you.', { status: 403 });
-    const r = await fetch(new URL(`media/${m[2]}/${m[3]}`, self.registration.scope));
+    // @lamha-full-N: a full-size copy, from its own site next to this one
+    const r = await fetch(new URL(m[2][0] === '@' ? `../${m[2].slice(1)}/${m[3]}` : `media/${m[2]}/${m[3]}`, self.registration.scope));
     if (!r.ok) return new Response('', { status: r.status });
     const buf = new Uint8Array(await r.arrayBuffer());
     try {
       const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.subarray(0, 12) }, key, buf.subarray(12));
-      return new Response(plain, { headers: { 'content-type': m[3].endsWith('.json') ? 'application/json' : 'image/avif', 'cache-control': 'private, max-age=86400' } });
+      return new Response(plain, { headers: { 'content-type': m[3].endsWith('.json') ? 'application/json' : m[2][0] === '@' ? 'image/jpeg' : 'image/avif', 'cache-control': 'private, max-age=86400' } });
     } catch { return new Response('Locked with another key.', { status: 403 }); }
   })());
 });

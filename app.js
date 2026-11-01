@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=bad9d4361d';
-import * as data from './data.js?v=bad9d4361d';
-import * as auth from './auth.js?v=bad9d4361d';
-import { openViewer, closeViewer } from './viewer.js?v=bad9d4361d';
-import './mesh.js?v=bad9d4361d';
-import { openReel, reelSupported } from './reel.js?v=bad9d4361d';
+import { decode } from './vendor/blurhash.js?v=7fa6bc2730';
+import * as data from './data.js?v=7fa6bc2730';
+import * as auth from './auth.js?v=7fa6bc2730';
+import { openViewer, closeViewer } from './viewer.js?v=7fa6bc2730';
+import './mesh.js?v=7fa6bc2730';
+import { openReel, reelSupported } from './reel.js?v=7fa6bc2730';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -76,9 +76,11 @@ function whenReady(img, fn) {
 }
 
 // The page's ambient light follows the photographs in view.
+const ambientEl = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'ambient' }));
+ambientEl.setAttribute('aria-hidden', 'true');
 function ambient(rgb) {
   const [r, g, b] = rgb.map(v => Math.round(v * 0.75 + 12));
-  document.documentElement.style.setProperty('--amb', `rgb(${r} ${g} ${b})`);
+  ambientEl.style.setProperty('--amb', `rgb(${r} ${g} ${b})`);
 }
 
 // View Transitions where the browser has them; otherwise just swap.
@@ -129,10 +131,8 @@ function parallax(els) {
   const tick = () => {
     raf = 0;
     const mid = innerHeight / 2;
-    for (const el of els) {
-      const r = el.parentElement.getBoundingClientRect();
-      el.style.transform = `translate3d(0, ${((r.top + r.height / 2 - mid) * -el._speed).toFixed(1)}px, 0)`;
-    }
+    const rects = els.map(el => el.parentElement.getBoundingClientRect()); // all reads, then all writes: one layout, not one each
+    els.forEach((el, i) => { el.style.transform = `translate3d(0, ${((rects[i].top + rects[i].height / 2 - mid) * -el._speed).toFixed(1)}px, 0)`; });
   };
   const on = () => { raf ||= requestAnimationFrame(tick); };
   addEventListener('scroll', on, { passive: true });
@@ -648,12 +648,16 @@ async function renderAlbum(id) {
   cleanup.push(() => amb.disconnect());
 
   let tag = 'All';
+  // search in plain words, like in the app: everything known about a photo (its words, people, tags, what
+  // the AI saw in it, camera, month and year); every word must match, plurals match singulars, and small
+  // words ("at", "the", "photos of") are left out, so "kids at the beach" just works
+  const STOP = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'into', 'me', 'my', 'of', 'on', 'or', 'our', 'the', 'to', 'with', 'show', 'photo', 'photos', 'picture', 'pictures', 'image', 'images', 'some', 'all']);
+  const stem = w => w.replace(/(?<=..)(es|s)$/, '');
+  const known = new Map(ordered.map(p => [p.h, [p.title, p.desc, p.src, ...(p.people || []), ...(p.tags || []), p.ai?.d, ...(p.ai?.t || []), p.camera, p.lens,
+    p.taken && new Date(p.taken).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })].filter(Boolean).join(' ').toLowerCase()]));
   const apply = () => {
-    const words = searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const match = p => {
-      const text = [p.title, p.src, ...(p.tags || []), p.camera, p.lens].join(' ').toLowerCase();
-      return (tag === 'All' || p.tags?.includes(tag)) && words.every(w => text.includes(w));
-    };
+    const words = searchInput.value.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(stem);
+    const match = p => (tag === 'All' || p.tags?.includes(tag)) && words.every(w => known.get(p.h).includes(w));
     for (const c of used) c.shown = c.photos.filter(match);
     layout(true);
   };
