@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=cdbc152053';
-import * as data from './data.js?v=cdbc152053';
-import * as auth from './auth.js?v=cdbc152053';
-import { openViewer, closeViewer } from './viewer.js?v=cdbc152053';
-import './mesh.js?v=cdbc152053';
-import { openReel, reelSupported } from './reel.js?v=cdbc152053';
+import { decode } from './vendor/blurhash.js?v=bad9d4361d';
+import * as data from './data.js?v=bad9d4361d';
+import * as auth from './auth.js?v=bad9d4361d';
+import { openViewer, closeViewer } from './viewer.js?v=bad9d4361d';
+import './mesh.js?v=bad9d4361d';
+import { openReel, reelSupported } from './reel.js?v=bad9d4361d';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -29,12 +29,17 @@ themeBtn.addEventListener('click', () => {
   const r = themeBtn.getBoundingClientRect(), W = innerWidth, H = innerHeight;
   const x = r.left + r.width / 2, y = r.top + r.height / 2, at = `at ${(x / W) * 100}% ${(y / H) * 100}%`;
   const end = (Math.hypot(Math.max(x, W - x), Math.max(y, H - y)) / (Math.hypot(W, H) / Math.SQRT2)) * 100; // % of the reference radius
+  // 'theming' also takes every other element's own transition name away (CSS), so the whole page is one
+  // picture and changes together inside the circle; nothing pops on its own
   document.documentElement.classList.add('theming');
   const t = document.startViewTransition(() => setTheme(next));
+  // quick to start, gentle to land: the page is a still picture while it runs, so it stays short
   t.ready.then(() => document.documentElement.animate(
     { clipPath: [`circle(0% ${at})`, `circle(${end}% ${at})`] },
-    { duration: 1300, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
+    { duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
   t.finished.finally(() => document.documentElement.classList.remove('theming'));
+  // if the browser can't finish the animation (a busy or hidden page), switch anyway rather than stay stuck
+  setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } document.documentElement.classList.remove('theming'); }, 2000);
 });
 
 const h = (tag, attrs = {}, ...kids) => {
@@ -498,24 +503,41 @@ function pull(book, { album, chapter, index, cover, img }) {
   document.body.append(layer);
   book.classList.add('lifted');
 
+  // the album leaves its place and comes forward: no bounce (nothing was thrown), settled and quick
   const offset = (a, b) => `translate(${a.left + a.width / 2 - (b.left + b.width / 2)}px, ${a.top + a.height / 2 - (b.top + b.height / 2)}px) scale(${a.width / b.width})`;
-  if (!reduced.matches) card.animate([{ transform: offset(from, card.getBoundingClientRect()) }, { transform: 'none' }], { duration: 760, easing: 'cubic-bezier(0.2, 1.15, 0.3, 1)' });
+  const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  let flight = null;
+  if (!reduced.matches) flight = card.animate([{ transform: offset(from, card.getBoundingClientRect()) }, { transform: 'none' }], { duration: 560, easing: ease });
   requestAnimationFrame(() => layer.classList.add('on'));
   flip.focus({ preventScroll: true });
 
-  const finish = () => { removeEventListener('keydown', key); layer.remove(); book.classList.remove('lifted'); };
+  // the album is back in its place in the same frame the card goes: no fade, so no blink between them
+  const finish = () => {
+    removeEventListener('keydown', key);
+    book.style.transition = 'none'; book.classList.remove('lifted');
+    layer.remove();
+    requestAnimationFrame(() => { book.style.transition = ''; });
+  };
+  let closing = false;
   const close = () => {
+    if (closing) return;
+    closing = true;
     layer.classList.remove('on');
-    card.classList.remove('flipped');
     if (reduced.matches) return finish();
-    card.animate([{ transform: 'none' }, { transform: offset(book.getBoundingClientRect(), card.getBoundingClientRect()) }],
-      { duration: 520, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }).finished.then(() => { finish(); book.focus({ preventScroll: true }); });
+    // it goes back the way it came, from wherever it is now (even mid-way in); turned over, it turns back as it goes
+    const now = getComputedStyle(card).transform;
+    flight?.cancel();
+    card.style.transition = `rotate 0.44s ${ease}`;
+    card.classList.remove('flipped');
+    card.animate([{ transform: now === 'none' ? 'none' : now }, { transform: offset(book.getBoundingClientRect(), card.getBoundingClientRect()) }],
+      { duration: 440, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }).finished.then(() => { finish(); book.focus({ preventScroll: true }); });
   };
   const key = e => { if (e.key === 'Escape') close(); };
   addEventListener('keydown', key);
   layer.addEventListener('click', e => { if (e.target === layer || e.target.classList.contains('pb-stage')) close(); });
   flip.onclick = () => card.classList.toggle('flipped');
-  openBtn.onclick = card.onclick = () => { pendingChapter = index; finish(); location.hash = `#/a/${album.id}`; };
+  // opening: the card stays in place while the album page fades in over it (the page change removes it)
+  openBtn.onclick = card.onclick = () => { if (closing) return; closing = true; pendingChapter = index; location.hash = `#/a/${album.id}`; };
   cleanup.push(() => layer.isConnected && finish());
 }
 

@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=cdbc152053';
-import * as data from './data.js?v=cdbc152053';
-import { decode } from './vendor/blurhash.js?v=cdbc152053';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=bad9d4361d';
+import * as data from './data.js?v=bad9d4361d';
+import { decode } from './vendor/blurhash.js?v=bad9d4361d';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -126,14 +126,14 @@ function ensureSlides() {
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-// A 12px picture of the photo's colours, deepened and stretched over the screen: soft without a blur filter.
+// A 12px picture of the photo's colours, darkened and stretched over the screen: soft without a blur filter.
 function glow(p) {
   const c = document.createElement('canvas'); c.width = c.height = 12;
   try {
     const px = decode(p.blurhash, 12, 12), g = c.getContext('2d'), im = g.createImageData(12, 12);
     for (let i = 0; i < px.length; i += 4) {
       const l = (px[i] + px[i + 1] + px[i + 2]) / 3;
-      for (let k = 0; k < 3; k++) im.data[i + k] = Math.max(0, Math.min(255, (l + (px[i + k] - l) * 1.7) * 0.65)); // saturate, darken
+      for (let k = 0; k < 3; k++) im.data[i + k] = Math.max(0, Math.min(255, (l + (px[i + k] - l) * 0.85) * 0.42)); // the photo's own colours, a little calmer and darker
       im.data[i + 3] = 255;
     }
     g.putImageData(im, 0, 0);
