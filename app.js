@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=c0b13b1c9b';
-import * as data from './data.js?v=c0b13b1c9b';
-import * as auth from './auth.js?v=c0b13b1c9b';
-import { openViewer, closeViewer } from './viewer.js?v=c0b13b1c9b';
-import './mesh.js?v=c0b13b1c9b';
-import { openReel, reelSupported } from './reel.js?v=c0b13b1c9b';
+import { decode } from './vendor/blurhash.js?v=cdbc152053';
+import * as data from './data.js?v=cdbc152053';
+import * as auth from './auth.js?v=cdbc152053';
+import { openViewer, closeViewer } from './viewer.js?v=cdbc152053';
+import './mesh.js?v=cdbc152053';
+import { openReel, reelSupported } from './reel.js?v=cdbc152053';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -44,6 +44,7 @@ const h = (tag, attrs = {}, ...kids) => {
   return el;
 };
 const year = d => d?.slice(0, 4);
+try { document.documentElement.classList.toggle('tagsoff', localStorage.getItem('lamhaatTags') === 'off'); } catch {}
 const years = a => year(a.dateStart) === year(a.dateEnd) ? year(a.dateStart) : `${year(a.dateStart)} – ${year(a.dateEnd)}`;
 const fmtDate = iso => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
@@ -648,7 +649,9 @@ function tile(p) {
   img.src = data.src(p.v.thumb);
   img.srcset = `${data.src(p.v.thumb)} 400w, ${data.src(p.v.md)} 1600w`;
   const inner = h('span', { className: 'ph' }, blurCanvas(p.blurhash, 24, 24), img);
-  const el = h('button', { className: 'tile', type: 'button', 'aria-label': p.title || 'Photo' }, inner);
+  // people and a few tags on the photo, as in the app (the # button in the large view hides them, here too)
+  const words = [...(p.people || []).map(n => h('i', { className: 'person' }, n)), ...(p.tags || []).slice(0, 3).map(t => h('i', {}, '#' + t))];
+  const el = h('button', { className: 'tile', type: 'button', 'aria-label': p.title || 'Photo' }, inner, words.length ? h('span', { className: 'twords' }, words) : null);
   el.addEventListener('click', () => {
     const i = current.photos.indexOf(p);
     if (i >= 0) open(i, el);

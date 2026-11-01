@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=c0b13b1c9b';
-import * as data from './data.js?v=c0b13b1c9b';
-import { decode } from './vendor/blurhash.js?v=c0b13b1c9b';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=cdbc152053';
+import * as data from './data.js?v=cdbc152053';
+import { decode } from './vendor/blurhash.js?v=cdbc152053';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -84,6 +84,7 @@ function build() {
   S.tagBtn.onclick = () => {
     const off = !root.classList.contains('tagsoff');
     root.classList.toggle('tagsoff', off); S.tagBtn.setAttribute('aria-pressed', String(!off));
+    document.documentElement.classList.toggle('tagsoff', off); // the grid too
     try { localStorage.setItem('lamhaatTags', off ? 'off' : 'on'); } catch {}
     fitCaption();
   };
@@ -103,7 +104,10 @@ function slide(i) {
   hi.decode().then(() => hi.classList.add('ready')).catch(() => {});
   frame.append(lo, hi);
   s.append(frame);
-  return { el: s, frame, p, full: null };
+  const sl = { el: s, frame, p, full: null };
+  // on a screen bigger than the 1600 px copy, the 3000 px one at once (else it looks soft, stretched)
+  if (f.w * (devicePixelRatio || 1) > 1700 || f.h * (devicePixelRatio || 1) > 1700) loadFull(sl);
+  return sl;
 }
 
 function loadFull(sl) {

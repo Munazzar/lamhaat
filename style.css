@@ -298,7 +298,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: transform 1.4s var(--ease), filter 1.4s var(--ease);
 }
 @media (hover: hover) {
-  .tile:hover .ph img { transform: translate(calc(var(--mx) * -12px), calc(var(--my) * -12px)) scale(1.07); filter: saturate(1.12); }
+  .tile:hover .ph img { transform: translate(calc(var(--mx) * -6px), calc(var(--my) * -6px)) scale(1.03); }
 }
 .tile:active .ph { transform: scale(0.975); transition: transform 0.15s ease-out; }
 .empty { text-align: center; color: var(--ink-3); font: 0.8rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin: 14vh 0; }
@@ -570,3 +570,37 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* who you are, and signing in for private albums */
 .account { display: grid; justify-items: center; gap: 12px; margin: 48px auto 24px; padding: 0 16px; max-width: 560px; text-align: center; }
 .account p { margin: 0; color: var(--ink-2, #8a877e); font-size: 0.95rem; }
+
+/* the words under a large photo stay while the buttons fade away; only the # button hides people and tags */
+.lb.bare .lb-caption { opacity: 1; transform: none; pointer-events: auto; }
+.lb.bare .lb-caption dl { max-height: 0; opacity: 0; margin: 0; }
+.twords { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; pointer-events: none; }
+.twords i { font: 500 0.66rem var(--sans); font-style: normal; padding: 2px 8px; border-radius: 999px; background: rgb(0 0 0 / 0.6); color: #fff; }
+.twords i.person { background: rgb(238 122 67 / 0.75); }
+html.tagsoff .twords { display: none; }
+
+/* ---------- shelf lighting: a lit cabinet. A warm strip under the board above, pools of light on the
+   back wall behind each book, light falling on the tops of the books, and the front edge catching it. ---------- */
+:root { --wall: #e6d6bd; --wall-lo: #cdb796; --lamp: 255 214 150; --lamp-pool: 0.45; --lamp-face: 0.16; }
+:root[data-theme="dark"] { --wall: #241c15; --wall-lo: #15110c; --lamp: 255 196 120; --lamp-pool: 0.38; --lamp-face: 0.2; }
+.track {
+  background:
+    /* the light strip, and its glow down the wall */
+    linear-gradient(to bottom, rgb(var(--lamp) / 0.95) 0 2px, rgb(var(--lamp) / 0.3) 2px, rgb(var(--lamp) / 0.08) 26px, transparent 90px) local 0 0 / 100% 90px no-repeat,
+    /* a pool of light on the wall behind every book */
+    radial-gradient(ellipse 46% 72% at 50% 0, rgb(var(--lamp) / var(--lamp-pool)), transparent 72%) local 22px 0 / clamp(168px, calc(19vw + 2.4vw), 284px) calc(100% - 38px) repeat-x, /* 22px: the shelf's left padding */
+    /* the board: its top (lit at the back where the light lands), its front edge, its shadow */
+    linear-gradient(to bottom, color-mix(in srgb, var(--wood-top) 70%, rgb(var(--lamp))), var(--wood-top)) local 0 calc(100% - 38px) / 100% 28px no-repeat,
+    linear-gradient(to bottom, rgb(var(--lamp) / 0.5) 0 1px, var(--wood-edge) 1px, var(--wood-edge-lo)) local 0 calc(100% - 20px) / 100% 18px no-repeat,
+    linear-gradient(to bottom, var(--wood-shadow), transparent) local 0 100% / 100% 20px no-repeat,
+    /* the back wall of the cabinet, darker low down where less light reaches */
+    linear-gradient(to bottom, var(--wall), var(--wall-lo)) local 0 0 / 100% calc(100% - 38px) no-repeat;
+  box-shadow: inset 0 14px 18px -12px rgb(0 0 0 / 0.45); /* the board above, overhanging */
+  border-radius: 4px 4px 0 0;
+}
+/* light from above on each book: brighter at the top, falling off towards the board */
+.book .face::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: linear-gradient(to bottom, rgb(var(--lamp) / var(--lamp-face)), transparent 38%, rgb(0 0 0 / 0.22)); }
+.b-title { z-index: 2; }
+.book { filter: drop-shadow(0 -2px 10px rgb(var(--lamp) / 0.18)) drop-shadow(0 10px 8px rgb(0 0 0 / 0.3)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.25)); }
+@media (prefers-reduced-transparency: reduce) { .track { box-shadow: none; } }
