@@ -1,27 +1,5 @@
 {
  "schema": 1,
- "updatedAt": "2026-11-01T04:13:28.294Z",
- "albums": [
-  {
-   "id": "vzrzrme81h",
-   "title": "Portfolio",
-   "dateStart": "2012-11-28",
-   "dateEnd": "2025-08-25",
-   "count": 110,
-   "cover": {
-    "repo": "lamha-a-vzrzrme81h-media",
-    "path": "md/2024/06/9359bf0ebfd70e71815e6f509af38766.avif",
-    "blob": "fe8521f050e9599f438462f67fbb4a8a621c0c52",
-    "w": 4592,
-    "hgt": 3448,
-    "blurhash": "L,DA[u.Tj?bGyDtRRnRkNeRoRiRi"
-   },
-   "repos": [
-    "lamha-a-vzrzrme81h-media"
-   ],
-   "encrypted": false,
-   "manifestBlob": "bf68dcb59e9e2763b52736cf7b93fa59facc0393",
-   "public": true
-  }
- ]
+ "updatedAt": "2026-11-01T04:25:44.432Z",
+ "albums": []
 }
