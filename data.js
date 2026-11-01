@@ -1,68 +1,85 @@
 // Where the gallery gets catalog, manifests and image URLs.
-// Public albums always come from next to the site (GitHub Pages; or the export staging folder via
-// scripts/dev.js). Private albums come from the Cloudflare Worker once a viewer has signed in with
-// Google and is on the owner's list (config.json names the Worker; without it there are only public albums).
-import { idToken, user } from './auth.js?v=ac50462a3d';
+// Public albums come from next to the site (GitHub Pages; or the export staging folder via scripts/dev.js).
+// Private albums sit next to the site too, but sealed, each with its own key. With Google sign-in set up
+// (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
+// they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
+// to the service worker (sw.js), which unseals each photo in the browser as it loads.
+import { idToken, user } from './auth.js?v=c0b13b1c9b';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
-const TOKEN_TTL = 50 * 60e3; // album tokens last 1 h; refresh before that
 let cfg = null;
-const tokens = new Map(); // albumId -> { t, at }
 const albums = new Map();
-const viaWorker = new Set(); // albums that come through the Worker (private ones)
+const sealed = new Set(); // private albums: their files come through the service worker
 let currentAlbum = null;
 
 export async function config() {
-  try { const r = await fetch('config.json', { cache: 'no-cache' }); if (r.ok) { const c = await r.json(); if (c.worker) cfg = c; } } catch {}
+  try { const r = await fetch('config.json', { cache: 'no-cache' }); if (r.ok) { const c = await r.json(); if (c.firebase) cfg = c; } } catch {}
+  if (cfg && 'serviceWorker' in navigator) await navigator.serviceWorker.register('sw.js').catch(() => {});
   return cfg;
 }
 
-async function api(path) {
-  const r = await fetch(cfg.worker + path, { headers: { authorization: `Bearer ${await idToken()}` } });
-  const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw Object.assign(new Error(body.error || `request failed (${r.status})`), { status: r.status });
-  return body;
+// Firestore, read as the signed-in viewer; its rules decide what comes back
+const STORE = () => `${cfg.firestore || 'https://firestore.googleapis.com/v1'}/projects/${cfg.firebase.projectId}/databases/(default)/documents`;
+const dec = v => 'stringValue' in v ? v.stringValue : 'integerValue' in v ? Number(v.integerValue) : 'doubleValue' in v ? v.doubleValue
+  : 'booleanValue' in v ? v.booleanValue : 'nullValue' in v ? null : 'arrayValue' in v ? (v.arrayValue.values || []).map(dec)
+  : 'mapValue' in v ? Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k, x]) => [k, dec(x)])) : null;
+async function doc(path) {
+  const r = await fetch(`${STORE()}/${path.split('/').map(encodeURIComponent).join('/')}`, { headers: { authorization: `Bearer ${await idToken()}` } });
+  if (r.status === 404 || r.status === 403) return null; // not there, or not for this viewer
+  if (!r.ok) throw new Error(`Private albums can’t be reached right now (${r.status}).`);
+  return dec({ mapValue: { fields: (await r.json()).fields || {} } });
 }
+async function ownerList() { // the owner may list every private album; for anyone else this is refused
+  const r = await fetch(`${STORE()}/albums?pageSize=300`, { headers: { authorization: `Bearer ${await idToken()}` } });
+  if (!r.ok) return null;
+  return ((await r.json()).documents || []).map(d => ({ id: d.name.split('/').pop(), ...dec({ mapValue: { fields: d.fields || {} } }) }));
+}
+// hand the service worker exactly the keys this viewer has now (keys of albums taken away go)
+async function keysToWorker(keys) {
+  if (!('serviceWorker' in navigator)) return;
+  const reg = await navigator.serviceWorker.ready;
+  const ch = new MessageChannel();
+  const done = new Promise(r => { ch.port1.onmessage = r; setTimeout(r, 3000); });
+  reg.active?.postMessage({ type: 'keys', keys }, [ch.port2]);
+  await done;
+}
+export const forgetKeys = () => keysToWorker({});
 
-export const me = () => api('/me');
-
-// the public albums, plus the private ones this viewer may see; `who` says whether they are on the list
+// the public albums, plus the private ones this viewer may see; `who` says how that went
 export async function catalog() {
   const res = await fetch(`${MEDIA}/lamha-catalog/catalog.json`, { cache: 'no-cache' }).catch(() => null);
   const pub = res?.ok ? await res.json() : { schema: 1, albums: [] };
   if (!cfg || !user()) { if (!res?.ok && !cfg) throw new Error('catalog unavailable'); return { ...pub, who: null }; }
-  let who = null, mine = [];
+  let mine = [], who = { email: user().email };
   try {
-    who = await me();
-    if (who.owner || who.groups.length) {
-      const cat = await api('/catalog');
-      for (const a of cat.albums) if (a.token) tokens.set(a.id, { t: a.token, at: Date.now() });
-      mine = cat.albums.filter(a => !pub.albums.some(p => p.id === a.id));
+    const all = await ownerList();
+    if (all) { mine = all.filter(a => a.id !== '_check'); who.owner = true; }
+    else {
+      const ids = new Set([...((await doc(`access/${user().email.toLowerCase()}`))?.albums || []), ...((await doc('access/_everyone'))?.albums || [])]);
+      mine = (await Promise.all([...ids].map(id => doc(`albums/${id}`).then(a => a && { id, ...a })))).filter(Boolean);
     }
-  } catch (err) { who = { error: err.message }; }
-  viaWorker.clear(); for (const a of mine) viaWorker.add(a.id);
-  return { ...pub, albums: [...pub.albums, ...mine.map(a => ({ ...a, private: true }))], who };
+    who.count = mine.length;
+  } catch (err) { who = { ...who, error: err.message }; }
+  mine = mine.filter(a => !pub.albums.some(p => p.id === a.id));
+  await keysToWorker(Object.fromEntries(mine.map(a => [a.id, a.key])));
+  sealed.clear(); for (const a of mine) sealed.add(a.id);
+  return { ...pub, albums: [...pub.albums, ...mine.map(({ key, groups, updatedAt, ...a }) => ({ ...a, encrypted: true, private: true }))], who };
 }
 
 export async function album(entry) {
   currentAlbum = entry.id;
-  const worker = viaWorker.has(entry.id);
-  const fresh = !worker || Date.now() - (tokens.get(entry.id)?.at || 0) < TOKEN_TTL;
-  if (!albums.has(entry.id) || !fresh) {
-    const p = (worker
-      ? api(`/album/${entry.id}`).then(({ manifest, token }) => { tokens.set(entry.id, { t: token, at: Date.now() }); return manifest; })
-      : fetch(`${MEDIA}/${entry.repos[0]}/manifest.json`).then(r => { if (!r.ok) throw new Error('album unavailable'); return r.json(); })
-    ).then(m => {
-      if (m.schema !== 1) throw new Error(`This album needs a newer version of Lamha (schema ${m.schema}).`);
-      return m;
-    });
+  if (!albums.has(entry.id)) {
+    const p = fetch(sealed.has(entry.id) ? `p/${entry.id}/${entry.repos[0]}/manifest.json` : `${MEDIA}/${entry.repos[0]}/manifest.json`)
+      .then(r => { if (!r.ok) throw new Error(r.status === 403 ? 'This album isn’t shared with you (any more).' : 'album unavailable'); return r.json(); })
+      .then(m => {
+        if (m.schema !== 1) throw new Error(`This album needs a newer version of Lamhaat (schema ${m.schema}).`);
+        return m;
+      });
     p.catch(() => albums.delete(entry.id));
     albums.set(entry.id, p);
   }
   return albums.get(entry.id);
 }
 
-// ponytail: image links already on the page keep their 1 h token; reopening the album refreshes them.
-export const src = (v, albumId = currentAlbum) => viaWorker.has(albumId)
-  ? `${cfg.worker}/img/${albumId}/${v.blob}.avif?t=${tokens.get(albumId)?.t}`
-  : `${MEDIA}/${v.repo}/${v.path}`;
+// a private album's files are asked for under p/<album>/..., which the service worker unseals
+export const src = (v, albumId = currentAlbum) => sealed.has(albumId) ? `p/${albumId}/${v.repo}/${v.path}` : `${MEDIA}/${v.repo}/${v.path}`;

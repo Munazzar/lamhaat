@@ -1,9 +1,9 @@
-import { decode } from './vendor/blurhash.js?v=ac50462a3d';
-import * as data from './data.js?v=ac50462a3d';
-import * as auth from './auth.js?v=ac50462a3d';
-import { openViewer, closeViewer } from './viewer.js?v=ac50462a3d';
-import './mesh.js?v=ac50462a3d';
-import { openReel, reelSupported } from './reel.js?v=ac50462a3d';
+import { decode } from './vendor/blurhash.js?v=c0b13b1c9b';
+import * as data from './data.js?v=c0b13b1c9b';
+import * as auth from './auth.js?v=c0b13b1c9b';
+import { openViewer, closeViewer } from './viewer.js?v=c0b13b1c9b';
+import './mesh.js?v=c0b13b1c9b';
+import { openReel, reelSupported } from './reel.js?v=c0b13b1c9b';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -764,7 +764,7 @@ async function start() {
 }
 async function signInOut() {
   try {
-    if (auth.user()) await auth.signOut(); else await auth.signIn();
+    if (auth.user()) { await data.forgetKeys(); await auth.signOut(); } else await auth.signIn();
     catalogP = null; route();
   } catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert('Sign-in didn’t finish. Please try again.'); }
 }
@@ -774,8 +774,8 @@ function accountLine(cat) {
   const who = cat.who, u = auth.user();
   const text = !u ? `Family and friends: sign in to see the private albums ${siteCfg.ownerName || 'the owner'} shared with you.`
     : who?.error ? `Signed in as ${u.email}, but the private albums can’t be reached right now.`
-    : who && !who.owner && !who.groups.length ? `Signed in as ${u.email}, which isn’t on the list yet. Ask ${siteCfg.ownerName || 'the owner'} to add you.`
-    : `Signed in as ${u.email}.`;
+    : who && !who.owner && !who.count ? `Signed in as ${u.email}. Nothing is shared with this account yet: ask ${siteCfg.ownerName || 'the owner'} to add you.`
+    : who?.owner ? `Signed in as ${u.email}: you see every private album.` : `Signed in as ${u.email}: ${who.count} private ${who.count === 1 ? 'album' : 'albums'} shared with you.`;
   return h('section', { className: 'account' }, h('p', {}, text),
     h('button', { className: u ? 'quiet' : 'google', type: 'button', onclick: signInOut }, u ? null : h('span', { className: 'g', 'aria-hidden': 'true' }), u ? 'Sign out' : 'Sign in with Google'));
 }
