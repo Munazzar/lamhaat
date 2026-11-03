@@ -4,7 +4,7 @@
 // (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
 // they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
 // to the service worker (sw.js), which unseals each photo in the browser as it loads.
-import { idToken, user } from './auth.js?v=7fa6bc2730';
+import { idToken, user } from './auth.js?v=b2e1734f16';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 let cfg = null;
@@ -87,3 +87,55 @@ export async function album(entry) {
 export const src = (v, albumId = currentAlbum) => v.site
   ? (sealed.has(albumId) ? `p/${albumId}/@${v.site}/${v.path}` : `../${v.site}/${v.path}`)
   : sealed.has(albumId) ? `p/${albumId}/${v.repo}/${v.path}` : `${MEDIA}/${v.repo}/${v.path}`;
+
+// ---------- favourites, comments, asking for access: the viewer's own, through Firestore (its rules decide) ----------
+const enc = v => typeof v === 'string' ? { stringValue: v } : Array.isArray(v) ? { arrayValue: { values: v.map(enc) } } : { nullValue: null };
+async function fs(method, path, fields) {
+  const r = await fetch(`${STORE()}/${path}`, { method, headers: { authorization: `Bearer ${await idToken()}`, 'content-type': 'application/json' },
+    ...(fields && { body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, enc(v)])) }) }) });
+  if (r.status === 404 && method === 'GET') return null;
+  if (!r.ok) throw new Error(r.status === 403 ? 'Not allowed.' : `Couldn’t reach the server (${r.status}).`);
+  return r.json();
+}
+// signed in, with Google sign-in set up: the things only a signed-in viewer can do
+export const social = () => !!(cfg && user());
+const me = () => user().email.toLowerCase();
+
+let favSet = null;
+export async function favourites() {
+  if (!social()) return new Set();
+  favSet ||= fs('GET', `favs/${encodeURIComponent(me())}`).then(d => new Set(d?.fields?.items ? dec(d.fields.items) : [])).catch(() => new Set());
+  return favSet;
+}
+export async function toggleFavourite(albumId, h) {
+  const set = await favourites(), k = `${albumId}/${h}`;
+  set.has(k) ? set.delete(k) : set.add(k);
+  await fs('PATCH', `favs/${encodeURIComponent(me())}`, { items: [...set] });
+  return set.has(k);
+}
+
+const commentCache = new Map();
+export function comments(albumId) {
+  if (!commentCache.has(albumId)) {
+    const p = fs('GET', `comments/${albumId}/items?pageSize=300`).then(d => (d?.documents || []).map(x => ({ id: x.name.split('/').pop(), ...dec({ mapValue: { fields: x.fields || {} } }) })).sort((a, b) => a.at.localeCompare(b.at)));
+    p.catch(() => commentCache.delete(albumId));
+    commentCache.set(albumId, p);
+  }
+  return commentCache.get(albumId);
+}
+export async function addComment(albumId, h, text) {
+  const c = { by: me(), name: user().displayName || me(), photo: h, text: text.trim().slice(0, 1000), at: new Date().toISOString() };
+  const d = await fs('POST', `comments/${albumId}/items`, c);
+  const list = await comments(albumId);
+  list.push({ id: d.name.split('/').pop(), ...c });
+  return list;
+}
+export async function deleteComment(albumId, id) {
+  await fs('DELETE', `comments/${albumId}/items/${id}`);
+  const list = await comments(albumId);
+  list.splice(list.findIndex(c => c.id === id), 1);
+  return list;
+}
+export const askForAccess = () => fs('PATCH', `requests/${encodeURIComponent(me())}`, { name: user().displayName || '', at: new Date().toISOString() });
+export const forgetSocial = () => { favSet = null; commentCache.clear(); };
+export const myEmail = () => user()?.email?.toLowerCase() || null;

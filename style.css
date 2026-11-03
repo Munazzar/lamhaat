@@ -36,6 +36,8 @@
 
 * { box-sizing: border-box; }
 html { background: var(--canvas); -webkit-text-size-adjust: 100%; overflow-x: clip; }
+/* phones: the dot grid is painted on the page itself (scrolls for free) instead of the live canvas */
+@media not ((hover: hover) and (pointer: fine)) { html { background-image: radial-gradient(var(--dot) 1px, transparent 1.4px); background-size: 22px 22px; } }
 /* no scroll lock while a photo is open: the viewer blocks touch, wheel and keys itself, and locking
    the page makes phones resize the screen (address bar) mid-animation */
 body {
@@ -631,3 +633,67 @@ html.tagsoff .twords { display: none; }
 /* lit from behind, the face is a touch darker, most at the bottom */
 .book .face::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
   background: linear-gradient(to bottom, rgb(0 0 0 / calc(var(--face-dim) * 0.4)), rgb(0 0 0 / var(--face-dim))); }
+@media (max-width: 640px) {
+  .twords { left: 6px; right: 6px; bottom: 6px; gap: 3px; }
+  .twords i { font-size: 0.6rem; padding: 1px 6px; }
+  .twords i:nth-child(n+3) { display: none; } /* two at most on a phone: the photo comes first */
+}
+
+/* ---------- phones and tablets: measured on an Android phone, these cost smooth scrolling ----------
+   tiles that slid in for 1.6 s, many at once while scrolling; the background tint blending over 2.4 s (a
+   full-screen repaint every frame); and the film grain, which a phone's sharp screen doesn't show anyway */
+@media not ((hover: hover) and (pointer: fine)) {
+  .ph { transform: none; transition: opacity 0.35s ease; }
+  .ph img { transition: none; }
+  .ambient { transition: none; }
+  body::after { display: none; }
+}
+
+/* narrowing an album: year, camera, shape */
+.refine { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 14px var(--gutter) 0; max-width: 1520px; margin: 0 auto; }
+.refine:empty { display: none; }
+.refine-pick { display: inline-flex; align-items: center; gap: 8px; }
+.refine-pick .mono { color: var(--ink-3); font-size: 0.66rem; }
+.refine-pick select { height: 34px; padding: 0 10px; border-radius: 9px; border: 0; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--line); font: 0.8rem var(--sans); }
+
+/* timeline: month by month across all albums */
+.timeline-view { max-width: 1440px; margin: 0 auto 10vh; padding: 0 var(--gutter); display: grid; gap: 34px; }
+.tl-month h3 { display: flex; align-items: baseline; gap: 14px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1 var(--serif); letter-spacing: -0.01em; }
+.tl-month h3 .mono { margin-left: auto; color: var(--ink-3); font-size: 0.66rem; }
+.tl-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(30%, 132px), 1fr)); gap: 6px; }
+.tl-photo { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: var(--tile); }
+.tl-photo > canvas, .tl-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tl-photo > img { opacity: 0; transition: opacity 0.5s ease; }
+.tl-photo.ready > img { opacity: 1; }
+@media (hover: hover) { .tl-photo > img { transition: opacity 0.5s ease, transform 0.6s var(--ease); } .tl-photo:hover > img { transform: scale(1.04); } }
+
+/* the map */
+.maplayer { position: fixed; inset: 0; z-index: 55; background: var(--canvas); }
+.mapbox { position: absolute; inset: 0; }
+.map-close { position: absolute; z-index: 1000; top: calc(14px + env(safe-area-inset-top)); right: 14px; font-size: 1.4rem; color: #fff; }
+.map-pin { position: relative; }
+.map-pin img { width: 52px; height: 52px; object-fit: cover; border-radius: 10px; border: 2px solid #fff; box-shadow: 0 6px 14px rgb(0 0 0 / 0.35); }
+.map-pin b { position: absolute; right: -6px; top: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--accent); color: #fff; font: 600 0.7rem/20px var(--sans); text-align: center; }
+
+/* favourites and comments in the large view (signed in only) */
+.lb-fav svg { fill: none; transition: fill 0.25s ease, stroke 0.25s ease, transform 0.35s var(--ease); }
+.lb-fav.on svg { fill: #e8506a; stroke: #e8506a; transform: scale(1.08); }
+.lb-com { position: relative; }
+.lb-com[data-n]:not([data-n=""])::after { content: attr(data-n); position: absolute; right: -4px; top: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font: 600 0.62rem/18px var(--sans); text-align: center; }
+.lb-talk { position: absolute; z-index: 2; right: 12px; top: calc(66px + env(safe-area-inset-top)); bottom: 12px; width: min(360px, calc(100vw - 24px)); display: none; flex-direction: column; gap: 10px;
+  padding: 16px; border-radius: 16px; overflow: auto; background: rgb(22 22 24 / 0.86); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08); color: #fff; }
+.lb.talking .lb-talk { display: flex; }
+@media (max-width: 640px) { .lb-talk { left: 8px; right: 8px; top: auto; width: auto; max-height: 60svh; bottom: calc(8px + env(safe-area-inset-bottom)); } }
+.lb-talk-head { margin: 0; font: 0.7rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgb(255 255 255 / 0.6); }
+.lb-talk-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-top: 1px solid rgb(255 255 255 / 0.08); }
+.lb-talk-row b { font: 600 0.84rem var(--sans); }
+.lb-talk-row span { font: 0.68rem var(--mono); color: rgb(255 255 255 / 0.5); }
+.lb-talk-row p { grid-column: 1 / -1; margin: 0; font: 0.9rem/1.45 var(--sans); color: rgb(255 255 255 / 0.88); white-space: pre-line; }
+.lb-talk-del { grid-column: 2; justify-self: end; font: 0.7rem var(--sans); color: rgb(255 255 255 / 0.5); text-decoration: underline; }
+.lb-talk-in { width: 100%; resize: vertical; border: 0; border-radius: 10px; padding: 10px 12px; background: rgb(255 255 255 / 0.08); color: #fff; font: 0.9rem/1.4 var(--sans); }
+.lb-talk-send { align-self: flex-end; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--accent); color: #fff; font: 600 0.82rem var(--sans); }
+/* night and day on a phone: a quick cross-fade of the two pictures */
+html.theming-fade::view-transition-old(root) { animation: 260ms ease both lamhaat-fade-out; mix-blend-mode: normal; }
+html.theming-fade::view-transition-new(root) { animation: 260ms ease both lamhaat-fade-in; mix-blend-mode: normal; }
+@keyframes lamhaat-fade-out { to { opacity: 0; } }
+@keyframes lamhaat-fade-in { from { opacity: 0; } }

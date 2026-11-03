@@ -7,70 +7,35 @@
  "chapters": [
   {
    "title": "The City",
-   "sub": "Chicago, in winter light",
-   "tags": [
-    "chicago"
-   ]
+   "sub": "Chicago, in winter light"
   },
   {
    "title": "Inland Sea",
-   "sub": "Pictured Rocks and Lake Superior, from a kayak",
-   "tags": [
-    "pictured rocks",
-    "lake superior",
-    "kayak"
-   ]
+   "sub": "Pictured Rocks and Lake Superior, from a kayak"
   },
   {
    "title": "Red Earth",
-   "sub": "Desert roads and canyons of the Southwest",
-   "tags": [
-    "desert",
-    "canyon"
-   ]
+   "sub": "Desert roads and canyons of the Southwest"
   },
   {
    "title": "High Country",
-   "sub": "Mountains, mist and alpine lakes",
-   "tags": [
-    "mountains",
-    "fog"
-   ]
+   "sub": "Mountains, mist and alpine lakes"
   },
   {
    "title": "The Turning",
-   "sub": "When the leaves go",
-   "tags": [
-    "autumn"
-   ]
+   "sub": "When the leaves go"
   },
   {
    "title": "Water & Light",
-   "sub": "Shores, falls and the last of the sun",
-   "tags": [
-    "waterfall",
-    "sunset",
-    "sunrise",
-    "lake",
-    "beach",
-    "moon"
-   ]
+   "sub": "Shores, falls and the last of the sun"
   },
   {
    "title": "Small Lives",
-   "sub": "Animals, birds and the tiny things",
-   "tags": [
-    "animal",
-    "insect",
-    "bird",
-    "spider",
-    "reptile"
-   ]
+   "sub": "Animals, birds and the tiny things"
   },
   {
    "title": "Quiet Things",
-   "sub": "Flowers, tables and everything in between",
-   "tags": []
+   "sub": "Flowers, tables and everything in between"
   }
  ],
  "highlights": [
@@ -131,19 +96,39 @@
      "type": "image/jpeg",
      "bytes": 60878,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2025/01/4d4beee4219c554ae8a632d5f99b79bb.avif",
+     "blob": "bed459dcfc75726e54865b748a1a00506fc63f37",
+     "type": "image/avif",
+     "bytes": 11723
     }
    },
    "blurhash": "L87dRIR*03xa=_WVE3oe0Noe~ARk",
-   "n": 66,
-   "q": 2
+   "n": 75,
+   "q": 2,
+   "ai": {
+    "d": "A silhouette of trees against a setting sun with a dark, moody sky.",
+    "t": [
+     "sunset",
+     "trees",
+     "silhouette",
+     "dark",
+     "sky",
+     "nature",
+     "peaceful"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "6c1d5878e142af8165e99a97d27888cc",
    "src": "neon-car-sign-dark",
    "title": "Neon car in the dark",
    "tags": [
-    "neon",
     "night",
+    "neon",
     "minimal",
     "car"
    ],
@@ -184,21 +169,41 @@
      "type": "image/jpeg",
      "bytes": 327028,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2025/08/6c1d5878e142af8165e99a97d27888cc.avif",
+     "blob": "4d61c4076c72cf8b30943c5a37019c8caf376030",
+     "type": "image/avif",
+     "bytes": 3559
     }
    },
    "blurhash": "L009gofRawf6j[fQa{fQWAfPj^fk",
-   "n": 10,
-   "q": 2
+   "n": 109,
+   "q": 2,
+   "ai": {
+    "d": "A neon sign of a car is illuminated against a dark background.",
+    "t": [
+     "neon",
+     "car",
+     "sign",
+     "dark",
+     "illuminated",
+     "artistic",
+     "abstract"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "cbfbe83236f935a3688ef54c24107aea",
    "src": "butterfly-white-celosia",
    "title": "Butterfly on celosia",
    "tags": [
+    "nature",
     "butterfly",
     "insect",
-    "flower",
-    "nature"
+    "flower"
    ],
    "taken": "2012-11-28T20:10:58.000Z",
    "w": 6000,
@@ -237,21 +242,41 @@
      "type": "image/jpeg",
      "bytes": 3038435,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2012/11/cbfbe83236f935a3688ef54c24107aea.avif",
+     "blob": "5db6ed444304c871bada1b95bc6a0afa0964d662",
+     "type": "image/avif",
+     "bytes": 41416
     }
    },
    "blurhash": "L7Fi#2iJDh?I~BWVM{tMI.W.Vus:",
-   "n": 64,
-   "q": 2
+   "n": 76,
+   "q": 2,
+   "ai": {
+    "d": "A butterfly perches on a white flower amidst green foliage.",
+    "t": [
+     "butterfly",
+     "flower",
+     "nature",
+     "serene",
+     "beauty",
+     "wildlife",
+     "peace"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "ee7a089ada36978386c7abe8d6c5aebf",
    "src": "spider-on-web-blue-sky",
    "title": "Spider on its web",
    "tags": [
-    "spider",
+    "nature",
     "insect",
-    "macro",
-    "nature"
+    "spider",
+    "macro"
    ],
    "taken": "2012-11-29T22:18:54.000Z",
    "w": 6000,
@@ -290,11 +315,31 @@
      "type": "image/jpeg",
      "bytes": 4164813,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2012/11/ee7a089ada36978386c7abe8d6c5aebf.avif",
+     "blob": "22b09d986c8787567853b967adfa188f008f890a",
+     "type": "image/avif",
+     "bytes": 28976
     }
    },
    "blurhash": "LbB7ibHXYRtUysjbX7W=N2tSkpR$",
-   "n": 62,
-   "q": 2
+   "n": 77,
+   "q": 2,
+   "ai": {
+    "d": "A spider perched on its web against a vibrant blue and green background.",
+    "t": [
+     "nature",
+     "spider",
+     "web",
+     "outdoor",
+     "summer",
+     "serene",
+     "beauty"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "62f5b4a223e4639c68ba562702c2fe20",
@@ -343,11 +388,31 @@
      "type": "image/jpeg",
      "bytes": 2913759,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2013/01/62f5b4a223e4639c68ba562702c2fe20.avif",
+     "blob": "afbb11825087f66d119b5827bdb5c6362bf63908",
+     "type": "image/avif",
+     "bytes": 24815
     }
    },
    "blurhash": "L5C~VJ}u.8={ug0fvg-8*x8_4:M{",
-   "n": 30,
-   "q": 2
+   "n": 90,
+   "q": 2,
+   "ai": {
+    "d": "A family photo with three individuals in a room, one lying down and two sitting, with a bookshelf in the background.",
+    "t": [
+     "family",
+     "indoors",
+     "room",
+     "bookshelf",
+     "people",
+     "casual",
+     "day"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "79d2f7d804483da3b027ab87262c7abc",
@@ -395,20 +460,40 @@
      "type": "image/jpeg",
      "bytes": 4240400,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2013/01/79d2f7d804483da3b027ab87262c7abc.avif",
+     "blob": "b70e7002ac7704cf5a72c96706fa986fe17ce1d0",
+     "type": "image/avif",
+     "bytes": 48154
     }
    },
    "blurhash": "LKF=Ho};V@I[S6V@RjbbOtNdV@ay",
-   "n": 33,
-   "q": 2
+   "n": 91,
+   "q": 2,
+   "ai": {
+    "d": "A motorcycle is parked on a dirt path surrounded by large rocks and sparse vegetation.",
+    "t": [
+     "motorcycle",
+     "dirt road",
+     "rocks",
+     "nature",
+     "outdoor",
+     "landscape",
+     "adventure"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "011294ba1ebe365684ff80f987df4209",
    "src": "red-bougainvillea-backlit",
    "title": "Backlit bougainvillea",
    "tags": [
+    "nature",
     "flower",
-    "moody",
-    "nature"
+    "moody"
    ],
    "taken": "2017-08-01T23:10:11.000Z",
    "w": 5184,
@@ -447,11 +532,31 @@
      "type": "image/jpeg",
      "bytes": 2273305,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2017/08/011294ba1ebe365684ff80f987df4209.avif",
+     "blob": "665b9141868691360ec6b3d8d5494d64b7303c76",
+     "type": "image/avif",
+     "bytes": 22407
     }
    },
    "blurhash": "L99tJq?u00V@~qxvD%of0LMy-otR",
-   "n": 108,
-   "q": 2
+   "n": 92,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant red flower is silhouetted against a soft, glowing light, with green leaves and a blurred background of foliage and structures.",
+    "t": [
+     "flower",
+     "silhouette",
+     "light",
+     "nature",
+     "beauty",
+     "outdoor",
+     "serene"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "1d025fb1e1b1852f0cfe9f9ee666781f",
@@ -500,20 +605,40 @@
      "type": "image/jpeg",
      "bytes": 3980026,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2017/10/1d025fb1e1b1852f0cfe9f9ee666781f.avif",
+     "blob": "bae2ecf1c04640f98e003839f9bd002f379a6962",
+     "type": "image/avif",
+     "bytes": 95187
     }
    },
    "blurhash": "LaLX9]s,%NxuxtayWCof~qofxut7",
-   "n": 65,
-   "q": 2
+   "n": 93,
+   "q": 2,
+   "ai": {
+    "d": "A basket filled with green, spiky fruits.",
+    "t": [
+     "basket",
+     "fruits",
+     "green",
+     "spiky",
+     "nature",
+     "still life",
+     "organic"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "17238f6a3291ad93dcfbe0c7f6f2bf44",
    "src": "bmx-rider-pump-track-bw",
    "title": "Pump track rider",
    "tags": [
+    "people",
     "bicycle",
     "sport",
-    "people",
     "black and white"
    ],
    "taken": "2018-07-05T22:14:27.000Z",
@@ -553,11 +678,31 @@
      "type": "image/jpeg",
      "bytes": 2716295,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2018/07/17238f6a3291ad93dcfbe0c7f6f2bf44.avif",
+     "blob": "8c5b40909430a67e462f991e79b5da470adbd3d7",
+     "type": "image/avif",
+     "bytes": 50018
     }
    },
    "blurhash": "LdFiPxayM{M{~qRjRjWB_3WBRjay",
-   "n": 31,
-   "q": 2
+   "n": 94,
+   "q": 2,
+   "ai": {
+    "d": "A person rides a BMX bike on a dirt track in a skate park.",
+    "t": [
+     "skate park",
+     "bmx",
+     "dirt track",
+     "outdoor",
+     "black and white",
+     "action",
+     "sports"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "68eace4d552feb6cf842ce9f678f4c9f",
@@ -606,11 +751,31 @@
      "type": "image/jpeg",
      "bytes": 2648158,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2019/03/68eace4d552feb6cf842ce9f678f4c9f.avif",
+     "blob": "e457425173177f295f264810a8666ef39f9e130e",
+     "type": "image/avif",
+     "bytes": 68038
     }
    },
    "blurhash": "L8I#0}xw5ky=]rVxpbyFu%rwQ-gM",
-   "n": 34,
-   "q": 2
+   "n": 95,
+   "q": 2,
+   "ai": {
+    "d": "A breakfast buffet setup with various fruits, spreads, and condiments.",
+    "t": [
+     "breakfast",
+     "buffet",
+     "fruits",
+     "spreads",
+     "table",
+     "food",
+     "family"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "2fc36d59483d1444dc8bf6dde05ff471",
@@ -659,11 +824,31 @@
      "type": "image/jpeg",
      "bytes": 8374898,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/03/2fc36d59483d1444dc8bf6dde05ff471.avif",
+     "blob": "8a9a66ace219e51590e4c0bfd3592c4318532057",
+     "type": "image/avif",
+     "bytes": 97128
     }
    },
    "blurhash": "L~HfxPtQt6ofu6s.jYoeIqoIkBj[",
-   "n": 83,
-   "q": 2
+   "n": 61,
+   "q": 2,
+   "ai": {
+    "d": "A serene lakeside scene with a clear blue sky, a paved path, and a grassy bank.",
+    "t": [
+     "lake",
+     "path",
+     "grass",
+     "trees",
+     "sky",
+     "peaceful",
+     "outdoor"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "fd7cf52c8306d3ef407519b3d60ac247",
@@ -712,20 +897,40 @@
      "type": "image/jpeg",
      "bytes": 8907305,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/04/fd7cf52c8306d3ef407519b3d60ac247.avif",
+     "blob": "4c315e8f410e1d38dd270d764d5efb9aa50f57e3",
+     "type": "image/avif",
+     "bytes": 181538
     }
    },
    "blurhash": "L8HT]S[A0x|^1iBp{tbX0YXU-2F1",
-   "n": 23,
-   "q": 2
+   "n": 96,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant indoor food court with colorful decor and various food stalls.",
+    "t": [
+     "food court",
+     "colorful",
+     "interior",
+     "vibrant",
+     "dining",
+     "market",
+     "food stalls"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "498b8dc17b33a00829503aa0b52bfb79",
    "src": "sunset-beach-waves",
    "title": "Beach sunset",
    "tags": [
+    "lake",
     "sunset",
     "beach",
-    "lake",
     "waves"
    ],
    "taken": "2021-06-03T10:22:25.000Z",
@@ -765,21 +970,42 @@
      "type": "image/jpeg",
      "bytes": 2229303,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/06/498b8dc17b33a00829503aa0b52bfb79.avif",
+     "blob": "e927f1a70f4e77358084dbb4a9367bd2ed5f0773",
+     "type": "image/avif",
+     "bytes": 35103
     }
    },
    "blurhash": "L#JaT3xsIpof~Vt6RkoeXmkCsloK",
-   "n": 68,
-   "q": 2
+   "n": 62,
+   "q": 2,
+   "ai": {
+    "d": "A serene sunset over a calm beach with gentle waves lapping the shore.",
+    "t": [
+     "beach",
+     "sunset",
+     "calm",
+     "water",
+     "horizon",
+     "peaceful",
+     "evening",
+     "nature"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "dc1df713cc7cd70eb1e11e3eeef9d606",
    "src": "pebble-beach-sunset",
    "title": "Pebble beach at sunset",
    "tags": [
+    "lake",
     "sunset",
     "beach",
-    "pebbles",
-    "lake"
+    "pebbles"
    ],
    "taken": "2021-06-22T10:01:33.000Z",
    "w": 4000,
@@ -818,11 +1044,31 @@
      "type": "image/jpeg",
      "bytes": 4099541,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/06/dc1df713cc7cd70eb1e11e3eeef9d606.avif",
+     "blob": "dd76586cde4c269dd3381512085fa8e94eed416d",
+     "type": "image/avif",
+     "bytes": 101307
     }
    },
    "blurhash": "L+Hn$[ofWCof~pofWBj[?aoff5j[",
-   "n": 70,
-   "q": 2
+   "n": 63,
+   "q": 2,
+   "ai": {
+    "d": "A pebble beach at sunset with gentle waves in the background.",
+    "t": [
+     "beach",
+     "sunset",
+     "pebbles",
+     "waves",
+     "serene",
+     "nature",
+     "landscape"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "34a559205df6564578880c46889a1b51",
@@ -871,20 +1117,40 @@
      "type": "image/jpeg",
      "bytes": 1773374,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/06/34a559205df6564578880c46889a1b51.avif",
+     "blob": "d308d206eda7df04c8c90233c0adf3b01b3cefc6",
+     "type": "image/avif",
+     "bytes": 33334
     }
    },
    "blurhash": "LiG]?ktRfQt7_Nayj[t7x]WBj[of",
-   "n": 17,
-   "q": 2
+   "n": 0,
+   "q": 2,
+   "ai": {
+    "d": "A cityscape with modern buildings and a construction crane under a cloudy sky, viewed from a reflective surface.",
+    "t": [
+     "city",
+     "architecture",
+     "cloudy",
+     "reflection",
+     "urban",
+     "skyscrapers",
+     "construction"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "9fcccde4d4bcf8547178b9d1afd2e910",
    "src": "red-ornaments-fairy-lights",
    "title": "Ornaments and fairy lights",
    "tags": [
+    "night",
     "christmas",
     "lights",
-    "night",
     "decorations"
    ],
    "taken": "2021-07-28T19:51:59.000Z",
@@ -924,11 +1190,31 @@
      "type": "image/jpeg",
      "bytes": 5997968,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/07/9fcccde4d4bcf8547178b9d1afd2e910.avif",
+     "blob": "8a528665d93f0a6c5eb1a5c21972d5ae9f31102d",
+     "type": "image/avif",
+     "bytes": 142602
     }
    },
    "blurhash": "L6D9M3Q87IKh00Yk#7q^WH$xa#PU",
-   "n": 25,
-   "q": 2
+   "n": 97,
+   "q": 2,
+   "ai": {
+    "d": "A festive indoor setting adorned with hanging lights and reflective spheres.",
+    "t": [
+     "interior",
+     "lights",
+     "decorations",
+     "festive",
+     "ceiling",
+     "spheres",
+     "illuminated"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "ef447d4159bc1a8a4946134b630e051b",
@@ -936,8 +1222,8 @@
    "title": "Red chairs",
    "tags": [
     "interior",
-    "restaurant",
-    "colourful"
+    "colourful",
+    "restaurant"
    ],
    "taken": "2021-08-02T23:19:49.000Z",
    "w": 4000,
@@ -976,11 +1262,32 @@
      "type": "image/jpeg",
      "bytes": 7150538,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2021/08/ef447d4159bc1a8a4946134b630e051b.avif",
+     "blob": "2509f84719de6013993843b0304e96cb45cd7f5d",
+     "type": "image/avif",
+     "bytes": 116239
     }
    },
    "blurhash": "LTJ7UPcu.8Y5F@KQ%L%2iwMxwuOE",
-   "n": 24,
-   "q": 2
+   "n": 98,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant and modern restaurant interior with colorful decor and exposed brick walls.",
+    "t": [
+     "restaurant",
+     "interior",
+     "vibrant",
+     "modern",
+     "colorful",
+     "exposed brick",
+     "tables",
+     "chairs"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "c7bb6da08cc94bdc9b0e5c7c879a4d71",
@@ -1029,20 +1336,41 @@
      "type": "image/jpeg",
      "bytes": 8454918,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/07/c7bb6da08cc94bdc9b0e5c7c879a4d71.avif",
+     "blob": "128e9e03cdf57428596d1c0fb659c54f560863db",
+     "type": "image/avif",
+     "bytes": 204985
     }
    },
    "blurhash": "LQDT5IxsIXWn?+R+RSoe-hWCRoWX",
-   "n": 84,
-   "q": 2
+   "n": 64,
+   "q": 2,
+   "ai": {
+    "d": "A serene waterfall cascades through a lush, green forest with a person standing near the water's edge.",
+    "t": [
+     "waterfall",
+     "forest",
+     "nature",
+     "serene",
+     "greenery",
+     "peaceful",
+     "outdoors",
+     "scenic"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "35df8c32525c3cd59ab814a466a7cbc6",
    "src": "mountain-road-green-forest",
    "title": "Mountain road",
    "tags": [
+    "forest",
     "road",
     "mountains",
-    "forest",
     "road trip"
    ],
    "taken": "2022-07-30T23:27:26.000Z",
@@ -1082,21 +1410,41 @@
      "type": "image/jpeg",
      "bytes": 6667381,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/07/35df8c32525c3cd59ab814a466a7cbc6.avif",
+     "blob": "b113b5ce70f7dd61dd4b86c31b11a071408680fc",
+     "type": "image/avif",
+     "bytes": 128981
     }
    },
    "blurhash": "LOCQ9;%MD*a$_4%NNFWU-?xvRjWU",
-   "n": 85,
-   "q": 2
+   "n": 43,
+   "q": 2,
+   "ai": {
+    "d": "A serene road winds through a lush forest under a cloudy sky.",
+    "t": [
+     "road",
+     "forest",
+     "greenery",
+     "cloudy",
+     "serene",
+     "nature",
+     "landscape"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "dc77cc195643cf5bee46f0a6589b35af",
    "src": "misty-pines-overcast",
    "title": "Pines in the mist",
    "tags": [
-    "fog",
+    "moody",
     "forest",
     "mountains",
-    "moody"
+    "fog"
    ],
    "taken": "2022-07-31T01:09:41.000Z",
    "w": 3000,
@@ -1135,21 +1483,42 @@
      "type": "image/jpeg",
      "bytes": 2536094,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/07/dc77cc195643cf5bee46f0a6589b35af.avif",
+     "blob": "9487844bd38853d39901d0338714ede629c4e66f",
+     "type": "image/avif",
+     "bytes": 24426
     }
    },
    "blurhash": "LcG+E+V@IUof~XWBRij[9Fofj[ay",
-   "n": 86,
-   "q": 2
+   "n": 44,
+   "q": 2,
+   "ai": {
+    "d": "A misty forest scene with tall evergreen trees and distant mountains under a cloudy sky.",
+    "t": [
+     "forest",
+     "trees",
+     "mist",
+     "mountains",
+     "clouds",
+     "nature",
+     "serene",
+     "landscape"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "f91ba2675fcec021ed24f5b7ddf556ab",
    "src": "green-mountain-ridges",
    "title": "Green ridges",
    "tags": [
-    "mountains",
+    "landscape",
     "forest",
-    "valley",
-    "landscape"
+    "mountains",
+    "valley"
    ],
    "taken": "2022-07-31T22:00:38.000Z",
    "w": 3264,
@@ -1188,22 +1557,42 @@
      "type": "image/jpeg",
      "bytes": 4674470,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/07/f91ba2675fcec021ed24f5b7ddf556ab.avif",
+     "blob": "b3b40b236a7e05431facd8252b0439ba67a447fa",
+     "type": "image/avif",
+     "bytes": 131278
     }
    },
    "blurhash": "LgA2Mdt8R5bH.AogWAay$+n%R*a{",
-   "n": 87,
-   "q": 2
+   "n": 45,
+   "q": 2,
+   "ai": {
+    "d": "A serene landscape of lush green mountains under a partly cloudy sky.",
+    "t": [
+     "mountains",
+     "forest",
+     "nature",
+     "peaceful",
+     "scenic",
+     "summer",
+     "landscape"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "222385dd7bee00b1c24770bb92c6fa2a",
    "src": "marina-city-river-night",
    "title": "Marina City over the river",
    "tags": [
-    "chicago",
-    "river",
     "night",
-    "city",
+    "chicago",
     "reflection",
+    "river",
+    "city",
     "architecture"
    ],
    "taken": "2022-10-02T02:50:20.000Z",
@@ -1243,20 +1632,41 @@
      "type": "image/jpeg",
      "bytes": 5217027,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/10/222385dd7bee00b1c24770bb92c6fa2a.avif",
+     "blob": "c3224ec114b1d6f3d295cde0d4a9e2d322200635",
+     "type": "image/avif",
+     "bytes": 182082
     }
    },
    "blurhash": "L29shsKhoV%e@@0i={,n010%aS+]",
-   "n": 20,
-   "q": 2
+   "n": 1,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant nighttime cityscape with illuminated skyscrapers and a reflective river.",
+    "t": [
+     "city",
+     "night",
+     "architecture",
+     "water",
+     "lights",
+     "urban",
+     "scenery",
+     "illuminated"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "20df9ecad1596ecda2ec3c72d0257b35",
    "src": "winding-road-autumn-dusk",
    "title": "Winding road at dusk",
    "tags": [
-    "autumn",
-    "road",
     "forest",
+    "road",
+    "autumn",
     "dusk"
    ],
    "taken": "2022-10-29T22:29:13.000Z",
@@ -1296,11 +1706,31 @@
      "type": "image/jpeg",
      "bytes": 3696588,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/10/20df9ecad1596ecda2ec3c72d0257b35.avif",
+     "blob": "e0d0d8b9ef040057f95d0c4f2bda05b19d5bddc2",
+     "type": "image/avif",
+     "bytes": 132822
     }
    },
    "blurhash": "LaE{IS%1D*WB~VxaIoay?uozRjj[",
-   "n": 39,
-   "q": 2
+   "n": 52,
+   "q": 2,
+   "ai": {
+    "d": "A winding road through a forest with autumn foliage at dusk.",
+    "t": [
+     "road",
+     "forest",
+     "autumn",
+     "dusk",
+     "trees",
+     "landscape",
+     "serene"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "88e780761638cc941944dde953828b87",
@@ -1308,10 +1738,10 @@
    "title": "Clear water and stones",
    "tags": [
     "lake",
+    "landscape",
     "pebbles",
     "clouds",
-    "lake superior",
-    "landscape"
+    "lake superior"
    ],
    "taken": "2022-10-30T14:43:39.000Z",
    "w": 3890,
@@ -1350,22 +1780,42 @@
      "type": "image/jpeg",
      "bytes": 3384624,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2022/10/88e780761638cc941944dde953828b87.avif",
+     "blob": "bab3cddce35d2a2068f9a2c1995fc0696456d59b",
+     "type": "image/avif",
+     "bytes": 51843
     }
    },
    "blurhash": "L@EWwibcoLof%%a~f6kBRpa#bHj[",
-   "n": 88,
-   "q": 2
+   "n": 22,
+   "q": 2,
+   "ai": {
+    "d": "A serene beach scene with clear water, pebbles, and a calm sky.",
+    "t": [
+     "beach",
+     "water",
+     "pebbles",
+     "sky",
+     "serene",
+     "nature",
+     "landscape"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "d599f0acebf48639f85687dc8fa71b5d",
    "src": "chicago-skyline-night-fog-bokeh",
    "title": "Skyline in fog",
    "tags": [
+    "night",
+    "lake",
     "chicago",
     "skyline",
-    "night",
-    "bokeh",
-    "lake"
+    "bokeh"
    ],
    "taken": "2023-03-11T01:07:29.000Z",
    "w": 3219,
@@ -1404,11 +1854,32 @@
      "type": "image/jpeg",
      "bytes": 1431351,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/03/d599f0acebf48639f85687dc8fa71b5d.avif",
+     "blob": "25e7b59bf556442b39a106bbff23c0ab9a17b924",
+     "type": "image/avif",
+     "bytes": 21151
     }
    },
    "blurhash": "L69%VA~80Lo#=txtX9WA00Iq-pRj",
-   "n": 16,
-   "q": 2
+   "n": 2,
+   "q": 2,
+   "ai": {
+    "d": "A blurry nighttime cityscape with illuminated buildings and a diamond-shaped light in the center.",
+    "t": [
+     "city",
+     "night",
+     "lights",
+     "blurry",
+     "architecture",
+     "urban",
+     "evening",
+     "scenery"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "839cd04a91d2fa0b5971c8da9cccf5b6",
@@ -1416,9 +1887,9 @@
    "title": "Roadside sunflowers",
    "tags": [
     "flower",
-    "sunflower",
     "clouds",
-    "road trip"
+    "road trip",
+    "sunflower"
    ],
    "taken": "2023-09-02T00:18:18.000Z",
    "w": 3000,
@@ -1457,11 +1928,31 @@
      "type": "image/jpeg",
      "bytes": 2964523,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/09/839cd04a91d2fa0b5971c8da9cccf5b6.avif",
+     "blob": "9c7246a4e15be5be26af38c6c11c501227800f9e",
+     "type": "image/avif",
+     "bytes": 62210
     }
    },
    "blurhash": "L:G]E,t7R,ofb~oxWBR,NhogoLa#",
-   "n": 95,
-   "q": 2
+   "n": 99,
+   "q": 2,
+   "ai": {
+    "d": "A field of sunflowers under a dramatic sky with a distant vehicle and mountains in the background.",
+    "t": [
+     "sunflowers",
+     "field",
+     "sky",
+     "mountains",
+     "landscape",
+     "vintage",
+     "beauty"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "93ce278c63ed619cddfa0d16bcb79407",
@@ -1469,10 +1960,10 @@
    "title": "Mountain lake reflection",
    "tags": [
     "lake",
-    "mountains",
+    "landscape",
     "reflection",
     "clouds",
-    "landscape"
+    "mountains"
    ],
    "taken": "2023-09-02T17:41:16.000Z",
    "w": 4000,
@@ -1511,21 +2002,42 @@
      "type": "image/jpeg",
      "bytes": 3449661,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/09/93ce278c63ed619cddfa0d16bcb79407.avif",
+     "blob": "0a76bc124852890054462e73848b337e6bcf7e5c",
+     "type": "image/avif",
+     "bytes": 72030
     }
    },
    "blurhash": "LjGlo1t6aIogO_s+s*NH%OoJW;oe",
-   "n": 89,
-   "q": 2
+   "n": 46,
+   "q": 2,
+   "ai": {
+    "d": "A serene lake surrounded by lush green trees and distant mountains under a partly cloudy sky.",
+    "t": [
+     "lake",
+     "mountains",
+     "trees",
+     "reflection",
+     "peaceful",
+     "landscape",
+     "summer",
+     "nature"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "302b682afb1e5aa45925598a4530d1ae",
    "src": "alpine-fence-mountain-cirque",
    "title": "Alpine fence",
    "tags": [
-    "mountains",
-    "fence",
+    "landscape",
     "clouds",
-    "landscape"
+    "mountains",
+    "fence"
    ],
    "taken": "2023-09-02T19:56:32.000Z",
    "w": 3265,
@@ -1564,22 +2076,43 @@
      "type": "image/jpeg",
      "bytes": 3220706,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/09/302b682afb1e5aa45925598a4530d1ae.avif",
+     "blob": "854e896eb263da3adf8ca1c3e4e23c6e931f779b",
+     "type": "image/avif",
+     "bytes": 118010
     }
    },
    "blurhash": "LdF65:V?D%t7%jV?ROkDb|V@Rij]",
-   "n": 94,
-   "q": 2
+   "n": 47,
+   "q": 2,
+   "ai": {
+    "d": "A serene mountain landscape with a wooden fence in the foreground and a small lake surrounded by rocky terrain and green grass under a partly cloudy sky.",
+    "t": [
+     "mountains",
+     "lake",
+     "fence",
+     "landscape",
+     "nature",
+     "peaceful",
+     "scenic",
+     "summer"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "b169118107dcb9ac201e31d0eeb9b510",
    "src": "mountain-valley-alpine-lake",
    "title": "Alpine valley",
    "tags": [
-    "mountains",
-    "valley",
     "lake",
+    "landscape",
     "clouds",
-    "landscape"
+    "mountains",
+    "valley"
    ],
    "taken": "2023-09-02T22:31:34.000Z",
    "w": 3987,
@@ -1618,21 +2151,42 @@
      "type": "image/jpeg",
      "bytes": 5422605,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/09/b169118107dcb9ac201e31d0eeb9b510.avif",
+     "blob": "af6ab08d546d68649edb6f230a7646ff86812d6e",
+     "type": "image/avif",
+     "bytes": 56159
     }
    },
    "blurhash": "LbCHHH-:aJkD.Axsn#a$I9ada}WC",
-   "n": 90,
-   "q": 2
+   "n": 48,
+   "q": 2,
+   "ai": {
+    "d": "A serene landscape featuring a mountain range, a lake, and a forested area under a partly cloudy sky.",
+    "t": [
+     "landscape",
+     "mountains",
+     "lake",
+     "forest",
+     "clouds",
+     "serene",
+     "nature",
+     "beauty"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "1e281b8184ae50e4bf2fb701437f2fe7",
    "src": "elk-in-winter-woods",
    "title": "Elk in the woods",
    "tags": [
+    "forest",
     "elk",
     "animal",
     "wildlife",
-    "forest",
     "winter"
    ],
    "taken": "2023-12-03T20:12:39.000Z",
@@ -1672,11 +2226,31 @@
      "type": "image/jpeg",
      "bytes": 3870928,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/1e281b8184ae50e4bf2fb701437f2fe7.avif",
+     "blob": "3629e546646896af9c063e5e5e06d0d8f7bcfc0b",
+     "type": "image/avif",
+     "bytes": 161881
     }
    },
    "blurhash": "LJGa|1-pD%NGu6o#IVjYtmt7adRk",
-   "n": 44,
-   "q": 2
+   "n": 78,
+   "q": 2,
+   "ai": {
+    "d": "A majestic elk stands amidst a forest of bare trees and dry grass in a serene, natural setting.",
+    "t": [
+     "forest",
+     "elk",
+     "wildlife",
+     "nature",
+     "serene",
+     "dry grass",
+     "bare trees"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "677dcc3105814ba455d859183d75a91c",
@@ -1684,8 +2258,8 @@
    "title": "Snowy mountain park",
    "tags": [
     "mountains",
-    "snow",
     "winter",
+    "snow",
     "park"
    ],
    "taken": "2023-12-25T16:59:38.000Z",
@@ -1725,20 +2299,40 @@
      "type": "image/jpeg",
      "bytes": 3898828,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/677dcc3105814ba455d859183d75a91c.avif",
+     "blob": "b6b0b4067f9077a105d5b3221d688d86ba36aae3",
+     "type": "image/avif",
+     "bytes": 168453
     }
    },
    "blurhash": "LKDv{N.AI7NhANkDnLo$pLR%ROR-",
-   "n": 96,
-   "q": 2
+   "n": 49,
+   "q": 2,
+   "ai": {
+    "d": "A serene winter scene with snow-covered mountains, a picnic table, and people walking in the distance.",
+    "t": [
+     "mountains",
+     "snow",
+     "winter",
+     "picnic",
+     "people",
+     "landscape",
+     "peaceful"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "6cbaa55b9914781b648bf8a8db8e49c7",
    "src": "sagebrush-desert-mesas",
    "title": "Sagebrush and mesas",
    "tags": [
-    "desert",
     "landscape",
-    "dusk"
+    "dusk",
+    "desert"
    ],
    "taken": "2023-12-25T23:02:14.000Z",
    "w": 4000,
@@ -1777,11 +2371,31 @@
      "type": "image/jpeg",
      "bytes": 3031581,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/6cbaa55b9914781b648bf8a8db8e49c7.avif",
+     "blob": "04478754c70dec543698c19ae8bc8197f794e4cb",
+     "type": "image/avif",
+     "bytes": 52367
     }
    },
    "blurhash": "L[EW%wWYRjoft:WDaefkD*jYoJay",
-   "n": 79,
-   "q": 2
+   "n": 34,
+   "q": 2,
+   "ai": {
+    "d": "A serene desert landscape with rugged rock formations and distant snow-capped mountains under a clear blue sky.",
+    "t": [
+     "desert",
+     "landscape",
+     "mountains",
+     "rock formations",
+     "clear sky",
+     "serene",
+     "nature"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "02b4a8541028f2ac981fd0d13f96ac41",
@@ -1789,10 +2403,10 @@
    "title": "Moon over the desert",
    "tags": [
     "moon",
-    "desert",
+    "landscape",
     "dusk",
-    "pastel",
-    "landscape"
+    "desert",
+    "pastel"
    ],
    "taken": "2023-12-25T23:05:44.000Z",
    "w": 3264,
@@ -1831,22 +2445,42 @@
      "type": "image/jpeg",
      "bytes": 1635981,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/02b4a8541028f2ac981fd0d13f96ac41.avif",
+     "blob": "0926571b7836d449937d7822fd5f09ff90c67573",
+     "type": "image/avif",
+     "bytes": 12512
     }
    },
    "blurhash": "LhL|[gxaD%t7?^s:V@j]0LbHazWC",
-   "n": 71,
-   "q": 2
+   "n": 35,
+   "q": 2,
+   "ai": {
+    "d": "A serene desert landscape at dusk with a full moon in the sky.",
+    "t": [
+     "desert",
+     "landscape",
+     "dusk",
+     "moon",
+     "peaceful",
+     "nature",
+     "scenic"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "6afc6327c7a13696115044c6372c7dbd",
    "src": "desert-road-truck-mesas",
    "title": "Desert road",
    "tags": [
-    "desert",
+    "blue sky",
+    "landscape",
     "road",
     "road trip",
-    "landscape",
-    "blue sky"
+    "desert"
    ],
    "taken": "2023-12-26T16:02:51.000Z",
    "w": 2853,
@@ -1885,22 +2519,42 @@
      "type": "image/jpeg",
      "bytes": 2160430,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/6afc6327c7a13696115044c6372c7dbd.avif",
+     "blob": "c663e2b055affef07e43f4c53894ae45cf69d71d",
+     "type": "image/avif",
+     "bytes": 31324
     }
    },
    "blurhash": "L_E|*:W=RPs:PEofaeWXD*WVslay",
-   "n": 78,
-   "q": 2
+   "n": 36,
+   "q": 2,
+   "ai": {
+    "d": "A lone vehicle travels on a desert highway under a clear blue sky.",
+    "t": [
+     "desert",
+     "road",
+     "landscape",
+     "travel",
+     "journey",
+     "open",
+     "sky"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "fab9b41555df8384b91978027312cfc8",
    "src": "red-cliffs-highway",
    "title": "Highway under red cliffs",
    "tags": [
-    "desert",
+    "landscape",
     "road",
-    "cliffs",
     "road trip",
-    "landscape"
+    "desert",
+    "cliffs"
    ],
    "taken": "2023-12-26T16:05:59.000Z",
    "w": 3264,
@@ -1939,22 +2593,42 @@
      "type": "image/jpeg",
      "bytes": 2424212,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/fab9b41555df8384b91978027312cfc8.avif",
+     "blob": "4818ed38ac257a9a7e4f11137af9f73480550e1a",
+     "type": "image/avif",
+     "bytes": 98419
     }
    },
    "blurhash": "LLGRk;g*58s9_4PCNenh2{O]junh",
-   "n": 77,
-   "q": 2
+   "n": 37,
+   "q": 2,
+   "ai": {
+    "d": "A car drives along a road flanked by rugged, golden cliffs under a clear blue sky.",
+    "t": [
+     "desert",
+     "road trip",
+     "landscape",
+     "cliffs",
+     "travel",
+     "adventure",
+     "scenic"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "b07b82d4bbc65424b6b81519ac16e092",
    "src": "car-at-desert-overlook",
    "title": "Overlook stop",
    "tags": [
-    "desert",
     "car",
-    "road trip",
+    "blue sky",
     "landscape",
-    "blue sky"
+    "road trip",
+    "desert"
    ],
    "taken": "2023-12-26T16:23:15.000Z",
    "w": 4000,
@@ -1993,23 +2667,43 @@
      "type": "image/jpeg",
      "bytes": 3571234,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/b07b82d4bbc65424b6b81519ac16e092.avif",
+     "blob": "0721175ae40d26f8baacd268ee951b6226353d9d",
+     "type": "image/avif",
+     "bytes": 55870
     }
    },
    "blurhash": "LqEWOpi_M_o#Jbogn}WB9GR*s+ay",
-   "n": 97,
-   "q": 2
+   "n": 38,
+   "q": 2,
+   "ai": {
+    "d": "A car is parked at a scenic overlook with a vast desert landscape and a clear blue sky in the background.",
+    "t": [
+     "desert",
+     "landscape",
+     "road trip",
+     "travel",
+     "scenic",
+     "road",
+     "beauty"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "9777224402cb5758542a6c5a910236cb",
    "src": "horseshoe-bend",
    "title": "Horseshoe Bend",
    "tags": [
+    "landscape",
+    "river",
+    "desert",
     "horseshoe bend",
     "arizona",
-    "canyon",
-    "desert",
-    "river",
-    "landscape"
+    "canyon"
    ],
    "taken": "2023-12-26T17:12:42.000Z",
    "w": 3000,
@@ -2048,20 +2742,41 @@
      "type": "image/jpeg",
      "bytes": 4483397,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/9777224402cb5758542a6c5a910236cb.avif",
+     "blob": "e0ee8c5c2e967a4e436d4973a57c752e0e3a5287",
+     "type": "image/avif",
+     "bytes": 84579
     }
    },
    "blurhash": "LzF}]OIqRkflk]j[WBWXEoxZayof",
-   "n": 45,
-   "q": 2
+   "n": 39,
+   "q": 2,
+   "ai": {
+    "d": "A stunning view of the Horseshoe Bend in Arizona, showcasing the river's dramatic curve and the surrounding rugged landscape.",
+    "t": [
+     "landscape",
+     "desert",
+     "river",
+     "canyon",
+     "nature",
+     "travel",
+     "scenery",
+     "beauty"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "b96a71d2f89d3ad3f92157c3a59ba480",
    "src": "desert-driftwood-blue-sky",
    "title": "Desert driftwood",
    "tags": [
-    "desert",
+    "blue sky",
     "landscape",
-    "blue sky"
+    "desert"
    ],
    "taken": "2023-12-26T17:16:28.000Z",
    "w": 3264,
@@ -2100,21 +2815,41 @@
      "type": "image/jpeg",
      "bytes": 3603418,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/b96a71d2f89d3ad3f92157c3a59ba480.avif",
+     "blob": "30f63ff918b8e40de2a844ccda86e3a59329402c",
+     "type": "image/avif",
+     "bytes": 84488
     }
    },
    "blurhash": "L?G9XYxbM{ofGKWrn$bIIUWBjYWV",
-   "n": 76,
-   "q": 2
+   "n": 40,
+   "q": 2,
+   "ai": {
+    "d": "A desert landscape with wooden logs and sparse vegetation under a clear blue sky.",
+    "t": [
+     "desert",
+     "wooden logs",
+     "landscape",
+     "clear sky",
+     "dry",
+     "scenic",
+     "nature"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "d10a2809324b23de37ffe7cd2c7d52af",
    "src": "grand-canyon-river-view",
    "title": "Grand Canyon river view",
    "tags": [
-    "grand canyon",
+    "landscape",
     "arizona",
     "canyon",
-    "landscape"
+    "grand canyon"
    ],
    "taken": "2023-12-26T20:57:03.000Z",
    "w": 2448,
@@ -2153,22 +2888,43 @@
      "type": "image/jpeg",
      "bytes": 3567516,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/d10a2809324b23de37ffe7cd2c7d52af.avif",
+     "blob": "1795048981b5ceaa6ef9d2c79fd3fa65f0691e13",
+     "type": "image/avif",
+     "bytes": 91308
     }
    },
    "blurhash": "LyK,~ta~IVs:T#WXn$j[AJs,R+WC",
-   "n": 80,
-   "q": 2
+   "n": 41,
+   "q": 2,
+   "ai": {
+    "d": "A breathtaking view of the Grand Canyon with the Colorado River winding through its depths.",
+    "t": [
+     "grand canyon",
+     "canyon",
+     "river",
+     "landscape",
+     "desert",
+     "nature",
+     "scenery",
+     "beauty"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "6a2098666a112eb379da01967c2d658c",
    "src": "grand-canyon-clouds",
    "title": "Grand Canyon under clouds",
    "tags": [
-    "grand canyon",
+    "landscape",
+    "clouds",
     "arizona",
     "canyon",
-    "clouds",
-    "landscape"
+    "grand canyon"
    ],
    "taken": "2023-12-26T21:26:40.000Z",
    "w": 4000,
@@ -2207,20 +2963,40 @@
      "type": "image/jpeg",
      "bytes": 4335326,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/6a2098666a112eb379da01967c2d658c.avif",
+     "blob": "123e5a8e71924e699d15e4d69c453e37d1a435d2",
+     "type": "image/avif",
+     "bytes": 85970
     }
    },
    "blurhash": "L*G]ByNfM|t6.TkDRks.ShV[ayod",
-   "n": 81,
-   "q": 2
+   "n": 42,
+   "q": 2,
+   "ai": {
+    "d": "A breathtaking view of the Grand Canyon under a partly cloudy sky.",
+    "t": [
+     "grand canyon",
+     "landscape",
+     "nature",
+     "desert",
+     "sky",
+     "clouds",
+     "scenic"
+    ]
+   },
+   "c": 2
   },
   {
    "h": "5ce6aebd8531fbefbb2064834eb60373",
    "src": "mountains-in-side-mirror",
    "title": "Mountains in the mirror",
    "tags": [
-    "road trip",
     "car",
     "mountains",
+    "road trip",
     "street"
    ],
    "taken": "2023-12-29T15:24:57.000Z",
@@ -2260,21 +3036,41 @@
      "type": "image/jpeg",
      "bytes": 3249499,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2023/12/5ce6aebd8531fbefbb2064834eb60373.avif",
+     "blob": "efde2e682b4b217a1abd24b2445154974f9fff4f",
+     "type": "image/avif",
+     "bytes": 41104
     }
    },
    "blurhash": "LJA_qx?tUuM{yZo}wHr;L$n4%f%0",
-   "n": 107,
-   "q": 2
+   "n": 50,
+   "q": 2,
+   "ai": {
+    "d": "A scenic view of snow-capped mountains reflected in a car's side mirror on a clear day.",
+    "t": [
+     "mountains",
+     "reflection",
+     "road",
+     "travel",
+     "landscape",
+     "winter",
+     "scenic"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "8c765ebfd618dff014549dbe311f4d2b",
    "src": "green-eyed-cat-portrait",
    "title": "Green-eyed cat",
    "tags": [
-    "cat",
-    "pet",
+    "portrait",
     "animal",
-    "portrait"
+    "cat",
+    "pet"
    ],
    "taken": "2024-03-03T18:26:38.000Z",
    "w": 5158,
@@ -2313,21 +3109,41 @@
      "type": "image/jpeg",
      "bytes": 5076722,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/03/8c765ebfd618dff014549dbe311f4d2b.avif",
+     "blob": "6bfba5c98271b97c94dff4f6d8acab066f555031",
+     "type": "image/avif",
+     "bytes": 24850
     }
    },
    "blurhash": "L9BzIO4:00~U00%g_N9F4:t7?HIU",
-   "n": 56,
-   "q": 2
+   "n": 79,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a cat with green eyes and a white and brown coat.",
+    "t": [
+     "cat",
+     "green eyes",
+     "close-up",
+     "animal",
+     "feline",
+     "pet",
+     "indoors"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "a7278edcbff9dbcf00de18e6f613305d",
    "src": "male-cardinal-branches",
    "title": "Cardinal in the branches",
    "tags": [
-    "bird",
-    "cardinal",
     "animal",
-    "wildlife"
+    "wildlife",
+    "bird",
+    "cardinal"
    ],
    "taken": "2024-03-03T18:29:20.000Z",
    "w": 5184,
@@ -2366,21 +3182,41 @@
      "type": "image/jpeg",
      "bytes": 5681834,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/03/a7278edcbff9dbcf00de18e6f613305d.avif",
+     "blob": "4070210a04ac5fe8da21e146c3b616a314902c42",
+     "type": "image/avif",
+     "bytes": 57720
     }
    },
    "blurhash": "LAGIcI00-@xv00_NITj=IA%fRQM}",
-   "n": 58,
-   "q": 2
+   "n": 80,
+   "q": 2,
+   "ai": {
+    "d": "A red cardinal perched on a bare branch in a natural setting.",
+    "t": [
+     "bird",
+     "nature",
+     "wildlife",
+     "red",
+     "branch",
+     "outdoor",
+     "day"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "7f90e87ee72ddbdcb32d94a95cc56cda",
    "src": "female-cardinal-branch",
    "title": "Female cardinal",
    "tags": [
-    "bird",
-    "cardinal",
     "animal",
-    "wildlife"
+    "wildlife",
+    "bird",
+    "cardinal"
    ],
    "taken": "2024-03-03T18:29:39.000Z",
    "w": 4894,
@@ -2419,20 +3255,41 @@
      "type": "image/jpeg",
      "bytes": 5117460,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/03/7f90e87ee72ddbdcb32d94a95cc56cda.avif",
+     "blob": "8a2e39a46a5869d4c1e6c57fede6a21b40c28976",
+     "type": "image/avif",
+     "bytes": 57450
     }
    },
    "blurhash": "L8Ee#u~o5WRp-oxtxtay57WBs9oe",
-   "n": 57,
-   "q": 2
+   "n": 81,
+   "q": 2,
+   "ai": {
+    "d": "A female cardinal perched on a bare tree branch in a natural setting.",
+    "t": [
+     "bird",
+     "nature",
+     "wildlife",
+     "tree",
+     "branch",
+     "feather",
+     "beak",
+     "outdoor"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "0a87509b73ca93e12e648b980cc6e8e7",
    "src": "squirrel-on-tree",
    "title": "Squirrel",
    "tags": [
-    "squirrel",
     "animal",
     "wildlife",
+    "squirrel",
     "tree"
    ],
    "taken": "2024-03-11T22:47:40.000Z",
@@ -2472,21 +3329,41 @@
      "type": "image/jpeg",
      "bytes": 7718061,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/03/0a87509b73ca93e12e648b980cc6e8e7.avif",
+     "blob": "3f9df21b6c8c3a7d74bb50cba83e44d3ac99841b",
+     "type": "image/avif",
+     "bytes": 101418
     }
    },
    "blurhash": "LKH21M9tNYxB~XM{IUxCJDjZM{IU",
-   "n": 59,
-   "q": 2
+   "n": 82,
+   "q": 2,
+   "ai": {
+    "d": "A squirrel perches on a tree branch in a natural setting.",
+    "t": [
+     "squirrel",
+     "tree",
+     "branch",
+     "nature",
+     "wildlife",
+     "outdoor",
+     "autumn"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "cee819d870b5e7ab603da4dfb2cd4aa4",
    "src": "tabby-cat-sitting",
    "title": "Tabby cat",
    "tags": [
-    "cat",
-    "pet",
+    "portrait",
     "animal",
-    "portrait"
+    "cat",
+    "pet"
    ],
    "taken": "2024-03-29T06:53:31.000Z",
    "w": 3767,
@@ -2525,21 +3402,41 @@
      "type": "image/jpeg",
      "bytes": 2680067,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/03/cee819d870b5e7ab603da4dfb2cd4aa4.avif",
+     "blob": "9b8e954d5cbc0e87e8cb5c20045ea82e7748afb6",
+     "type": "image/avif",
+     "bytes": 15457
     }
    },
    "blurhash": "LeHe^0?wozn#o#tSt7WBtSofo2j[",
-   "n": 29,
-   "q": 2
+   "n": 83,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a cat with a white and brown coat, sitting on a surface.",
+    "t": [
+     "cat",
+     "pet",
+     "indoors",
+     "feline",
+     "animal",
+     "home",
+     "furry"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "c7908b18e4a6ca8b8867a5f6d7c7b03c",
    "src": "sunset-lake-silhouette-blue",
    "title": "Blue hour lake",
    "tags": [
-    "sunset",
+    "silhouette",
     "lake",
-    "blue hour",
-    "silhouette"
+    "sunset",
+    "blue hour"
    ],
    "taken": "2024-04-22T00:28:18.000Z",
    "w": 2915,
@@ -2578,21 +3475,41 @@
      "type": "image/jpeg",
      "bytes": 1185518,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/04/c7908b18e4a6ca8b8867a5f6d7c7b03c.avif",
+     "blob": "c8956a7bd63c80539b1f1c83c3fe932b119cedc2",
+     "type": "image/avif",
+     "bytes": 8473
     }
    },
    "blurhash": "L99GdPxZ58bH~Vs.IpfR0oR--Qj@",
-   "n": 67,
-   "q": 2
+   "n": 65,
+   "q": 2,
+   "ai": {
+    "d": "A serene sunset over a body of water with a silhouette of a structure in the distance.",
+    "t": [
+     "sunset",
+     "water",
+     "silhouette",
+     "peaceful",
+     "evening",
+     "nature",
+     "scenic"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "99ecab9324d164a779d4e24650030990",
    "src": "red-sorrel-dry-grass",
    "title": "Red sorrel",
    "tags": [
-    "plant",
-    "grass",
     "nature",
-    "bokeh"
+    "bokeh",
+    "plant",
+    "grass"
    ],
    "taken": "2024-06-23T12:55:21.000Z",
    "w": 3448,
@@ -2631,22 +3548,42 @@
      "type": "image/jpeg",
      "bytes": 6859422,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/99ecab9324d164a779d4e24650030990.avif",
+     "blob": "f79f7541f525d463dc2ddcff3038942781d41867",
+     "type": "image/avif",
+     "bytes": 65996
     }
    },
    "blurhash": "LDHURC~U9]xs~oxuaLoeM{Ioa1jb",
-   "n": 98,
-   "q": 2
+   "n": 100,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a red flowering plant amidst tall grass in a natural setting.",
+    "t": [
+     "nature",
+     "plant",
+     "red",
+     "grass",
+     "field",
+     "outdoor",
+     "landscape"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "9b423f1600a58762efc23013912e3e17",
    "src": "yellow-wildflowers-meadow-burn-edit",
    "title": "Yellow wildflowers (burn edit)",
    "tags": [
-    "flower",
-    "meadow",
-    "summer",
     "nature",
-    "bokeh"
+    "flower",
+    "summer",
+    "bokeh",
+    "meadow"
    ],
    "variantOf": "yellow-wildflowers-meadow",
    "taken": "2024-06-23T12:56:10.000Z",
@@ -2686,22 +3623,42 @@
      "type": "image/jpeg",
      "bytes": 2352929,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/9b423f1600a58762efc23013912e3e17.avif",
+     "blob": "4928836ffcf8d975647f5cb0f8e6177a64c58b21",
+     "type": "image/avif",
+     "bytes": 25770
     }
    },
    "blurhash": "L5BD@|}?DBSw0CNKx:sl069vb?Vx",
-   "n": 43,
-   "q": 2
+   "n": 101,
+   "q": 2,
+   "ai": {
+    "d": "A field of yellow flowers bathed in sunlight with a blurred green background.",
+    "t": [
+     "flowers",
+     "sunlight",
+     "field",
+     "nature",
+     "summer",
+     "serene",
+     "beauty"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "3e59bb26291f3f3040651ba80325f871",
    "src": "yellow-wildflowers-meadow",
    "title": "Yellow wildflowers",
    "tags": [
-    "flower",
-    "meadow",
-    "summer",
     "nature",
-    "bokeh"
+    "flower",
+    "summer",
+    "bokeh",
+    "meadow"
    ],
    "taken": "2024-06-23T12:56:10.000Z",
    "w": 4592,
@@ -2740,21 +3697,41 @@
      "type": "image/jpeg",
      "bytes": 3390064,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/3e59bb26291f3f3040651ba80325f871.avif",
+     "blob": "96fb0860169b50572d5ae3c7f881a13aec60302a",
+     "type": "image/avif",
+     "bytes": 25625
     }
    },
    "blurhash": "L5B;HE}@8$S^0CNJxosl035RSxRR",
-   "n": 42,
-   "q": 2
+   "n": 102,
+   "q": 2,
+   "ai": {
+    "d": "A field of yellow flowers swaying gently in the breeze under a bright, sunny sky.",
+    "t": [
+     "field",
+     "flowers",
+     "sunshine",
+     "peaceful",
+     "summer",
+     "nature",
+     "beauty"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "390176a8b8a2a52de7a8e8f17b0aa0d3",
    "src": "milkweed-blossoms",
    "title": "Milkweed",
    "tags": [
-    "flower",
-    "summer",
     "nature",
-    "macro"
+    "flower",
+    "macro",
+    "summer"
    ],
    "taken": "2024-06-23T12:58:06.000Z",
    "w": 4592,
@@ -2793,21 +3770,41 @@
      "type": "image/jpeg",
      "bytes": 4179849,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/390176a8b8a2a52de7a8e8f17b0aa0d3.avif",
+     "blob": "a212aac488c8d746bee8da9d5e6c13b64bfb9a55",
+     "type": "image/avif",
+     "bytes": 58069
     }
    },
    "blurhash": "L6BNupR~01050D={YEP300r^~C~A",
    "n": 103,
-   "q": 2
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a cluster of purple milkweed flowers with green leaves in a natural setting.",
+    "t": [
+     "flowers",
+     "nature",
+     "milkweed",
+     "purple",
+     "green",
+     "summer",
+     "beauty"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "6897b14656c29c6d034cf1c9b982d9a4",
    "src": "grass-seed-heads-bokeh",
    "title": "Grass seed heads",
    "tags": [
-    "grass",
-    "macro",
     "nature",
-    "bokeh"
+    "macro",
+    "bokeh",
+    "grass"
    ],
    "taken": "2024-06-23T12:58:32.000Z",
    "w": 4592,
@@ -2846,21 +3843,41 @@
      "type": "image/jpeg",
      "bytes": 2951212,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/6897b14656c29c6d034cf1c9b982d9a4.avif",
+     "blob": "a305639db3c18d1ff14e288cdb05be15dbdad296",
+     "type": "image/avif",
+     "bytes": 19290
     }
    },
    "blurhash": "L5B}1?%D4TqT:e}H-m.L00?G?HyT",
-   "n": 82,
-   "q": 2
+   "n": 104,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of grass seed heads with a blurred green background.",
+    "t": [
+     "nature",
+     "grass",
+     "seed heads",
+     "greenery",
+     "outdoor",
+     "serene",
+     "summer"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "858f62f9542583536cb2826f5795d5e6",
    "src": "wild-sorrel-meadow",
    "title": "Sorrel in the meadow",
    "tags": [
-    "plant",
-    "meadow",
+    "nature",
     "summer",
-    "nature"
+    "plant",
+    "meadow"
    ],
    "taken": "2024-06-23T13:00:18.000Z",
    "w": 3448,
@@ -2899,21 +3916,41 @@
      "type": "image/jpeg",
      "bytes": 3860476,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/858f62f9542583536cb2826f5795d5e6.avif",
+     "blob": "466e9f5451c96be82af5544a225d44eafe6c008a",
+     "type": "image/avif",
+     "bytes": 55067
     }
    },
    "blurhash": "L3BhxWuf0KcV0Hx@zr={00IA}E9L",
-   "n": 53,
-   "q": 2
+   "n": 105,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a plant with reddish-brown seed heads in a lush green field.",
+    "t": [
+     "plant",
+     "field",
+     "nature",
+     "summer",
+     "greenery",
+     "serene",
+     "beauty"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "f0657d75d58b63fdc0bdf69573a35304",
    "src": "green-tree-soft-focus",
    "title": "Green tree",
    "tags": [
-    "tree",
-    "summer",
     "nature",
-    "bokeh"
+    "summer",
+    "bokeh",
+    "tree"
    ],
    "taken": "2024-06-23T13:02:28.000Z",
    "w": 3448,
@@ -2952,22 +3989,42 @@
      "type": "image/jpeg",
      "bytes": 3814949,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/f0657d75d58b63fdc0bdf69573a35304.avif",
+     "blob": "d2054a62ae7b1b62637624edff04e40a2f34fed9",
+     "type": "image/avif",
+     "bytes": 38613
     }
    },
    "blurhash": "LMC*BT9WI1II_L9FxbRlxKNE%cRn",
-   "n": 41,
-   "q": 2
+   "n": 106,
+   "q": 2,
+   "ai": {
+    "d": "A blurred photo of a lush green tree canopy with sunlight filtering through the leaves.",
+    "t": [
+     "trees",
+     "greenery",
+     "sunlight",
+     "blurred",
+     "nature",
+     "serene",
+     "outdoor"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "b34e1e97e8f5df55d4ecf0c3d58c33f9",
    "src": "deer-antlers-velvet-meadow-crop",
    "title": "Velvet antlers (2:1 crop)",
    "tags": [
-    "deer",
-    "antlers",
     "animal",
     "wildlife",
-    "meadow"
+    "meadow",
+    "deer",
+    "antlers"
    ],
    "variantOf": "deer-antlers-velvet-meadow",
    "taken": "2024-06-23T13:23:07.000Z",
@@ -3007,22 +4064,42 @@
      "type": "image/jpeg",
      "bytes": 1053741,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/b34e1e97e8f5df55d4ecf0c3d58c33f9.avif",
+     "blob": "6523e70fe5c15ef150f9e3dcf2baa368a0ca7fb8",
+     "type": "image/avif",
+     "bytes": 8473
     }
    },
    "blurhash": "L85Yci-:V@Io_L-:WAIV^k-:bEIV",
-   "n": 52,
-   "q": 2
+   "n": 84,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a deer's antlers against a blurred green field at dusk.",
+    "t": [
+     "deer",
+     "antlers",
+     "field",
+     "dusk",
+     "nature",
+     "wildlife",
+     "peaceful"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "4ff2df7cd1068cd283d67159a8b6d5c6",
    "src": "deer-antlers-velvet-meadow",
    "title": "Velvet antlers",
    "tags": [
-    "deer",
-    "antlers",
     "animal",
     "wildlife",
-    "meadow"
+    "meadow",
+    "deer",
+    "antlers"
    ],
    "taken": "2024-06-23T13:23:07.000Z",
    "w": 4592,
@@ -3061,21 +4138,41 @@
      "type": "image/jpeg",
      "bytes": 1969564,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/4ff2df7cd1068cd283d67159a8b6d5c6.avif",
+     "blob": "c65973001c6fc2b717f859d8c6534d9b38dac231",
+     "type": "image/avif",
+     "bytes": 10843
     }
    },
    "blurhash": "LdCQ0nxtWBRj~pt7axRj?HWVj[ay",
-   "n": 51,
-   "q": 2
+   "n": 85,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a deer's antlers against a blurred green field and sky.",
+    "t": [
+     "deer",
+     "antlers",
+     "field",
+     "nature",
+     "evening",
+     "silhouette",
+     "wildlife"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "0e35bd17137147b706fff85dacea70d1",
    "src": "forest-waterfall-fallen-logs",
    "title": "Waterfall and fallen logs",
    "tags": [
+    "nature",
     "waterfall",
     "forest",
-    "long exposure",
-    "nature"
+    "long exposure"
    ],
    "taken": "2024-06-30T13:23:05.000Z",
    "w": 4592,
@@ -3114,20 +4211,40 @@
      "type": "image/jpeg",
      "bytes": 7761625,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/0e35bd17137147b706fff85dacea70d1.avif",
+     "blob": "2d79530e78eab68e645d7d511490721ae9278ca9",
+     "type": "image/avif",
+     "bytes": 151265
     }
    },
    "blurhash": "L456hgHxD4xnoqa0W?pIq?RPu6o}",
-   "n": 69,
-   "q": 2
+   "n": 66,
+   "q": 2,
+   "ai": {
+    "d": "A serene forest scene featuring a waterfall surrounded by lush greenery and fallen logs.",
+    "t": [
+     "forest",
+     "waterfall",
+     "nature",
+     "serene",
+     "greenery",
+     "peaceful",
+     "landscape"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "2bf93f431ad0ec9a8c77b4810d41b057",
    "src": "orange-sunset-horizon",
    "title": "Sunset horizon",
    "tags": [
-    "sunset",
-    "lake",
     "minimal",
+    "lake",
+    "sunset",
     "sky"
    ],
    "taken": "2024-06-30T14:29:01.000Z",
@@ -3167,22 +4284,42 @@
      "type": "image/jpeg",
      "bytes": 2094371,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/2bf93f431ad0ec9a8c77b4810d41b057.avif",
+     "blob": "c346ecf6af95fb7cd6732fe77ea07f394944e45e",
+     "type": "image/avif",
+     "bytes": 4463
     }
    },
    "blurhash": "LKG@S-^iNGs:_4xaaeoL0OIqoeWW",
-   "n": 50,
-   "q": 2
+   "n": 67,
+   "q": 2,
+   "ai": {
+    "d": "A serene sunset over a calm sea with a gradient sky transitioning from purple to orange.",
+    "t": [
+     "sunset",
+     "sea",
+     "horizon",
+     "peaceful",
+     "evening",
+     "nature",
+     "landscape"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "3a14d11e61b5305b610fd008073fde2a",
    "src": "sunrise-over-marsh",
    "title": "Sunrise over the marsh",
    "tags": [
-    "sunrise",
+    "nature",
     "lake",
+    "sunrise",
     "marsh",
-    "golden",
-    "nature"
+    "golden"
    ],
    "taken": "2024-06-30T22:25:52.000Z",
    "w": 4592,
@@ -3221,22 +4358,42 @@
      "type": "image/jpeg",
      "bytes": 2332749,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/3a14d11e61b5305b610fd008073fde2a.avif",
+     "blob": "5ed0cc6cc732061b87f0178cfe1713af33440821",
+     "type": "image/avif",
+     "bytes": 14613
     }
    },
    "blurhash": "LAAbtsoL10oL?Gayn$j[1%j[}UbH",
-   "n": 40,
-   "q": 2
+   "n": 68,
+   "q": 2,
+   "ai": {
+    "d": "A serene sunset over a misty lake with reeds in the foreground.",
+    "t": [
+     "sunset",
+     "lake",
+     "reeds",
+     "mist",
+     "peaceful",
+     "evening",
+     "nature"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "9359bf0ebfd70e71815e6f509af38766",
    "src": "kayakers-lovers-leap-arch",
    "title": "Kayakers at the arch",
    "tags": [
+    "people",
+    "cliffs",
     "kayak",
     "pictured rocks",
-    "arch",
-    "cliffs",
-    "people"
+    "arch"
    ],
    "taken": "2024-07-01T02:30:16.000Z",
    "w": 4592,
@@ -3275,21 +4432,41 @@
      "type": "image/jpeg",
      "bytes": 5517176,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/9359bf0ebfd70e71815e6f509af38766.avif",
+     "blob": "46ec3dd62abf556d03eca6ccf3d3451f5358709c",
+     "type": "image/avif",
+     "bytes": 93347
     }
    },
    "blurhash": "L,DA[u.Tj?bGyDtRRnRkNeRoRiRi",
-   "n": 92,
-   "q": 2
+   "n": 23,
+   "q": 2,
+   "ai": {
+    "d": "Kayakers explore a natural archway in a rocky coastal area.",
+    "t": [
+     "kayaking",
+     "coast",
+     "arch",
+     "nature",
+     "adventure",
+     "summer",
+     "scenic"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "af810164888a06bebac314031ed10129",
    "src": "rock-arch-lake-superior",
    "title": "Rock arch",
    "tags": [
-    "pictured rocks",
     "lake superior",
-    "arch",
     "cliffs",
+    "pictured rocks",
+    "arch",
     "water"
    ],
    "taken": "2024-07-01T02:35:44.000Z",
@@ -3329,20 +4506,41 @@
      "type": "image/jpeg",
      "bytes": 5135553,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/af810164888a06bebac314031ed10129.avif",
+     "blob": "378fc0b29b5a9842aabcbe539c78218bb489d5ea",
+     "type": "image/avif",
+     "bytes": 90864
     }
    },
    "blurhash": "LJDAr[00to%h.TMcRjxv0N?EMyo$",
-   "n": 49,
-   "q": 2
+   "n": 24,
+   "q": 2,
+   "ai": {
+    "d": "A stunning natural archway formed by erosion stands majestically over calm waters, with a kayaker in the distance.",
+    "t": [
+     "landscape",
+     "cliffs",
+     "water",
+     "arch",
+     "nature",
+     "serene",
+     "beauty",
+     "outdoor"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "92532d7d9816fa3714202eaf3398102c",
    "src": "streaked-cliff-face",
    "title": "Streaked cliff",
    "tags": [
-    "pictured rocks",
-    "cliffs",
     "rocks",
+    "cliffs",
+    "pictured rocks",
     "water"
    ],
    "taken": "2024-07-01T02:40:11.000Z",
@@ -3382,20 +4580,41 @@
      "type": "image/jpeg",
      "bytes": 8923166,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/92532d7d9816fa3714202eaf3398102c.avif",
+     "blob": "3125dc19480679d10e3a44ff45a7b4d1ac12b55b",
+     "type": "image/avif",
+     "bytes": 154849
     }
    },
    "blurhash": "LECjX|?Yxt%h_NxsIpxaI9IUM{j?",
-   "n": 99,
-   "q": 2
+   "n": 25,
+   "q": 2,
+   "ai": {
+    "d": "A dramatic rock formation with colorful streaks of paint or mineral deposits, set against a backdrop of green foliage and water.",
+    "t": [
+     "rock",
+     "paint",
+     "nature",
+     "landscape",
+     "water",
+     "colorful",
+     "scenic",
+     "outdoor"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "1ac75207b19f373c811938c1ab8dabf2",
    "src": "kayak-along-painted-cliffs",
    "title": "Along the painted cliffs",
    "tags": [
+    "cliffs",
     "kayak",
     "pictured rocks",
-    "cliffs",
     "water"
    ],
    "taken": "2024-07-01T02:54:35.000Z",
@@ -3435,21 +4654,41 @@
      "type": "image/jpeg",
      "bytes": 7855567,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/1ac75207b19f373c811938c1ab8dabf2.avif",
+     "blob": "3fcaa89c02242b77414eac8b02d837efede67cde",
+     "type": "image/avif",
+     "bytes": 151974
     }
    },
    "blurhash": "La9S6j.TyEx^yEtmbJRjS2SiNGMx",
-   "n": 100,
-   "q": 2
+   "n": 26,
+   "q": 2,
+   "ai": {
+    "d": "A serene view of a rocky cliffside from a kayak on a calm body of water.",
+    "t": [
+     "cliff",
+     "water",
+     "kayak",
+     "nature",
+     "serene",
+     "landscape",
+     "outdoor"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "0cc6ca35a5e6e6ff0ad208ec9c66fb07",
    "src": "kayak-bow-blue-water",
    "title": "Kayak bow",
    "tags": [
-    "kayak",
     "lake",
-    "pictured rocks",
     "summer",
+    "kayak",
+    "pictured rocks",
     "water"
    ],
    "taken": "2024-07-01T03:00:23.000Z",
@@ -3489,21 +4728,41 @@
      "type": "image/jpeg",
      "bytes": 4837638,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/0cc6ca35a5e6e6ff0ad208ec9c66fb07.avif",
+     "blob": "1763915db9394953555d190d5a9df59ff6caba43",
+     "type": "image/avif",
+     "bytes": 39968
     }
    },
    "blurhash": "Lu7fZRkEV?oztpflWAj]RojYocay",
-   "n": 48,
-   "q": 2
+   "n": 27,
+   "q": 2,
+   "ai": {
+    "d": "A kayaker paddles through calm waters under a clear blue sky.",
+    "t": [
+     "kayaking",
+     "water",
+     "ocean",
+     "adventure",
+     "nature",
+     "peaceful",
+     "outdoor"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "e9f7f410386cace420a68a94861305dd",
    "src": "kayak-bow-cliffs",
    "title": "Paddling to the cliffs",
    "tags": [
-    "kayak",
-    "pictured rocks",
     "lake superior",
     "cliffs",
+    "kayak",
+    "pictured rocks",
     "water"
    ],
    "taken": "2024-07-01T03:16:26.000Z",
@@ -3543,20 +4802,41 @@
      "type": "image/jpeg",
      "bytes": 5397099,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/e9f7f410386cace420a68a94861305dd.avif",
+     "blob": "651a0a1b79a747fb278b39dd23705f538c51888d",
+     "type": "image/avif",
+     "bytes": 49964
     }
    },
    "blurhash": "L$CRT%tSIVRkXrWEt2oeWYROWCog",
-   "n": 93,
-   "q": 2
+   "n": 28,
+   "q": 2,
+   "ai": {
+    "d": "A serene kayaking scene with a bright yellow kayak in the foreground, calm blue waters, and a rocky cliff with greenery in the background under a clear blue sky.",
+    "t": [
+     "kayaking",
+     "calm",
+     "cliff",
+     "water",
+     "nature",
+     "serene",
+     "beauty",
+     "outdoor"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "2e7f491a1e53746699000dd1947cbc08",
    "src": "kayak-under-overhang",
    "title": "Under the overhang",
    "tags": [
+    "cliffs",
     "kayak",
     "pictured rocks",
-    "cliffs",
     "water"
    ],
    "taken": "2024-07-01T03:30:44.000Z",
@@ -3596,22 +4876,42 @@
      "type": "image/jpeg",
      "bytes": 5081492,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/2e7f491a1e53746699000dd1947cbc08.avif",
+     "blob": "73da8d7087163f93cbe6ae73da53298b6b9c5897",
+     "type": "image/avif",
+     "bytes": 89700
     }
    },
    "blurhash": "LP9R2-?^?v.8RjRiR%WV9GD*IUM|",
-   "n": 101,
-   "q": 2
+   "n": 29,
+   "q": 2,
+   "ai": {
+    "d": "Two kayakers explore a dramatic rocky coastline at dusk.",
+    "t": [
+     "kayaking",
+     "coast",
+     "cliffs",
+     "dusk",
+     "adventure",
+     "nature",
+     "exploration"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "d2818373660956a29d2c00251d44db29",
    "src": "kayak-sea-cave-view",
    "title": "Sea cave by kayak",
    "tags": [
+    "cliffs",
     "kayak",
-    "cave",
     "pictured rocks",
     "water",
-    "cliffs"
+    "cave"
    ],
    "taken": "2024-07-01T03:38:08.000Z",
    "w": 3448,
@@ -3650,20 +4950,40 @@
      "type": "image/jpeg",
      "bytes": 7462702,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/d2818373660956a29d2c00251d44db29.avif",
+     "blob": "48f85e88a6f4440c9800914d3f92b82d5b3bf506",
+     "type": "image/avif",
+     "bytes": 101279
     }
    },
    "blurhash": "L685ZUAD4T^l.-D*Td-,8wbDysa2",
-   "n": 74,
-   "q": 2
+   "n": 30,
+   "q": 2,
+   "ai": {
+    "d": "A kayaker explores a serene cave entrance with a view of a cliff and a bird flying overhead.",
+    "t": [
+     "cave",
+     "kayaking",
+     "cliff",
+     "bird",
+     "serene",
+     "adventure",
+     "nature"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "096017e737fa29916ea264e34bd381cf",
    "src": "grand-portal-arch",
    "title": "Rock arch from the water",
    "tags": [
+    "cliffs",
     "pictured rocks",
     "arch",
-    "cliffs",
     "water"
    ],
    "taken": "2024-07-01T03:41:54.000Z",
@@ -3703,22 +5023,43 @@
      "type": "image/jpeg",
      "bytes": 6493954,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/096017e737fa29916ea264e34bd381cf.avif",
+     "blob": "bb022ea17c27cfaafcc95e7f50a0acf7c89718ac",
+     "type": "image/avif",
+     "bytes": 121568
     }
    },
    "blurhash": "LABge]4T0r~B%$iuIutl00.S|sEk",
-   "n": 102,
-   "q": 2
+   "n": 31,
+   "q": 2,
+   "ai": {
+    "d": "A stunning natural archway formed by eroded rock cliffs overlooking a calm blue sea under a clear sky.",
+    "t": [
+     "cliffs",
+     "archway",
+     "sea",
+     "landscape",
+     "nature",
+     "beauty",
+     "serene",
+     "photography"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "7888b559d0c62e424a2d1e64054f051a",
    "src": "kayak-cave-mouth-kayakers",
    "title": "Out of the cave",
    "tags": [
+    "people",
     "kayak",
-    "cave",
     "pictured rocks",
     "water",
-    "people"
+    "cave"
    ],
    "taken": "2024-07-01T03:45:56.000Z",
    "w": 4574,
@@ -3757,11 +5098,31 @@
      "type": "image/jpeg",
      "bytes": 4899281,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/06/7888b559d0c62e424a2d1e64054f051a.avif",
+     "blob": "258326c8fbdd927fe786eee2f3aaa1e2375ce520",
+     "type": "image/avif",
+     "bytes": 69583
     }
    },
    "blurhash": "LI8hX*%%DhRNoIjYWCbI00I8-=t8",
-   "n": 91,
-   "q": 2
+   "n": 32,
+   "q": 2,
+   "ai": {
+    "d": "A serene scene of kayakers exploring a cave opening on a calm day.",
+    "t": [
+     "cave",
+     "kayaking",
+     "water",
+     "nature",
+     "adventure",
+     "peaceful",
+     "exploration"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "7db8b033bdaeb62cecc16fe6127deb5b",
@@ -3769,9 +5130,9 @@
    "title": "Pines over the lake",
    "tags": [
     "lake",
-    "forest",
+    "blue sky",
     "beach",
-    "blue sky"
+    "forest"
    ],
    "taken": "2024-07-01T13:10:23.000Z",
    "w": 4592,
@@ -3810,22 +5171,43 @@
      "type": "image/jpeg",
      "bytes": 6473500,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/07/7db8b033bdaeb62cecc16fe6127deb5b.avif",
+     "blob": "805590dd8e5c2357d86a943a6e47c78d900e23b1",
+     "type": "image/avif",
+     "bytes": 130930
     }
    },
    "blurhash": "LiC?+gt:R.V?pLbyaenhIURPayof",
-   "n": 104,
-   "q": 2
+   "n": 69,
+   "q": 2,
+   "ai": {
+    "d": "A serene coastal scene with a sandy beach, tall pine trees, and a calm blue sea under a clear sky.",
+    "t": [
+     "coast",
+     "beach",
+     "trees",
+     "sea",
+     "landscape",
+     "peaceful",
+     "nature",
+     "summer"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "617face279da3c20b80133f319d3fc97",
    "src": "rocky-shore-golden-light",
    "title": "Golden shoreline",
    "tags": [
-    "lake",
     "rocks",
-    "golden hour",
+    "lake",
+    "waterfall",
     "pictured rocks",
-    "waterfall"
+    "golden hour"
    ],
    "taken": "2024-07-01T13:20:48.000Z",
    "w": 4592,
@@ -3864,21 +5246,42 @@
      "type": "image/jpeg",
      "bytes": 6905262,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/07/617face279da3c20b80133f319d3fc97.avif",
+     "blob": "fdf644e2b9067fe94b55a0368857cbfc292c4a74",
+     "type": "image/avif",
+     "bytes": 175434
     }
    },
    "blurhash": "LeHBG7%%XVslO@-pxuR*WXoeWAWA",
-   "n": 72,
-   "q": 2
+   "n": 33,
+   "q": 2,
+   "ai": {
+    "d": "A serene coastal scene with rocky cliffs, flowing water, and lush greenery under a clear sky.",
+    "t": [
+     "coast",
+     "waterfall",
+     "trees",
+     "rocky",
+     "serene",
+     "beach",
+     "nature",
+     "landscape"
+    ]
+   },
+   "c": 1
   },
   {
    "h": "66d44e5fde07e209281a9ce0cd89fc2c",
    "src": "waterfall-red-pool-forest",
    "title": "Waterfall over a red pool",
    "tags": [
+    "nature",
     "waterfall",
     "forest",
-    "summer",
-    "nature"
+    "summer"
    ],
    "taken": "2024-07-02T03:49:17.000Z",
    "w": 4591,
@@ -3917,21 +5320,42 @@
      "type": "image/jpeg",
      "bytes": 9688129,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/07/66d44e5fde07e209281a9ce0cd89fc2c.avif",
+     "blob": "1835f5b013bfc3fb0f6ec436d5886c6b066d4d6f",
+     "type": "image/avif",
+     "bytes": 189919
     }
    },
    "blurhash": "LFCs{G?[TVx[B}oh#?WU$+R*8~of",
-   "n": 75,
-   "q": 2
+   "n": 70,
+   "q": 2,
+   "ai": {
+    "d": "A serene waterfall cascades down a moss-covered rock in a lush forest setting.",
+    "t": [
+     "waterfall",
+     "forest",
+     "nature",
+     "serenity",
+     "greenery",
+     "peace",
+     "landscape",
+     "beauty"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "ff8f19f172bd20e432462710788356ba",
    "src": "waterfall-mossy-gorge",
    "title": "Waterfall in a mossy gorge",
    "tags": [
+    "nature",
     "waterfall",
     "forest",
-    "long exposure",
-    "nature"
+    "long exposure"
    ],
    "taken": "2024-07-02T06:39:50.000Z",
    "w": 4592,
@@ -3970,11 +5394,32 @@
      "type": "image/jpeg",
      "bytes": 8380176,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/07/ff8f19f172bd20e432462710788356ba.avif",
+     "blob": "ff693f02d15736f89c743171f4a748d5ce301a64",
+     "type": "image/avif",
+     "bytes": 177877
     }
    },
    "blurhash": "L77{Dr[L4Y5jIVNGi#srQ1bImqXy",
-   "n": 105,
-   "q": 2
+   "n": 71,
+   "q": 2,
+   "ai": {
+    "d": "A serene waterfall cascades down a rocky cliff surrounded by lush greenery in a forested area.",
+    "t": [
+     "waterfall",
+     "forest",
+     "nature",
+     "serenity",
+     "greenery",
+     "peace",
+     "landscape",
+     "summer"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "d17535f158350622bd65cb9e95512e8f",
@@ -3982,8 +5427,8 @@
    "title": "Boathouse on a green pond",
    "tags": [
     "lake",
-    "forest",
     "reflection",
+    "forest",
     "summer"
    ],
    "taken": "2024-07-02T08:16:16.000Z",
@@ -4023,22 +5468,42 @@
      "type": "image/jpeg",
      "bytes": 6948661,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/07/d17535f158350622bd65cb9e95512e8f.avif",
+     "blob": "ffe5d378ea32522ac0a58d179e600c18f97202f0",
+     "type": "image/avif",
+     "bytes": 132117
     }
    },
    "blurhash": "L69k1d--00D+?].7Dj4oUn%4TC9F",
-   "n": 106,
-   "q": 2
+   "n": 72,
+   "q": 2,
+   "ai": {
+    "d": "A serene lakeside scene with a wooden gazebo and reflections in the water.",
+    "t": [
+     "lake",
+     "trees",
+     "gazebo",
+     "reflection",
+     "peaceful",
+     "nature",
+     "outdoors"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "8b981e7f63aa9c0f4f4062c62c533738",
    "src": "misty-lake-red-maple",
    "title": "Misty lake and red maple",
    "tags": [
-    "autumn",
+    "nature",
     "lake",
-    "fog",
     "reflection",
-    "nature"
+    "fog",
+    "autumn"
    ],
    "taken": "2024-10-12T00:25:19.000Z",
    "w": 4540,
@@ -4077,21 +5542,42 @@
      "type": "image/jpeg",
      "bytes": 3896099,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/8b981e7f63aa9c0f4f4062c62c533738.avif",
+     "blob": "5d6529a139404f31d9751030300e32351c46b440",
+     "type": "image/avif",
+     "bytes": 53831
     }
    },
    "blurhash": "LREoJq~XE0V@~X%MM_jZR.R*WBof",
-   "n": 46,
-   "q": 2
+   "n": 51,
+   "q": 2,
+   "ai": {
+    "d": "A serene autumn scene with a misty lake reflecting colorful trees under a cloudy sky.",
+    "t": [
+     "lake",
+     "autumn",
+     "mist",
+     "trees",
+     "reflection",
+     "peaceful",
+     "cloudy",
+     "serene"
+    ]
+   },
+   "c": 3
   },
   {
    "h": "1e97eb073e4c49b6e44f58ca99978db8",
    "src": "autumn-trees-red-leaves-lakeside",
    "title": "Lakeside autumn",
    "tags": [
-    "autumn",
-    "trees",
+    "nature",
     "lake",
-    "nature"
+    "autumn",
+    "trees"
    ],
    "taken": "2024-10-12T00:45:11.000Z",
    "w": 4592,
@@ -4130,21 +5616,41 @@
      "type": "image/jpeg",
      "bytes": 9251991,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/1e97eb073e4c49b6e44f58ca99978db8.avif",
+     "blob": "ca6ca5e7648f8cd1dcdff5fd4cf52508d60de382",
+     "type": "image/avif",
+     "bytes": 245507
     }
    },
    "blurhash": "LcHBGE-=Ose-~qtSkDM{%gxujYM{",
-   "n": 73,
-   "q": 2
+   "n": 53,
+   "q": 2,
+   "ai": {
+    "d": "A serene autumn scene with colorful trees and fallen leaves by a body of water.",
+    "t": [
+     "autumn",
+     "trees",
+     "leaves",
+     "water",
+     "serene",
+     "landscape",
+     "fall"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "37efc466bc6336bb3bb6c7e69fe11197",
    "src": "yellow-maple-leaf",
    "title": "Maple leaf",
    "tags": [
-    "leaf",
-    "autumn",
     "nature",
-    "macro"
+    "macro",
+    "autumn",
+    "leaf"
    ],
    "taken": "2024-10-12T02:13:15.000Z",
    "w": 4592,
@@ -4183,22 +5689,42 @@
      "type": "image/jpeg",
      "bytes": 3833570,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/37efc466bc6336bb3bb6c7e69fe11197.avif",
+     "blob": "f890af4d3b6e77eeb26dd115a5d8e2f076320f3a",
+     "type": "image/avif",
+     "bytes": 21887
     }
    },
    "blurhash": "LEF#1=~8069f0NIps:Wn0.I@^c$z",
    "n": 54,
-   "q": 2
+   "q": 2,
+   "ai": {
+    "d": "A close-up of a single yellow maple leaf with a blurred autumnal background.",
+    "t": [
+     "fall",
+     "nature",
+     "leaves",
+     "autumn",
+     "season",
+     "beauty",
+     "outdoor"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "2b79834d7028039d4289d486782d2143",
    "src": "woman-on-autumn-path",
    "title": "Walk through autumn",
    "tags": [
-    "autumn",
     "people",
-    "forest",
+    "portrait",
     "path",
-    "portrait"
+    "forest",
+    "autumn"
    ],
    "taken": "2024-10-12T02:14:45.000Z",
    "w": 4592,
@@ -4237,21 +5763,41 @@
      "type": "image/jpeg",
      "bytes": 2818975,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/2b79834d7028039d4289d486782d2143.avif",
+     "blob": "21fca115147620f6aeac455514175e06219cbb1c",
+     "type": "image/avif",
+     "bytes": 83836
     }
    },
    "blurhash": "LOKJ;+-VQ,n#~qs=R5n#O]t7E1aJ",
-   "n": 109,
-   "q": 2
+   "n": 55,
+   "q": 2,
+   "ai": {
+    "d": "A person stands in a forest during autumn, surrounded by colorful foliage.",
+    "t": [
+     "forest",
+     "autumn",
+     "leaves",
+     "path",
+     "nature",
+     "peaceful",
+     "season"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "e4b48497824efe1d0f416cbca59abf1e",
    "src": "autumn-dirt-road-tunnel",
    "title": "Autumn back road",
    "tags": [
-    "autumn",
-    "road",
+    "nature",
     "forest",
-    "nature"
+    "road",
+    "autumn"
    ],
    "taken": "2024-10-12T13:12:11.000Z",
    "w": 2983,
@@ -4290,22 +5836,42 @@
      "type": "image/jpeg",
      "bytes": 10079919,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/e4b48497824efe1d0f416cbca59abf1e.avif",
+     "blob": "c9cb209fa1734847fb4d35d0e8446f5f519a321d",
+     "type": "image/avif",
+     "bytes": 267741
     }
    },
    "blurhash": "LMFEW2x]9vad~Vb^V@WAE-XAslad",
-   "n": 38,
-   "q": 2
+   "n": 56,
+   "q": 2,
+   "ai": {
+    "d": "A serene autumn scene with a dirt road flanked by trees in vibrant fall foliage.",
+    "t": [
+     "autumn",
+     "trees",
+     "leaves",
+     "road",
+     "landscape",
+     "peaceful",
+     "seasonal"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "870cf936991de67288bdcd78dd7015a6",
    "src": "autumn-lake-cabin-reflection",
    "title": "Cabin on an autumn lake",
    "tags": [
-    "autumn",
+    "nature",
     "lake",
     "reflection",
     "forest",
-    "nature"
+    "autumn"
    ],
    "taken": "2024-10-12T15:41:04.000Z",
    "w": 4000,
@@ -4344,22 +5910,42 @@
      "type": "image/jpeg",
      "bytes": 4206274,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/870cf936991de67288bdcd78dd7015a6.avif",
+     "blob": "f5a24742c394b21eb6b93baad3573770042cdfd9",
+     "type": "image/avif",
+     "bytes": 116640
     }
    },
    "blurhash": "LVE.e6$|NGoe~qxWjroe%$t3s+s:",
-   "n": 36,
-   "q": 2
+   "n": 57,
+   "q": 2,
+   "ai": {
+    "d": "A serene lakeside scene with autumn foliage and a small cabin reflecting in the calm water.",
+    "t": [
+     "lake",
+     "autumn",
+     "cabin",
+     "reflection",
+     "peaceful",
+     "trees",
+     "seasonal"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "427624984648047bbe7565da4d1e3507",
    "src": "autumn-valley-through-pines",
    "title": "Valley through the pines",
    "tags": [
-    "autumn",
-    "valley",
-    "forest",
+    "nature",
     "sunset",
-    "nature"
+    "forest",
+    "valley",
+    "autumn"
    ],
    "taken": "2024-10-12T21:10:05.000Z",
    "w": 4000,
@@ -4398,11 +5984,31 @@
      "type": "image/jpeg",
      "bytes": 3840650,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/427624984648047bbe7565da4d1e3507.avif",
+     "blob": "9d3ff62f48c2cdf343c4c7b500106ef3971658f8",
+     "type": "image/avif",
+     "bytes": 106064
     }
    },
    "blurhash": "LIB{[bR,9ZR*~XWDM{WC9$t6s-oL",
-   "n": 37,
-   "q": 2
+   "n": 58,
+   "q": 2,
+   "ai": {
+    "d": "A scenic view of a forested landscape with autumn foliage and a sunset sky framed by tree branches.",
+    "t": [
+     "landscape",
+     "autumn",
+     "sunset",
+     "forest",
+     "trees",
+     "view",
+     "peaceful"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "1881ac5eb97932c640fefef114656b4c",
@@ -4410,9 +6016,9 @@
    "title": "Autumn through rain",
    "tags": [
     "autumn",
+    "bokeh",
     "rain",
-    "abstract",
-    "bokeh"
+    "abstract"
    ],
    "taken": "2024-10-13T04:11:29.000Z",
    "w": 4592,
@@ -4451,20 +6057,40 @@
      "type": "image/jpeg",
      "bytes": 3790705,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/10/1881ac5eb97932c640fefef114656b4c.avif",
+     "blob": "f198ef46c028bf009da32b94c27ec65132e0321e",
+     "type": "image/avif",
+     "bytes": 41876
     }
    },
    "blurhash": "LOI{~FET0$s,~AShS$WXETxs%1WX",
-   "n": 47,
-   "q": 2
+   "n": 59,
+   "q": 2,
+   "ai": {
+    "d": "A close-up of raindrops on a window with a blurred autumnal background.",
+    "t": [
+     "rain",
+     "window",
+     "autumn",
+     "blurry",
+     "seasonal",
+     "weather",
+     "mood"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "1bff10a0a0bb68ef07722b9587594422",
    "src": "pink-carnation-autumn-trees",
    "title": "Carnation in autumn",
    "tags": [
+    "nature",
     "flower",
     "autumn",
-    "nature",
     "bokeh"
    ],
    "taken": "2024-11-18T06:14:31.000Z",
@@ -4504,21 +6130,41 @@
      "type": "image/jpeg",
      "bytes": 2735740,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/1bff10a0a0bb68ef07722b9587594422.avif",
+     "blob": "f3bfd72ba7e53aa91e229d76106e821eab6226a2",
+     "type": "image/avif",
+     "bytes": 38651
     }
    },
    "blurhash": "LgH-#,VWkqSL~pROozax-=M{V[n$",
-   "n": 32,
-   "q": 2
+   "n": 60,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant pink carnation stands out against a backdrop of autumnal trees with yellow leaves.",
+    "t": [
+     "flower",
+     "carnation",
+     "autumn",
+     "trees",
+     "yellow",
+     "park",
+     "beauty"
+    ]
+   },
+   "c": 4
   },
   {
    "h": "8d018c94fac0c5d1e7dd02f6b905d62e",
    "src": "cat-sleeping-blanket-bw",
    "title": "Sleeping cat",
    "tags": [
-    "cat",
-    "pet",
+    "black and white",
     "animal",
-    "black and white"
+    "cat",
+    "pet"
    ],
    "taken": "2024-11-27T06:21:28.000Z",
    "w": 3840,
@@ -4557,22 +6203,42 @@
      "type": "image/jpeg",
      "bytes": 1369856,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/8d018c94fac0c5d1e7dd02f6b905d62e.avif",
+     "blob": "ca3215b053bf479488ca835ec914fa28593c751a",
+     "type": "image/avif",
+     "bytes": 10867
     }
    },
    "blurhash": "LZDvfy9Ft7j[~qD%xuWB?bM{j[Rj",
-   "n": 61,
-   "q": 2
+   "n": 86,
+   "q": 2,
+   "ai": {
+    "d": "A black and white photo of a cat sleeping on a bed with string lights in the background.",
+    "t": [
+     "cat",
+     "sleeping",
+     "bed",
+     "string lights",
+     "black and white",
+     "peaceful",
+     "indoors"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "87cfb0fd63d079def05b21fa3aa3981f",
    "src": "cyclist-crossing-canal-street",
    "title": "Cyclist at the crossing",
    "tags": [
-    "chicago",
-    "street",
     "people",
     "bicycle",
-    "city"
+    "chicago",
+    "city",
+    "street"
    ],
    "taken": "2024-11-28T20:20:27.000Z",
    "w": 3987,
@@ -4611,11 +6277,31 @@
      "type": "image/jpeg",
      "bytes": 4663748,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/87cfb0fd63d079def05b21fa3aa3981f.avif",
+     "blob": "2f3e3b936a19469cd0036076aa71b1ed4c8a3083",
+     "type": "image/avif",
+     "bytes": 77353
     }
    },
    "blurhash": "LCBWlK?G00IU~q%200IU.9WB9ZRj",
-   "n": 14,
-   "q": 2
+   "n": 3,
+   "q": 2,
+   "ai": {
+    "d": "A city street scene with a cyclist in the foreground and tall buildings in the background under a cloudy sky.",
+    "t": [
+     "city",
+     "street",
+     "bike",
+     "buildings",
+     "cloudy",
+     "urban",
+     "traffic"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "b850e327d36bf90bf912b1b38ada7d32",
@@ -4624,8 +6310,8 @@
    "tags": [
     "chicago",
     "architecture",
-    "skyscraper",
-    "blue hour"
+    "blue hour",
+    "skyscraper"
    ],
    "taken": "2024-11-28T20:21:04.000Z",
    "w": 4608,
@@ -4664,22 +6350,43 @@
      "type": "image/jpeg",
      "bytes": 3459785,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/b850e327d36bf90bf912b1b38ada7d32.avif",
+     "blob": "e2b72d9c17aaf9c782ba47f39e509fba4276efc2",
+     "type": "image/avif",
+     "bytes": 16461
     }
    },
    "blurhash": "LB8;=T%N-=M{_4s,adR.Ris-M_WY",
-   "n": 9,
-   "q": 2
+   "n": 4,
+   "q": 2,
+   "ai": {
+    "d": "A modern skyscraper with reflective glass facade against a cloudy sky.",
+    "t": [
+     "building",
+     "architecture",
+     "skyscraper",
+     "cloudy",
+     "cityscape",
+     "modern",
+     "glass",
+     "sky"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "070006c34ef7a397f21433751c1c9a38",
    "src": "snowflake-lights-lobby-night",
    "title": "Snowflake lights",
    "tags": [
+    "night",
+    "interior",
     "chicago",
     "christmas",
-    "lights",
-    "night",
-    "interior"
+    "lights"
    ],
    "taken": "2024-11-28T20:23:51.000Z",
    "w": 4534,
@@ -4718,23 +6425,43 @@
      "type": "image/jpeg",
      "bytes": 2026753,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/070006c34ef7a397f21433751c1c9a38.avif",
+     "blob": "b1d3bb6b61a234f8079bee33ffc855afd633860e",
+     "type": "image/avif",
+     "bytes": 39628
     }
    },
    "blurhash": "L12O@eofE0WC?cofIUWVo$j[Riaz",
-   "n": 8,
-   "q": 2
+   "n": 5,
+   "q": 2,
+   "ai": {
+    "d": "A festive indoor scene with illuminated snowflake decorations hanging from the ceiling.",
+    "t": [
+     "interior",
+     "lights",
+     "holiday",
+     "decoration",
+     "illuminated",
+     "snowflakes",
+     "ceiling"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "65610f4e7506eecdb77f7851cfa4f00a",
    "src": "union-station-great-hall-columns-bw",
    "title": "Great Hall columns",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
+    "black and white",
+    "chicago",
     "christmas",
-    "black and white"
+    "architecture",
+    "union station"
    ],
    "taken": "2024-11-28T20:31:39.000Z",
    "w": 7728,
@@ -4773,23 +6500,43 @@
      "type": "image/jpeg",
      "bytes": 10303350,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/65610f4e7506eecdb77f7851cfa4f00a.avif",
+     "blob": "196210df014b89d983853a02043ca02a36cae7e8",
+     "type": "image/avif",
+     "bytes": 40060
     }
    },
    "blurhash": "LEF68|%M-;xu~qt7t7t7IUoft7j[",
-   "n": 3,
-   "q": 2
+   "n": 6,
+   "q": 2,
+   "ai": {
+    "d": "A black and white photograph of a grand architectural interior with columns and a decorative ceiling.",
+    "t": [
+     "architecture",
+     "building",
+     "columns",
+     "ceiling",
+     "interior",
+     "black and white",
+     "monochrome"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "1040f1ce5b48ed5c9724481d7c06cd54",
    "src": "union-station-traveller-on-bench-bw",
    "title": "Traveller waiting in the Great Hall",
    "tags": [
-    "chicago",
-    "union station",
     "people",
-    "street",
+    "black and white",
+    "chicago",
     "christmas",
-    "black and white"
+    "street",
+    "union station"
    ],
    "taken": "2024-11-28T20:32:04.000Z",
    "w": 2244,
@@ -4828,23 +6575,42 @@
      "type": "image/jpeg",
      "bytes": 576314,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/1040f1ce5b48ed5c9724481d7c06cd54.avif",
+     "blob": "d2aaac4cd9b59e51c0808a96dd84aec235911806",
+     "type": "image/avif",
+     "bytes": 27423
     }
    },
    "blurhash": "LOE:0nt7M{xu%MoffQM{~qxuWBay",
-   "n": 1,
-   "q": 2
+   "n": 7,
+   "q": 2,
+   "ai": {
+    "d": "A person wearing a fur hat sits on a bench in a grand, ornate interior space, possibly a train station, with Christmas decorations in the background.",
+    "t": [
+     "station",
+     "fashion",
+     "winter",
+     "holiday",
+     "architecture",
+     "people"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "0c0ccc0d6764e0c60176af5dea83f5f1",
    "src": "union-station-clinton-street-entrance-bw",
    "title": "Union Station, Clinton Street entrance",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
+    "black and white",
+    "chicago",
     "christmas",
-    "black and white"
+    "architecture",
+    "union station"
    ],
    "taken": "2024-11-28T20:32:28.000Z",
    "w": 7728,
@@ -4883,23 +6649,43 @@
      "type": "image/jpeg",
      "bytes": 8677201,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/0c0ccc0d6764e0c60176af5dea83f5f1.avif",
+     "blob": "293a37db6b14794bca3afadf46fb29169737ba84",
+     "type": "image/avif",
+     "bytes": 40852
     }
    },
    "blurhash": "LKD,4Y~qxu-;%Mxu-;t7WBIUIURj",
-   "n": 0,
-   "q": 2
+   "n": 8,
+   "q": 2,
+   "ai": {
+    "d": "A black and white photo of a grand train station interior with a Christmas tree and people walking.",
+    "t": [
+     "station",
+     "architecture",
+     "holiday",
+     "travel",
+     "people",
+     "interior",
+     "black and white"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "08b35d56d2c6bd8c1c7237049c6e448d",
    "src": "union-station-great-hall-ceiling-bw",
    "title": "Great Hall ceiling",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
-    "ceiling",
-    "black and white"
+    "black and white",
+    "chicago",
+    "architecture",
+    "union station",
+    "ceiling"
    ],
    "taken": "2024-11-28T20:33:02.000Z",
    "w": 7728,
@@ -4938,23 +6724,43 @@
      "type": "image/jpeg",
      "bytes": 10683988,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/08b35d56d2c6bd8c1c7237049c6e448d.avif",
+     "blob": "11bedb31135eebb160bde74c5f583cdfeb9323ed",
+     "type": "image/avif",
+     "bytes": 67032
     }
    },
    "blurhash": "LDEV+:_3xut7~q-;M{j[t7RjfQof",
-   "n": 2,
-   "q": 2
+   "n": 9,
+   "q": 2,
+   "ai": {
+    "d": "A black and white photograph of an ornate architectural interior with a statue and detailed ceiling.",
+    "t": [
+     "architecture",
+     "statue",
+     "ceiling",
+     "black and white",
+     "interior",
+     "detail",
+     "monochrome"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "e7ee553b7010e3f2605490a40739ab0b",
    "src": "union-station-skylight-statue",
    "title": "Skylight and statue",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
-    "ceiling",
-    "golden"
+    "chicago",
+    "architecture",
+    "golden",
+    "union station",
+    "ceiling"
    ],
    "taken": "2024-11-28T20:34:56.000Z",
    "w": 7728,
@@ -4993,23 +6799,43 @@
      "type": "image/jpeg",
      "bytes": 12423135,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/e7ee553b7010e3f2605490a40739ab0b.avif",
+     "blob": "f731504df144f0303e25109f4dd2fe5d3e79e84b",
+     "type": "image/avif",
+     "bytes": 91133
     }
    },
    "blurhash": "LOD[^K%N9aRO?wgiaJelt-Xna{NG",
-   "n": 13,
-   "q": 2
+   "n": 10,
+   "q": 2,
+   "ai": {
+    "d": "An ornate interior with a large skylight and classical architecture.",
+    "t": [
+     "architecture",
+     "interior",
+     "skylight",
+     "columns",
+     "statue",
+     "beauty",
+     "grand"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "c77cd4d720c1f8d9d9375e347862287c",
    "src": "union-station-skylight-gold",
    "title": "Union Station skylight",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
-    "ceiling",
-    "golden"
+    "chicago",
+    "architecture",
+    "golden",
+    "union station",
+    "ceiling"
    ],
    "taken": "2024-11-28T20:37:15.000Z",
    "w": 7728,
@@ -5048,23 +6874,43 @@
      "type": "image/jpeg",
      "bytes": 12662474,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/c77cd4d720c1f8d9d9375e347862287c.avif",
+     "blob": "11206a8c61b077843cf65079e3fcecbf9cf9c6de",
+     "type": "image/avif",
+     "bytes": 73162
     }
    },
    "blurhash": "LDI;q#00S%~o_3wE-;ESEn~3-mER",
-   "n": 12,
-   "q": 2
+   "n": 11,
+   "q": 2,
+   "ai": {
+    "d": "An ornate interior with detailed architecture and a skylight.",
+    "t": [
+     "architecture",
+     "interior",
+     "details",
+     "skylight",
+     "beauty",
+     "design",
+     "grand"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "477377ff3b916abb0ae10113aabb8cb5",
    "src": "union-station-grand-staircase",
    "title": "Grand staircase",
    "tags": [
-    "chicago",
-    "union station",
-    "architecture",
     "interior",
-    "stairs",
-    "golden"
+    "chicago",
+    "architecture",
+    "golden",
+    "union station",
+    "stairs"
    ],
    "taken": "2024-11-28T21:05:45.000Z",
    "w": 7559,
@@ -5103,21 +6949,41 @@
      "type": "image/jpeg",
      "bytes": 10682647,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/477377ff3b916abb0ae10113aabb8cb5.avif",
+     "blob": "d4639f85c17f2dc604e3efa8bb5ee5a77346f267",
+     "type": "image/avif",
+     "bytes": 64693
     }
    },
    "blurhash": "L6DbyT-OZLw]%1of,lr=0uW=VpWC",
-   "n": 19,
-   "q": 2
+   "n": 12,
+   "q": 2,
+   "ai": {
+    "d": "A grand staircase with ornate railings and large windows in a historic building.",
+    "t": [
+     "staircase",
+     "architecture",
+     "interior",
+     "building",
+     "grand",
+     "elegant",
+     "illuminated"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "a3aed87fe25e60b2618f1936f79c32b1",
    "src": "police-suv-and-buses-street",
    "title": "Police SUV and buses",
    "tags": [
-    "chicago",
-    "street",
-    "city",
     "car",
+    "chicago",
+    "city",
+    "street",
     "bus"
    ],
    "taken": "2024-11-28T21:14:08.000Z",
@@ -5157,21 +7023,41 @@
      "type": "image/jpeg",
      "bytes": 3199196,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/a3aed87fe25e60b2618f1936f79c32b1.avif",
+     "blob": "f2fb7d4924ddc7a01568c14a517b50214ecceea6",
+     "type": "image/avif",
+     "bytes": 62700
     }
    },
    "blurhash": "LdDTV59FrWRj?wD%rqRj.8M{i_oL",
-   "n": 15,
-   "q": 2
+   "n": 13,
+   "q": 2,
+   "ai": {
+    "d": "A city street scene featuring a police SUV, buses, and modern buildings.",
+    "t": [
+     "city",
+     "street",
+     "traffic",
+     "buildings",
+     "urban",
+     "transportation",
+     "architecture"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "8b8ce459f5754d3217c8a8b0823121cb",
    "src": "mustang-on-empty-street-bw",
    "title": "Mustang on an empty street",
    "tags": [
-    "chicago",
     "car",
-    "street",
-    "black and white"
+    "black and white",
+    "chicago",
+    "street"
    ],
    "taken": "2024-11-28T21:18:25.000Z",
    "w": 4608,
@@ -5210,11 +7096,31 @@
      "type": "image/jpeg",
      "bytes": 2469169,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/8b8ce459f5754d3217c8a8b0823121cb.avif",
+     "blob": "56a661adaade53fa655a0687eb87e566a9d26e2b",
+     "type": "image/avif",
+     "bytes": 21956
     }
    },
    "blurhash": "L69H2_4nof9F~q00?bRj009F_3WB",
-   "n": 5,
-   "q": 2
+   "n": 14,
+   "q": 2,
+   "ai": {
+    "d": "A black and white photo of a Ford Mustang GT parked on a city street.",
+    "t": [
+     "car",
+     "mustang",
+     "city",
+     "street",
+     "black and white",
+     "urban",
+     "photography"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "f61e471728344c42d0fb3d78ea3999f7",
@@ -5222,8 +7128,8 @@
    "title": "Steel and glass",
    "tags": [
     "chicago",
-    "architecture",
     "city",
+    "architecture",
     "skyscraper"
    ],
    "taken": "2024-11-28T21:22:58.000Z",
@@ -5263,22 +7169,42 @@
      "type": "image/jpeg",
      "bytes": 6849282,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/f61e471728344c42d0fb3d78ea3999f7.avif",
+     "blob": "1005edcc302920d21e3533d0fdaf1d6084521bdf",
+     "type": "image/avif",
+     "bytes": 86570
     }
    },
    "blurhash": "LM8}DTM|IU-=.AWFM{x]aytSayRk",
-   "n": 18,
-   "q": 2
+   "n": 15,
+   "q": 2,
+   "ai": {
+    "d": "A cityscape with modern buildings, a traffic light, and urban infrastructure.",
+    "t": [
+     "city",
+     "architecture",
+     "skyscrapers",
+     "traffic",
+     "urban",
+     "buildings",
+     "street"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "4171223c7d3fcb870b8391698b5d9687",
    "src": "christkindlmarket-crowd",
    "title": "Christmas market crowd",
    "tags": [
+    "people",
     "chicago",
     "christmas",
-    "market",
-    "people",
-    "street"
+    "street",
+    "market"
    ],
    "taken": "2024-11-28T21:25:50.000Z",
    "w": 4530,
@@ -5317,11 +7243,31 @@
      "type": "image/jpeg",
      "bytes": 3587748,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/4171223c7d3fcb870b8391698b5d9687.avif",
+     "blob": "221d6fbe6410d14519997948cdb0ad1a52902b86",
+     "type": "image/avif",
+     "bytes": 72937
     }
    },
    "blurhash": "L78zx=?G004._Ns:DiD*9]S1jFM|",
-   "n": 7,
-   "q": 2
+   "n": 16,
+   "q": 2,
+   "ai": {
+    "d": "A bustling city street scene with people walking past holiday market stalls.",
+    "t": [
+     "city",
+     "people",
+     "market",
+     "winter",
+     "buildings",
+     "holiday",
+     "street"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "439adde7130b5ad5a90a5341d005c487",
@@ -5370,22 +7316,42 @@
      "type": "image/jpeg",
      "bytes": 4270252,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/439adde7130b5ad5a90a5341d005c487.avif",
+     "blob": "9620439457a57a3d2c80cf18c150c9ce31bcf8bd",
+     "type": "image/avif",
+     "bytes": 69006
     }
    },
    "blurhash": "LRB|Nl00-;NF~q4n%Max%LM|oeof",
-   "n": 6,
-   "q": 2
+   "n": 17,
+   "q": 2,
+   "ai": {
+    "d": "A cityscape featuring the Chicago Public Library and modern high-rise buildings under a cloudy sky.",
+    "t": [
+     "city",
+     "architecture",
+     "buildings",
+     "library",
+     "skyscrapers",
+     "cloudy",
+     "urban"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "317afb66fa365e498e86eaf60b577d42",
    "src": "chicago-street-night-wrigley-building-bw",
    "title": "Michigan Avenue at night",
    "tags": [
+    "night",
+    "black and white",
     "chicago",
     "city",
-    "street",
-    "night",
-    "black and white"
+    "street"
    ],
    "taken": "2024-11-28T21:48:01.000Z",
    "w": 4608,
@@ -5424,20 +7390,41 @@
      "type": "image/jpeg",
      "bytes": 2505600,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/317afb66fa365e498e86eaf60b577d42.avif",
+     "blob": "687540eae65aab841ba0aaec62885c3f91e0b168",
+     "type": "image/avif",
+     "bytes": 34303
     }
    },
    "blurhash": "L76t].M{00?b~qM{4n-;%MRjIUxu",
-   "n": 4,
-   "q": 2
+   "n": 18,
+   "q": 2,
+   "ai": {
+    "d": "A black and white cityscape with tall buildings, streetlights, and a few pedestrians walking along a sidewalk.",
+    "t": [
+     "city",
+     "street",
+     "buildings",
+     "monochrome",
+     "architecture",
+     "streetlights",
+     "pedestrians",
+     "urban"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "287385a194a16a97aa2e436048761d7e",
    "src": "boy-on-ice-rink",
    "title": "On the ice",
    "tags": [
-    "chicago",
     "people",
     "portrait",
+    "chicago",
     "winter",
     "ice skating"
    ],
@@ -5478,11 +7465,31 @@
      "type": "image/jpeg",
      "bytes": 1717533,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/287385a194a16a97aa2e436048761d7e.avif",
+     "blob": "b850bb5e3639e40afac7b3d28d7eecc979b4c04b",
+     "type": "image/avif",
+     "bytes": 24583
     }
    },
    "blurhash": "LUI~V,x]?^M{00V@IAt7V?e.MxjZ",
-   "n": 22,
-   "q": 2
+   "n": 19,
+   "q": 2,
+   "ai": {
+    "d": "A child ice skating on a rink with other people in the background.",
+    "t": [
+     "ice rink",
+     "winter",
+     "skating",
+     "family",
+     "outdoor",
+     "fun",
+     "child"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "02b2e82669a353b4b86eef8384af5c51",
@@ -5490,10 +7497,10 @@
    "title": "The Bean and Michigan Avenue",
    "tags": [
     "chicago",
-    "millennium park",
-    "cloud gate",
+    "skyline",
     "city",
-    "skyline"
+    "millennium park",
+    "cloud gate"
    ],
    "taken": "2024-11-28T22:06:53.000Z",
    "w": 4569,
@@ -5532,19 +7539,39 @@
      "type": "image/jpeg",
      "bytes": 5368009,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/02b2e82669a353b4b86eef8384af5c51.avif",
+     "blob": "aba43e3f814a1b49e0362e809f0de64120b79172",
+     "type": "image/avif",
+     "bytes": 78150
     }
    },
    "blurhash": "L;KBOB-=M{Rj~q%MRja}t7WAWBt7",
-   "n": 11,
-   "q": 2
+   "n": 20,
+   "q": 2,
+   "ai": {
+    "d": "A photo of the Chicago skyline with the Cloud Gate sculpture in the foreground.",
+    "t": [
+     "cityscape",
+     "architecture",
+     "cloud gate",
+     "urban",
+     "skyscrapers",
+     "photography",
+     "travel"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "464d242a2f6db318fb48e31f99fbf93e",
    "src": "ice-rink-crowd-from-above",
    "title": "Skaters from above",
    "tags": [
-    "chicago",
     "people",
+    "chicago",
     "winter",
     "ice skating"
    ],
@@ -5585,21 +7612,41 @@
      "type": "image/jpeg",
      "bytes": 2377580,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/11/464d242a2f6db318fb48e31f99fbf93e.avif",
+     "blob": "2f6bbbbc1593b943463a6764a594fee89b1fdf5a",
+     "type": "image/avif",
+     "bytes": 36375
     }
    },
    "blurhash": "LK9aNz?vNGIT_N-=WBM{x]tRoLof",
    "n": 21,
-   "q": 2
+   "q": 2,
+   "ai": {
+    "d": "A group of people ice skating and socializing in a public ice rink.",
+    "t": [
+     "ice rink",
+     "winter",
+     "social gathering",
+     "people",
+     "activity",
+     "fun",
+     "community"
+    ]
+   },
+   "c": 0
   },
   {
    "h": "19964874532e1615165cbf9590e3ec04",
    "src": "snake-on-branch",
    "title": "Snake on a branch",
    "tags": [
-    "snake",
-    "reptile",
     "animal",
     "wildlife",
+    "snake",
+    "reptile",
     "dark"
    ],
    "taken": "2024-12-24T19:21:50.000Z",
@@ -5639,21 +7686,41 @@
      "type": "image/jpeg",
      "bytes": 3976221,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/12/19964874532e1615165cbf9590e3ec04.avif",
+     "blob": "63135f6914dd167ca824889954c5044ecc638822",
+     "type": "image/avif",
+     "bytes": 39762
     }
    },
    "blurhash": "L26RAEEd03H_TatR=_IB}lkB0jjd",
-   "n": 63,
-   "q": 2
+   "n": 87,
+   "q": 2,
+   "ai": {
+    "d": "A snake with iridescent scales is coiled on a tree branch.",
+    "t": [
+     "snake",
+     "iridescent",
+     "tree",
+     "branch",
+     "nature",
+     "wildlife",
+     "serpentine"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "925c79376c09e5257b424fb12950224c",
    "src": "anemone-and-tangs-aquarium",
    "title": "Anemone and tangs",
    "tags": [
-    "fish",
-    "aquarium",
+    "colourful",
     "animal",
-    "colourful"
+    "fish",
+    "aquarium"
    ],
    "taken": "2024-12-24T21:01:41.000Z",
    "w": 7728,
@@ -5692,21 +7759,41 @@
      "type": "image/jpeg",
      "bytes": 6831146,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/12/925c79376c09e5257b424fb12950224c.avif",
+     "blob": "ba7f8a0232cdc880bb006295d985beea1d821d15",
+     "type": "image/avif",
+     "bytes": 35119
     }
    },
    "blurhash": "LD7^Y:~9?D%FV|a6V{V|ELI:W;t6",
-   "n": 60,
-   "q": 2
+   "n": 88,
+   "q": 2,
+   "ai": {
+    "d": "A vibrant underwater scene featuring a yellow tang fish and a blue tang fish swimming near coral and anemones.",
+    "t": [
+     "aquarium",
+     "fish",
+     "coral",
+     "underwater",
+     "marine",
+     "aquatic",
+     "colorful"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "0b78fcd8b2c32baa87a486a65694a88d",
    "src": "lionfish-aquarium",
    "title": "Lionfish",
    "tags": [
-    "fish",
-    "aquarium",
     "animal",
-    "dark"
+    "dark",
+    "fish",
+    "aquarium"
    ],
    "taken": "2024-12-24T21:11:42.000Z",
    "w": 7728,
@@ -5745,21 +7832,41 @@
      "type": "image/jpeg",
      "bytes": 9433399,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/12/0b78fcd8b2c32baa87a486a65694a88d.avif",
+     "blob": "11780791aaaf6cb8c0b5cec4a492661d3c27bca0",
+     "type": "image/avif",
+     "bytes": 34636
     }
    },
    "blurhash": "L33]DXtk00MKx]bvMxa04URP?t%f",
-   "n": 55,
-   "q": 2
+   "n": 89,
+   "q": 2,
+   "ai": {
+    "d": "A lionfish with vibrant stripes and spiky fins is captured in a dark underwater environment.",
+    "t": [
+     "underwater",
+     "fish",
+     "marine",
+     "nature",
+     "striped",
+     "spiky",
+     "dark"
+    ]
+   },
+   "c": 6
   },
   {
    "h": "b7a758af329330971b175ec78d98f684",
    "src": "beached-boat-dune-grass",
    "title": "Boat on the dunes",
    "tags": [
-    "boat",
+    "minimal",
     "lake",
     "beach",
-    "minimal",
+    "boat",
     "overcast"
    ],
    "taken": "2024-12-31T18:27:40.000Z",
@@ -5799,21 +7906,40 @@
      "type": "image/jpeg",
      "bytes": 7914077,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/12/b7a758af329330971b175ec78d98f684.avif",
+     "blob": "c8ef82439ac5a6b908022aab7940404fd9df2e75",
+     "type": "image/avif",
+     "bytes": 35052
     }
    },
    "blurhash": "L%Mtmzt8Rjof_Nf6WBofITWVj[ay",
-   "n": 28,
-   "q": 2
+   "n": 73,
+   "q": 2,
+   "ai": {
+    "d": "A boat is elevated on a grassy field under a cloudy sky.",
+    "t": [
+     "boat",
+     "field",
+     "cloudy",
+     "winter",
+     "landscape",
+     "deserted"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "157928f87e56397cd799eca97f591ea3",
    "src": "white-lighthouse-lake-shore",
    "title": "Lighthouse on the shore",
    "tags": [
-    "lighthouse",
     "lake",
     "beach",
-    "overcast"
+    "overcast",
+    "lighthouse"
    ],
    "taken": "2024-12-31T19:57:06.000Z",
    "w": 7677,
@@ -5852,22 +7978,42 @@
      "type": "image/jpeg",
      "bytes": 8036903,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2024/12/157928f87e56397cd799eca97f591ea3.avif",
+     "blob": "082d1bb0b1b8b6cbb4d2256b27a627a078adcce0",
+     "type": "image/avif",
+     "bytes": 28537
     }
    },
    "blurhash": "LlM@TD%ME1xa~qs:n%ofRkaej[WB",
-   "n": 27,
-   "q": 2
+   "n": 74,
+   "q": 2,
+   "ai": {
+    "d": "A serene coastal scene featuring a lighthouse on a cloudy day.",
+    "t": [
+     "coast",
+     "lighthouse",
+     "beach",
+     "cloudy",
+     "peaceful",
+     "landscape",
+     "beauty"
+    ]
+   },
+   "c": 5
   },
   {
    "h": "2f0320f259aab43b4687a779d73a3b36",
    "src": "snowy-forest-stream",
    "title": "Snowy stream",
    "tags": [
-    "winter",
-    "snow",
+    "nature",
     "forest",
     "river",
-    "nature"
+    "winter",
+    "snow"
    ],
    "taken": "2025-01-01T15:52:14.000Z",
    "w": 7728,
@@ -5906,21 +8052,41 @@
      "type": "image/jpeg",
      "bytes": 17431578,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2025/01/2f0320f259aab43b4687a779d73a3b36.avif",
+     "blob": "e2a5940717ee6d4114baa8af3852ca439c347efa",
+     "type": "image/avif",
+     "bytes": 137718
     }
    },
    "blurhash": "LbJk+ZIU4n%M~qxuM|j?V[ofazaz",
-   "n": 26,
-   "q": 2
+   "n": 107,
+   "q": 2,
+   "ai": {
+    "d": "A serene winter scene with snow-covered trees and a calm river.",
+    "t": [
+     "winter",
+     "snow",
+     "river",
+     "trees",
+     "peaceful",
+     "landscape",
+     "nature"
+    ]
+   },
+   "c": 7
   },
   {
    "h": "ca0f7169751616e483b268bc042c55af",
    "src": "vintage-camera-tulips-moody",
    "title": "Camera and tulips",
    "tags": [
-    "camera",
-    "still life",
     "flower",
-    "moody"
+    "moody",
+    "still life",
+    "camera"
    ],
    "taken": "2025-02-01T21:35:35.000Z",
    "w": 1848,
@@ -5959,11 +8125,31 @@
      "type": "image/jpeg",
      "bytes": 1110915,
      "q": 1
+    },
+    "sm": {
+     "repo": "lamha-a-vzrzrme81h-media",
+     "path": "sm/2025/02/ca0f7169751616e483b268bc042c55af.avif",
+     "blob": "0a63ad2683c9f0f0aa5275111b8bcf37c7fbe421",
+     "type": "image/avif",
+     "bytes": 13775
     }
    },
    "blurhash": "LA6aL;}p^4=awbxFw]xFM|R+R*Nd",
-   "n": 35,
-   "q": 2
+   "n": 108,
+   "q": 2,
+   "ai": {
+    "d": "A vintage camera with a strap, a bouquet of tulips, and a camera case on a wooden surface.",
+    "t": [
+     "camera",
+     "flowers",
+     "still life",
+     "photography",
+     "vintage",
+     "indoors",
+     "warm lighting"
+    ]
+   },
+   "c": 7
   }
  ]
 }

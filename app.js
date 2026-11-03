@@ -1,9 +1,10 @@
-import { decode } from './vendor/blurhash.js?v=7fa6bc2730';
-import * as data from './data.js?v=7fa6bc2730';
-import * as auth from './auth.js?v=7fa6bc2730';
-import { openViewer, closeViewer } from './viewer.js?v=7fa6bc2730';
-import './mesh.js?v=7fa6bc2730';
-import { openReel, reelSupported } from './reel.js?v=7fa6bc2730';
+import { decode } from './vendor/blurhash.js?v=b2e1734f16';
+import * as data from './data.js?v=b2e1734f16';
+import * as auth from './auth.js?v=b2e1734f16';
+import { openViewer, closeViewer } from './viewer.js?v=b2e1734f16';
+// the live dot grid only where there is a mouse to play with it; on phones it cost a full-screen layer every frame
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=b2e1734f16');
+import { openReel, reelSupported } from './reel.js?v=b2e1734f16';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -12,6 +13,7 @@ const barTitle = bar.querySelector('.bar-title');
 const search = bar.querySelector('.search');
 const searchInput = search.querySelector('input');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const phone = matchMedia('(max-width: 700px)').matches; // fewer cards to turn on a phone
 
 // Night and day. The new theme spreads from the button in a circle while the icon's sun sets and moon rises.
 const themeBtn = document.querySelector('.theme');
@@ -31,8 +33,17 @@ themeBtn.addEventListener('click', () => {
   const end = (Math.hypot(Math.max(x, W - x), Math.max(y, H - y)) / (Math.hypot(W, H) / Math.SQRT2)) * 100; // % of the reference radius
   // 'theming' also takes every other element's own transition name away (CSS), so the whole page is one
   // picture and changes together inside the circle; nothing pops on its own
+  // a phone or tablet: a short cross-fade between the two looks instead (the graphics card does it alone; the
+  // widening circle made phones redraw the whole picture every frame)
+  const touch = !matchMedia('(hover: hover) and (pointer: fine)').matches;
   document.documentElement.classList.add('theming');
+  document.documentElement.classList.toggle('theming-fade', touch);
   const t = document.startViewTransition(() => setTheme(next));
+  if (touch) {
+    t.finished.finally(() => document.documentElement.classList.remove('theming', 'theming-fade'));
+    setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } }, 1200); // never stuck
+    return;
+  }
   // quick to start, gentle to land: the page is a still picture while it runs, so it stays short
   t.ready.then(() => document.documentElement.animate(
     { clipPath: [`circle(0% ${at})`, `circle(${end}% ${at})`] },
@@ -161,7 +172,7 @@ async function renderHome() {
 
   // 1. a curved ribbon of photographs that turns slowly and can be spun by hand
   const step = Math.max(1, Math.floor(pool.length / 20));
-  const ringPhotos = [...pool].sort((x, y) => (x.n ?? 0) - (y.n ?? 0)).filter((_, i) => i % step === 0).slice(0, 20);
+  const ringPhotos = [...pool].sort((x, y) => (x.n ?? 0) - (y.n ?? 0)).filter((_, i) => i % step === 0).slice(0, phone ? 12 : 20);
   const cards = ringPhotos.map(p => {
     const img = h('img', { alt: p.title || '', decoding: 'async', draggable: false, src: data.src(p.v.thumb, albumId) });
     const card = h('a', { className: 'card3d', href: `#/a/${albumId}/${p.h}`, draggable: false, 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
@@ -181,7 +192,7 @@ async function renderHome() {
     openViewer({
       photos: homePhotos, index: homePhotos.indexOf(ringPhotos[i]), from: card,
       tileFor: p => (c => c && c.style.visibility !== 'hidden' ? c : null)(cardOf.get(p.h)),
-      onIndex: () => {}, fmtDate,
+      onIndex: () => {}, fmtDate, albumId,
       onClose: () => { removeEventListener('popstate', pop); if (history.state?.viewer) history.back(); },
     });
   }));
@@ -212,7 +223,7 @@ async function renderHome() {
   }));
 
   // 4. albums: on shelves, as gallery walls, or as a plain list. The switch remembers your choice.
-  const [shelf, wall] = await Promise.all([shelves(albums), walls(albums)]);
+  const [shelf, wall, line] = await Promise.all([shelves(albums), walls(albums), timeline(albums)]);
   const index = h('section', { className: 'index' },
     albums.map((a, i) => {
       const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', src: a.cover ? data.src(a.cover, a.id) : '' });
@@ -226,7 +237,7 @@ async function renderHome() {
         media);
     }));
 
-  const views = { shelves: ['Shelves', shelf], wall: ['Wall', wall], list: ['List', index] };
+  const views = { shelves: ['Shelves', shelf], wall: ['Wall', wall], list: ['List', index], timeline: ['Timeline', line] };
   let mode = 'shelves';
   try { mode = views[localStorage.getItem('albumsView')] ? localStorage.getItem('albumsView') : mode; } catch {}
   const seg = h('div', { className: 'seg', role: 'group', 'aria-label': 'Show albums as' },
@@ -241,7 +252,7 @@ async function renderHome() {
     transition(() => { mode = k; paint(); });
   };
   paint();
-  const list = h('section', { className: 'albums' }, h('div', { className: 'albums-head' }, h('h2', { className: 'eyebrow' }, 'Albums'), seg), shelf, wall, index);
+  const list = h('section', { className: 'albums' }, h('div', { className: 'albums-head' }, h('h2', { className: 'eyebrow' }, 'Albums'), seg), shelf, wall, index, line);
 
   view.replaceChildren(cine, scatter, list);
   const account = accountLine(await getCatalog());
@@ -283,12 +294,16 @@ function spin(stage, cards) {
       c.style.opacity = Math.min(1, (P * 0.62 - z) / (P * 0.25)).toFixed(3);
     });
   };
-  let onScreen = true;
+  // it rests while the page scrolls (turning 3D cards and scrolling at once is what made phones stutter)
+  let onScreen = true, scrolling = false, scrollTimer = 0;
+  const onScroll = () => { scrolling = true; clearTimeout(scrollTimer); scrollTimer = setTimeout(() => { scrolling = false; resume(); }, 160); };
+  addEventListener('scroll', onScroll, { passive: true });
+  cleanup.push(() => removeEventListener('scroll', onScroll));
   const frame = t => {
     const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
     if (!drag) { angle += vel * dt; vel = drift + (vel - drift) * Math.exp(-dt * 1.6); }
     place();
-    const idle = !onScreen || document.documentElement.classList.contains('viewing');
+    const idle = !onScreen || scrolling || document.documentElement.classList.contains('viewing');
     raf = stage.isConnected && !idle ? requestAnimationFrame(frame) : 0;
   };
   const resume = () => { if (!raf && stage.isConnected) raf = requestAnimationFrame(t => { last = t; frame(t); }); };
@@ -418,6 +433,57 @@ function slider(track) {
 }
 
 const SIZES = [1.25, 0.9, 1.05, 0.8, 1.15, 0.85, 1, 0.95]; // a salon hang mixes sizes
+
+// ---------- map: where an album's photos were taken (only albums whose owner chose to show it, to ~1 km) ----------
+const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
+async function openMap(photos, albumId) {
+  if (!document.querySelector('link[data-leaflet]')) document.head.append(h('link', { rel: 'stylesheet', href: LEAFLET + 'leaflet.min.css', 'data-leaflet': '' }));
+  if (!window.L) await new Promise((ok, no) => document.head.append(h('script', { src: LEAFLET + 'leaflet.min.js', onload: ok, onerror: no })));
+  const box = h('div', { className: 'mapbox' });
+  const close = () => { layer.remove(); removeEventListener('keydown', key); };
+  const key = e => { if (e.key === 'Escape') close(); };
+  const layer = h('div', { className: 'maplayer', role: 'dialog', 'aria-label': 'Map' }, box,
+    h('button', { className: 'lb-btn map-close', type: 'button', 'aria-label': 'Close', onclick: close }, '×'));
+  document.body.append(layer);
+  addEventListener('keydown', key);
+  const map = L.map(box, { zoomControl: true, attributionControl: true });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 15, attribution: '© OpenStreetMap' }).addTo(map);
+  // one marker per place, with how many photos were taken there; it opens the first of them
+  const places = new Map();
+  for (const p of photos.filter(p => p.geo)) { const k = p.geo.join(','); if (!places.has(k)) places.set(k, []); places.get(k).push(p); }
+  const pts = [...places].map(([k, ps]) => {
+    const [lat, lon] = k.split(',').map(Number);
+    L.marker([lat, lon], { icon: L.divIcon({ className: 'map-pin', html: `<img src="${data.src(ps[0].v.thumb, albumId)}" alt=""><b>${ps.length}</b>`, iconSize: [52, 52] }) })
+      .addTo(map).on('click', () => { close(); location.hash = `#/a/${albumId}/${ps[0].h}`; });
+    return [lat, lon];
+  });
+  map.fitBounds(pts, { padding: [60, 60], maxZoom: 12 });
+}
+
+// ---------- timeline: every photo you can see, month by month across all albums ----------
+async function timeline(albums) {
+  const loaded = (await Promise.all(albums.map(a => data.album(a).then(m => ({ a, m }), () => null)))).filter(Boolean);
+  const months = new Map();
+  for (const { a, m } of loaded) for (const p of m.photos) {
+    if (!p.taken) continue;
+    const k = p.taken.slice(0, 7);
+    if (!months.has(k)) months.set(k, []);
+    months.get(k).push({ a, p });
+  }
+  const keys = [...months.keys()].sort().reverse(); // the newest first
+  return h('section', { className: 'timeline-view' }, keys.map(k => {
+    const items = months.get(k).sort((x, y) => x.p.taken.localeCompare(y.p.taken));
+    const label = new Date(`${k}-15T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    return h('div', { className: 'tl-month' },
+      h('h3', {}, label, h('span', { className: 'mono' }, `${items.length} ${items.length === 1 ? 'photograph' : 'photographs'}`)),
+      h('div', { className: 'tl-strip' }, items.map(({ a, p }) => {
+        const img = h('img', { alt: p.title || '', loading: 'lazy', decoding: 'async', src: data.src(p.v.thumb, a.id) });
+        const el = h('a', { className: 'tl-photo', href: `#/a/${a.id}/${p.h}`, 'aria-label': p.title || a.title }, blurCanvas(p.blurhash, 12, 12), img);
+        whenReady(img, () => el.classList.add('ready'));
+        return el;
+      })));
+  }));
+}
 
 async function walls(albums) {
   const loaded = (await Promise.all(albums.map(a => data.album(a).then(m => ({ a, m }), () => null)))).filter(Boolean);
@@ -568,6 +634,23 @@ async function renderAlbum(id) {
   const topTags = [...tagCounts].filter(([, n]) => n > 2 && n < ordered.length).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([t]) => t);
   const chips = h('div', { className: 'chips', role: 'group', 'aria-label': 'Filter by subject' },
     ['All', ...topTags].map((t, i) => h('button', { className: 'chip', type: 'button', 'aria-pressed': String(i === 0) }, t)));
+  // signed in: your favourites in this album, as a chip of their own (once there are any)
+  let favs = new Set();
+  data.favourites().then(f => {
+    favs = f;
+    if ([...f].some(k => k.startsWith(`${id}/`))) chips.insertBefore(h('button', { className: 'chip fav', type: 'button', 'aria-pressed': 'false', 'data-fav': '' }, '♥ Favourites'), chips.children[1] || null);
+  });
+  // narrowing by year, camera and shape (only the ones this album has more than one of)
+  const shapeOf = p => p.w / p.hgt > 1.1 ? 'Landscape' : p.hgt / p.w > 1.1 ? 'Portrait' : 'Square';
+  const yearOf = p => p.taken?.slice(0, 4) || '';
+  const refineBy = { year: '', camera: '', shape: '' };
+  const pick = (key, label, values) => values.length > 1 ? h('label', { className: 'refine-pick' }, h('span', { className: 'mono' }, label),
+    h('select', { onchange: e => { refineBy[key] = e.target.value; apply(); } }, h('option', { value: '' }, 'All'), values.map(v => h('option', { value: v }, v)))) : null;
+  const refine = h('div', { className: 'refine' },
+    pick('year', 'Year', [...new Set(ordered.map(yearOf).filter(Boolean))].sort()),
+    pick('camera', 'Camera', [...new Set(ordered.map(p => p.camera).filter(Boolean))].sort()),
+    pick('shape', 'Shape', ['Landscape', 'Portrait', 'Square'].filter(s => ordered.some(p => shapeOf(p) === s))));
+  const refined = p => (!refineBy.year || yearOf(p) === refineBy.year) && (!refineBy.camera || p.camera === refineBy.camera) && (!refineBy.shape || shapeOf(p) === refineBy.shape);
 
   current = { entry, chapters: used, photos: ordered, tiles: new Map(), grid: false };
   for (const p of ordered) current.tiles.set(p.h, tile(p));
@@ -590,7 +673,7 @@ async function renderAlbum(id) {
   }
   // It opens like the home page: a ribbon of the album's photographs. "Expand into grid" lays them all out.
   const step = Math.max(1, Math.floor(ordered.length / 30));
-  const ringPhotos = ordered.filter((_, i) => i % step === 0).slice(0, 30);
+  const ringPhotos = ordered.filter((_, i) => i % step === 0).slice(0, phone ? 14 : 30);
   const cards = new Map(ringPhotos.map(p => {
     const img = h('img', { alt: '', decoding: 'async', draggable: false, src: data.src(p.v.thumb, id) });
     const card = h('button', { className: 'card3d', type: 'button', 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
@@ -614,9 +697,10 @@ async function renderAlbum(id) {
   const gridView = h('div', { className: 'gridview', hidden: true },
     h('div', { className: 'gridtop' },
       h('h1', { className: 'gridtitle' }, entry.title),
-      h('div', { className: 'ctas tight' }, reelBtn(), h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon'))),
+      h('div', { className: 'ctas tight' }, reelBtn(), ordered.some(p => p.geo) ? h('button', { className: 'btn ghost', type: 'button', onclick: () => openMap(ordered, id) }, 'Map') : null, h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon'))),
     h('section', { className: 'contents' }, h('p', { className: 'eyebrow' }, 'Contents'), toc),
     chips,
+    refine,
     ...sections,
     h('p', { className: 'empty', hidden: true }, 'No photographs match.'));
   view.replaceChildren(stage, gridView);
@@ -655,11 +739,28 @@ async function renderAlbum(id) {
   const stem = w => w.replace(/(?<=..)(es|s)$/, '');
   const known = new Map(ordered.map(p => [p.h, [p.title, p.desc, p.src, ...(p.people || []), ...(p.tags || []), p.ai?.d, ...(p.ai?.t || []), p.camera, p.lens,
     p.taken && new Date(p.taken).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })].filter(Boolean).join(' ').toLowerCase()]));
+  // and by meaning: photos whose words are close to the search's ("children by the sea" finds "kids at the
+  // beach"), once the small model is in (it loads on the first search, then is kept)
+  let close = new Set(), asked = 0, meaningTimer = 0;
+  const withMeaning = ordered.some(p => p.emb);
   const apply = () => {
-    const words = searchInput.value.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(stem);
-    const match = p => (tag === 'All' || p.tags?.includes(tag)) && words.every(w => known.get(p.h).includes(w));
+    const q = searchInput.value.trim(), words = q.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(stem);
+    const match = p => refined(p) && (tag === 'All' || (tag === '♥ Favourites' ? favs.has(`${id}/${p.h}`) : p.tags?.includes(tag))) && (words.every(w => known.get(p.h).includes(w)) || close.has(p.h));
     for (const c of used) c.shown = c.photos.filter(match);
     layout(true);
+    clearTimeout(meaningTimer);
+    if (!withMeaning || words.length === 0) { if (close.size) { close = new Set(); } return; }
+    const me = ++asked;
+    meaningTimer = setTimeout(async () => {
+      try {
+        const m = await import('./meaning.js?v=b2e1734f16');
+        const v = await m.embed(q);
+        if (me !== asked) return; // typed on meanwhile
+        close = new Set(ordered.filter(p => p.emb && m.similarity(v, m.unpack(p.emb)) >= 0.4).map(p => p.h));
+        for (const c of used) c.shown = c.photos.filter(match);
+        layout(true);
+      } catch {} // the model couldn't load (offline): word search still works
+    }, 250);
   };
   chips.addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
@@ -673,7 +774,8 @@ async function renderAlbum(id) {
 function tile(p) {
   const img = h('img', { alt: p.title || '', decoding: 'async', loading: 'lazy' });
   img.src = data.src(p.v.thumb);
-  img.srcset = `${data.src(p.v.thumb)} 400w, ${data.src(p.v.md)} 1600w`;
+  // an 800 px copy in between, so a phone's grid doesn't decode 1600 px photos for 200 px tiles
+  img.srcset = [`${data.src(p.v.thumb)} 400w`, p.v.sm && `${data.src(p.v.sm)} 800w`, `${data.src(p.v.md)} 1600w`].filter(Boolean).join(', ');
   const inner = h('span', { className: 'ph' }, blurCanvas(p.blurhash, 24, 24), img);
   // people and a few tags on the photo, as in the app (the # button in the large view hides them, here too)
   const words = [...(p.people || []).map(n => h('i', { className: 'person' }, n)), ...(p.tags || []).slice(0, 3).map(t => h('i', {}, '#' + t))];
@@ -757,14 +859,14 @@ function open(i, fromEl) {
     tileFor: current.tileFor,
     onIndex: p => history.replaceState({ viewer: true }, '', `#/a/${current.entry.id}/${p.h}`),
     onClose: () => { if (history.state?.viewer) history.back(); else history.replaceState(null, '', `#/a/${current.entry.id}`); },
-    fmtDate,
+    fmtDate, albumId: current.entry.id,
   });
 }
 function openFromHash(hsh) {
   const i = current?.photos.findIndex(p => p.h === hsh);
   if (i >= 0) openViewer({ photos: current.photos, index: i, from: null, tileFor: current.tileFor,
     onIndex: p => history.replaceState(null, '', `#/a/${current.entry.id}/${p.h}`),
-    onClose: () => history.replaceState(null, '', `#/a/${current.entry.id}`), fmtDate });
+    onClose: () => history.replaceState(null, '', `#/a/${current.entry.id}`), fmtDate, albumId: current.entry.id });
 }
 
 // ---------- chrome ----------
@@ -793,7 +895,7 @@ async function start() {
 }
 async function signInOut() {
   try {
-    if (auth.user()) { await data.forgetKeys(); await auth.signOut(); } else await auth.signIn();
+    if (auth.user()) { await data.forgetKeys(); data.forgetSocial(); await auth.signOut(); } else await auth.signIn();
     catalogP = null; route();
   } catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert('Sign-in didn’t finish. Please try again.'); }
 }
@@ -805,7 +907,13 @@ function accountLine(cat) {
     : who?.error ? `Signed in as ${u.email}, but the private albums can’t be reached right now.`
     : who && !who.owner && !who.count ? `Signed in as ${u.email}. Nothing is shared with this account yet: ask ${siteCfg.ownerName || 'the owner'} to add you.`
     : who?.owner ? `Signed in as ${u.email}: you see every private album.` : `Signed in as ${u.email}: ${who.count} private ${who.count === 1 ? 'album' : 'albums'} shared with you.`;
-  return h('section', { className: 'account' }, h('p', {}, text),
+  // not on the list yet: one tap tells the owner, who sees it in Lamhaat and can add you
+  const ask = u && who && !who.owner && !who.count && !who.error ? h('button', { className: 'btn ghost', type: 'button', onclick: async e => {
+    e.target.disabled = true;
+    try { await data.askForAccess(); e.target.textContent = `Asked. ${siteCfg.ownerName || 'The owner'} will see it in Lamhaat.`; }
+    catch { e.target.disabled = false; e.target.textContent = 'Couldn’t send. Try again'; }
+  } }, `Ask ${siteCfg.ownerName || 'the owner'} for access`) : null;
+  return h('section', { className: 'account' }, h('p', {}, text), ask,
     h('button', { className: u ? 'quiet' : 'google', type: 'button', onclick: signInOut }, u ? null : h('span', { className: 'g', 'aria-hidden': 'true' }), u ? 'Sign out' : 'Sign in with Google'));
 }
 

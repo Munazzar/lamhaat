@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=7fa6bc2730';
-import * as data from './data.js?v=7fa6bc2730';
-import { decode } from './vendor/blurhash.js?v=7fa6bc2730';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=b2e1734f16';
+import * as data from './data.js?v=b2e1734f16';
+import { decode } from './vendor/blurhash.js?v=b2e1734f16';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -54,6 +54,8 @@ const icon = {
   info: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/><path d="M10 9v5M10 6.2v.1"/></svg>',
   prev: '<svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6"/></svg>',
   next: '<svg viewBox="0 0 20 20"><path d="m7.5 4 6 6-6 6"/></svg>',
+  heart: '<svg viewBox="0 0 20 20"><path d="M10 16.5s-6.5-3.9-6.5-8.4A3.6 3.6 0 0 1 10 5.9a3.6 3.6 0 0 1 6.5 2.2c0 4.5-6.5 8.4-6.5 8.4Z"/></svg>',
+  talk: '<svg viewBox="0 0 20 20"><path d="M4 4.5h12v8H8.5L5 15.5v-3H4z"/></svg>',
 };
 
 function build() {
@@ -66,6 +68,18 @@ function build() {
   // people and tags under the photo: shown or hidden, remembered on this device
   S.tagBtn = el('button', 'lb-btn lb-tagbtn', '#'); S.tagBtn.setAttribute('aria-label', 'Show or hide tags');
   const right = el('div', 'lb-right'); right.append(S.tagBtn, S.infoBtn);
+  // signed in: a favourite, and comments (saved through Firestore; its rules decide who may)
+  if (data.social() && S.albumId) {
+    S.favBtn = el('button', 'lb-btn lb-fav', icon.heart); S.favBtn.setAttribute('aria-label', 'Favourite');
+    S.comBtn = el('button', 'lb-btn lb-com', icon.talk); S.comBtn.setAttribute('aria-label', 'Comments');
+    right.prepend(S.favBtn, S.comBtn);
+    S.favBtn.onclick = async () => {
+      const on = !S.favBtn.classList.contains('on');
+      S.favBtn.classList.toggle('on', on); // at once; put back if saving fails
+      try { await data.toggleFavourite(S.albumId, photo().h); } catch { S.favBtn.classList.toggle('on', !on); }
+    };
+    S.comBtn.onclick = () => root.classList.toggle('talking');
+  }
   top.append(S.closeBtn, S.count, right);
   S.prevBtn = el('button', 'lb-nav prev', icon.prev); S.prevBtn.setAttribute('aria-label', 'Previous photo');
   S.nextBtn = el('button', 'lb-nav next', icon.next); S.nextBtn.setAttribute('aria-label', 'Next photo');
@@ -160,6 +174,39 @@ function caption() {
   fitCaption();
   S.prevBtn.hidden = S.index === 0;
   S.nextBtn.hidden = S.index === S.photos.length - 1;
+  if (S.favBtn) { S.favBtn.classList.remove('on'); data.favourites().then(f => { if (S && photo() === p) S.favBtn.classList.toggle('on', f.has(`${S.albumId}/${p.h}`)); }); }
+  if (S.comBtn) talk(p);
+}
+
+// comments under this photo: who said what, and a box to add yours (yours you can delete)
+async function talk(p) {
+  if (!S.talk) {
+    S.talk = el('div', 'lb-talk');
+    S.caption.parentElement.append(S.talk);
+  }
+  const box = S.talk, s0 = S;
+  const draw = list => {
+    if (S !== s0 || photo() !== p) return;
+    const mine = list.filter(c => c.photo === p.h);
+    S.comBtn.dataset.n = mine.length || '';
+    const input = el('textarea', 'lb-talk-in'); input.rows = 2; input.maxLength = 1000; input.placeholder = 'Say something about this photo';
+    const send = el('button', 'lb-talk-send', 'Post');
+    send.onclick = async () => {
+      if (!input.value.trim()) return;
+      send.disabled = true;
+      try { draw(await data.addComment(S.albumId, p.h, input.value)); } catch { send.disabled = false; send.textContent = 'Couldn’t post. Try again'; }
+    };
+    box.replaceChildren(
+      el('p', 'lb-talk-head', mine.length ? `${mine.length} ${mine.length === 1 ? 'comment' : 'comments'}` : 'No comments yet'),
+      ...mine.map(c => {
+        const row = el('div', 'lb-talk-row', `<b>${esc(c.name || c.by)}</b><span>${esc(S.fmtDate(c.at))}</span><p>${esc(c.text)}</p>`);
+        if (c.by === data.myEmail()) { const del = el('button', 'lb-talk-del', 'Delete'); del.onclick = async () => draw(await data.deleteComment(S.albumId, c.id)); row.append(del); }
+        return row;
+      }),
+      input, send);
+  };
+  box.replaceChildren(el('p', 'lb-talk-head', 'Comments…'));
+  try { draw(await data.comments(S.albumId)); } catch { box.replaceChildren(el('p', 'lb-talk-head', 'Comments can’t be reached right now.')); }
 }
 
 // everything under the photo stays readable and whole: the text gets smaller rather than cut off
@@ -182,7 +229,7 @@ export function openViewer(opts) {
   S.clip = new Spring(0, { precision: 0.0005, onUpdate: render }); // 1 = cropped to the tile's shape, 0 = whole photo
   S.ci = { x: 0, y: 0, r: 0 };
   build();
-  root.classList.remove('bare', 'details');
+  root.classList.remove('bare', 'details', 'talking');
   ensureSlides(); caption(); loadFull(S.slides.get(S.index));
   S.returnFocus = document.activeElement;
   const s0 = S;
@@ -311,7 +358,7 @@ function pinchStart() {
 }
 
 root.addEventListener('pointerdown', e => {
-  if (!S || S.closing || e.button > 0 || e.target.closest('button, .lb-caption')) return;
+  if (!S || S.closing || e.button > 0 || e.target.closest('button, .lb-caption, .lb-talk')) return;
   root.setPointerCapture(e.pointerId);
   pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
   for (const s of [S.track, S.zx, S.zy, S.zs, S.scrim]) s.stop(); // grab it where it is
@@ -413,7 +460,7 @@ function tap(e) {
 }
 
 root.addEventListener('wheel', e => {
-  if (!S || S.closing) return;
+  if (!S || S.closing || e.target.closest?.('.lb-talk')) return; // the comments scroll on their own
   e.preventDefault();
   if (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY) && S.zs.target <= 1.01) {
     // Two-finger horizontal swipe on a trackpad pages through photos.
@@ -426,6 +473,7 @@ root.addEventListener('wheel', e => {
 
 addEventListener('keydown', e => {
   if (!S || S.closing) return;
+  if (e.target.closest?.('textarea, input')) return; // typing a comment
   const k = e.key;
   if (k === 'Escape') closeViewer(true);
   else if (k === 'ArrowRight') goTo(S.index + 1);

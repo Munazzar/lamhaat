@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "updatedAt": "2026-11-01T05:00:53.816Z",
+ "updatedAt": "2026-11-03T04:17:56.936Z",
  "albums": [
   {
    "id": "vzrzrme81h",
@@ -10,17 +10,17 @@
    "count": 110,
    "cover": {
     "repo": "lamha-a-vzrzrme81h-media",
-    "path": "md/2022/10/222385dd7bee00b1c24770bb92c6fa2a.avif",
-    "blob": "8430efbf019c165be511e5d20c1a2d757ecdeddf",
-    "w": 3545,
-    "hgt": 2963,
-    "blurhash": "L29shsKhoV%e@@0i={,n010%aS+]"
+    "path": "md/2024/06/9359bf0ebfd70e71815e6f509af38766.avif",
+    "blob": "80f3ff59f7b64a4549cb904029ed0af7b6b25cd2",
+    "w": 4592,
+    "hgt": 3448,
+    "blurhash": "L,DA[u.Tj?bGyDtRRnRkNeRoRiRi"
    },
    "repos": [
     "lamha-a-vzrzrme81h-media"
    ],
    "encrypted": false,
-   "manifestBlob": "986bbfc140fe3b4c0b579d92e18dd1024e22e091",
+   "manifestBlob": "7ba72ccaed732ced3183516ad57694600bd68633",
    "public": true
   }
  ]
