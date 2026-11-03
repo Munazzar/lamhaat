@@ -4,7 +4,7 @@
 // (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
 // they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
 // to the service worker (sw.js), which unseals each photo in the browser as it loads.
-import { idToken, user } from './auth.js?v=b2e1734f16';
+import { idToken, user } from './auth.js?v=45d8f2a0c5';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 let cfg = null;
@@ -70,7 +70,7 @@ export async function catalog() {
 export async function album(entry) {
   currentAlbum = entry.id;
   if (!albums.has(entry.id)) {
-    const p = fetch(sealed.has(entry.id) ? `p/${entry.id}/${entry.repos[0]}/manifest.json` : `${MEDIA}/${entry.repos[0]}/manifest.json`)
+    const p = fetch(sealed.has(entry.id) ? `p/${entry.id}/${entry.repos[0]}/manifest.json` : `${MEDIA}/${entry.repos[0]}/manifest.json`, { cache: 'no-cache' })
       .then(r => { if (!r.ok) throw new Error(r.status === 403 ? 'This album isn’t shared with you (any more).' : 'album unavailable'); return r.json(); })
       .then(m => {
         if (m.schema !== 1) throw new Error(`This album needs a newer version of Lamhaat (schema ${m.schema}).`);

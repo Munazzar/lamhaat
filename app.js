@@ -1,10 +1,10 @@
-import { decode } from './vendor/blurhash.js?v=b2e1734f16';
-import * as data from './data.js?v=b2e1734f16';
-import * as auth from './auth.js?v=b2e1734f16';
-import { openViewer, closeViewer } from './viewer.js?v=b2e1734f16';
+import { decode } from './vendor/blurhash.js?v=45d8f2a0c5';
+import * as data from './data.js?v=45d8f2a0c5';
+import * as auth from './auth.js?v=45d8f2a0c5';
+import { openViewer, closeViewer } from './viewer.js?v=45d8f2a0c5';
 // the live dot grid only where there is a mouse to play with it; on phones it cost a full-screen layer every frame
-if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=b2e1734f16');
-import { openReel, reelSupported } from './reel.js?v=b2e1734f16';
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=45d8f2a0c5');
+import { openReel, reelSupported } from './reel.js?v=45d8f2a0c5';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -662,7 +662,7 @@ async function renderAlbum(id) {
         h('span', { className: 'rn' }, ROMAN[i]),
         h('h2', {}, c.title),
         h('p', {}, c.sub || ''),
-        h('span', { className: 'c' }, `${c.photos.length} photographs`)),
+        c.count = h('span', { className: 'c' }, `${c.photos.length} photographs`)),
       c.grid);
     return c.el;
   });
@@ -749,11 +749,11 @@ async function renderAlbum(id) {
     for (const c of used) c.shown = c.photos.filter(match);
     layout(true);
     clearTimeout(meaningTimer);
-    if (!withMeaning || words.length === 0) { if (close.size) { close = new Set(); } return; }
-    const me = ++asked;
+    const me = ++asked; // a newer search (or clearing it) makes any answer still on its way stale
+    if (!withMeaning || words.length === 0) { close = new Set(); return; }
     meaningTimer = setTimeout(async () => {
       try {
-        const m = await import('./meaning.js?v=b2e1734f16');
+        const m = await import('./meaning.js?v=45d8f2a0c5');
         const v = await m.embed(q);
         if (me !== asked) return; // typed on meanwhile
         close = new Set(ordered.filter(p => p.emb && m.similarity(v, m.unpack(p.emb)) >= 0.4).map(p => p.h));
@@ -822,6 +822,7 @@ const io = new IntersectionObserver(entries => {
 
 function layout(animate = false) {
   if (!current) return;
+  for (const c of current.chapters) c.el.hidden = false; // a chapter a search hid measures 0 wide; set again below, before anything is drawn
   const width = current.chapters[0]?.grid.clientWidth;
   if (!width) return;
   const small = width < 640;
@@ -832,6 +833,7 @@ function layout(animate = false) {
     const shown = c.shown || c.photos;
     current.photos.push(...shown);
     c.el.hidden = !shown.length;
+    c.count.textContent = shown.length < c.photos.length ? `${shown.length} of ${c.photos.length}` : `${c.photos.length} photographs`;
     const { boxes, height } = masonry(shown, width, cols, gap);
     c.grid.classList.toggle('animate', animate);
     c.grid.style.height = `${height}px`;

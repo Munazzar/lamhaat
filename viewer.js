@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=b2e1734f16';
-import * as data from './data.js?v=b2e1734f16';
-import { decode } from './vendor/blurhash.js?v=b2e1734f16';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=45d8f2a0c5';
+import * as data from './data.js?v=45d8f2a0c5';
+import { decode } from './vendor/blurhash.js?v=45d8f2a0c5';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
