@@ -3,7 +3,7 @@
 // settles. Each photograph arrives in black and white and fills with colour grain by grain, like sand,
 // as it comes to rest in the frame; it drains back to grey as it leaves.
 // Everything moving is drawn in one WebGL canvas, so nothing is re-laid-out mid-motion and nothing flickers.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=45d8f2a0c5';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=c89378eedc';
 
 export const reelSupported = (() => {
   try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; }
@@ -32,7 +32,7 @@ uniform vec4 win;     // the frame's window on the stage: x, y, w, h (css px)
 uniform float winR, faint, pad;  // pad: how far the shadow's quad reaches past the photo (css px)
 uniform int mode;     // 0 shadow, 1 flat placeholder, 2 photograph
 uniform vec2 size;    // rect size in css px
-uniform float radius, fill, alpha, grain, seed, shade;
+uniform float radius, fill, alpha, grain, seed, shade, plain; // plain: 1 = just the photograph, no black-and-white to colour
 out vec4 o;
 float hash(vec2 p) { p = fract(p * vec2(234.34, 435.345) + seed); p += dot(p, p + 34.23); return fract(p.x * p.y); }
 float box(vec2 q, vec2 hs, float r) { vec2 d = abs(q) - (hs - r); return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r; }
@@ -63,10 +63,16 @@ void main() {
   float spark = 1.0 - smoothstep(0.1, 0.75, length(fract(uv * size / grain) - 0.5)); // each grain glows from its centre
   vec3 col = mix(vec3(g), c, on);
   col = min(col + glow * (0.5 * spark + 0.12) * (0.55 + 0.7 * c), vec3(1.0)); // lit in its own colour, cooling to the original
+  col = mix(col, c, plain);
   o = vec4(col, 1.0) * edge * alpha * k;
 }`;
 
 let R = null; // the open reel
+
+// two choices, remembered on this device: the black-and-white-to-colour fill (some prefer plain colour), and
+// on big screens a larger frame (the same 'larger view' the rest of the site has)
+const pref = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch {} return null; };
+const sw = (k, label, on, extra = '') => `<button class="sw ${extra}" type="button" role="switch" aria-checked="${on}" data-k="${k}"><span class="sw-rail" aria-hidden="true"><span class="sw-knob"></span></span>${label}</button>`;
 
 export function openReel({ photos, index = 0, src, title = '', onClose }) {
   if (R || !photos.length) return;
@@ -81,7 +87,8 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     <div class="reel-frame"></div><canvas class="reel-canvas"></canvas>
     <div class="reel-cap" aria-live="polite"><p class="reel-t"></p><p class="reel-n"></p></div>
     <button class="reel-close" type="button" aria-label="Close reel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg></button>
-    <p class="reel-hint" aria-hidden="true">Swipe up</p>`;
+    <p class="reel-hint" aria-hidden="true">Swipe up</p>
+    <div class="reel-opts">${sw('fill', 'Colour fill', pref('lamhaatReelColour') !== 'plain')}${sw('large', 'Larger frame', document.documentElement.classList.contains('roomy'), 'sw-wide')}</div>`;
   document.body.append(root);
   const frameEl = root.querySelector('.reel-frame'), canvas = root.querySelector('canvas');
   const capT = root.querySelector('.reel-t'), capN = root.querySelector('.reel-n'), halo = root.querySelector('.reel-halo');
@@ -95,7 +102,9 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     floor: index, // while the first photo rises in, nothing above it is drawn
     pos: new Spring(index - 1.15, { damping: 1, response: 0.5, precision: 0.0004, onUpdate: () => wake() }),
     uploads: [], prog: null, quad: null, u: {},
+    plain: pref('lamhaatReelColour') === 'plain' ? 1 : 0,
   };
+  S.plainTo = S.plain;
   const returnFocus = document.activeElement;
   document.documentElement.classList.add('viewing');
 
@@ -114,7 +123,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     const loc = gl.getAttribLocation(prog, 'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade', 'win', 'winR', 'faint', 'pad']) S.u[n] = gl.getUniformLocation(prog, n);
+    for (const n of ['rect', 'view', 'tex', 'mode', 'size', 'radius', 'fill', 'alpha', 'grain', 'seed', 'shade', 'win', 'winR', 'faint', 'pad', 'plain']) S.u[n] = gl.getUniformLocation(prog, n);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     S.prog = prog;
@@ -130,7 +139,10 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     S.W = frameEl.clientWidth; S.H = frameEl.clientHeight;          // the frame
     S.X = frameEl.offsetLeft; S.Y = frameEl.offsetTop;              // its place on the stage
     S.SW = root.clientWidth; S.SH = root.clientHeight;              // the stage
-    canvas.width = Math.round(S.SW * S.dpr); canvas.height = Math.round(S.SH * S.dpr);
+    // only when the stage itself changed size: setting a canvas's size clears and reallocates it
+    const cw = Math.round(S.SW * S.dpr), ch = Math.round(S.SH * S.dpr);
+    if (canvas.width !== cw) canvas.width = cw;
+    if (canvas.height !== ch) canvas.height = ch;
     draw(); // redraw in the same frame the canvas was cleared, so a resize never blinks
   };
   const ro = new ResizeObserver(resize);
@@ -214,6 +226,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
         gl.uniform1i(S.u.mode, 2);
         gl.uniform1f(S.u.alpha, s.show);
         gl.uniform1f(S.u.fill, s.fill);
+        gl.uniform1f(S.u.plain, S.plain);
         gl.uniform1f(S.u.grain, 1.8); // css px per grain
         gl.uniform1f(S.u.seed, (i * 0.618) % 1);
         gl.activeTexture(gl.TEXTURE0);
@@ -233,6 +246,11 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     const pos = S.pos.value;
     manage(pos);
     let busy = S.uploads.length > 0 || S.pos.moving || !!S.drag;
+    if (S.plain !== S.plainTo) { // the colour fill switched on or off: every photo eases between the two
+      const d = reducedMotion.matches ? 1 : dt / 0.45;
+      S.plain = S.plainTo > S.plain ? Math.min(S.plainTo, S.plain + d) : Math.max(S.plainTo, S.plain - d);
+      busy = true;
+    }
     S.slides.forEach((s, i) => {
       const off = Math.abs(i - pos);
       if (off > 2.5 && s.fill === 0) return;
@@ -270,7 +288,7 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
   const D = () => S.H || 1;
 
   root.addEventListener('pointerdown', e => {
-    if (e.target.closest('.reel-close') || e.button > 0) return;
+    if (e.target.closest('.reel-close, .reel-opts') || e.button > 0) return;
     try { root.setPointerCapture(e.pointerId); } catch {}
     S.pos.stop();
     S.floor = 0;
@@ -317,10 +335,22 @@ export function openReel({ photos, index = 0, src, title = '', onClose }) {
     else if (['ArrowUp', 'PageUp', 'k'].includes(e.key)) { e.preventDefault(); go(Math.round(S.pos.target) - 1); }
     else if (e.key === 'Home') go(0);
     else if (e.key === 'End') go(N - 1);
-    else if (e.key === 'Tab') { e.preventDefault(); root.querySelector('.reel-close').focus(); }
+    else if (e.key === 'Tab') { // round the reel's own buttons
+      e.preventDefault();
+      const f = [...root.querySelectorAll('button')].filter(b => b.offsetParent), i = f.indexOf(document.activeElement);
+      f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length]?.focus();
+    }
   };
   addEventListener('keydown', key);
   root.querySelector('.reel-close').addEventListener('click', () => close());
+  root.querySelector('.reel-opts').addEventListener('click', e => {
+    const b = e.target.closest('.sw'); if (!b) return;
+    const on = b.getAttribute('aria-checked') !== 'true';
+    b.setAttribute('aria-checked', String(on));
+    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); // the knob pops as it lands
+    if (b.dataset.k === 'fill') { S.plainTo = on ? 0 : 1; pref('lamhaatReelColour', on ? 'fill' : 'plain'); wake(); }
+    else { document.documentElement.classList.toggle('roomy', on); pref('lamhaatLarge', on ? 'on' : 'off'); dispatchEvent(new Event('lamhaat:roomy')); }
+  });
 
   // the phone's back gesture closes the reel instead of leaving the album
   history.pushState({ reel: true }, '', location.href);

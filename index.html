@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Lamhaat</title>
-  <link rel="icon" href="logo.svg?v=45d8f2a0c5" type="image/svg+xml">
+  <link rel="icon" href="logo.svg?v=c89378eedc" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="description" content="A private photo library.">
@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400&family=Amiri:wght@700&display=swap&text=%D9%84%D9%85%D8%AD%D8%A7%D8%AA%D9%80">
-  <link rel="stylesheet" href="style.css?v=45d8f2a0c5">
-  <script type="module" src="app.js?v=45d8f2a0c5"></script>
+  <link rel="stylesheet" href="style.css?v=c89378eedc">
+  <script type="module" src="app.js?v=c89378eedc"></script>
 </head>
 <body>
   <header class="bar" id="bar">
@@ -29,6 +29,9 @@
       <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" /><path d="m13 13 5 5" /></svg>
       <input type="search" placeholder="Search photos" aria-label="Search photos by what is in them, people, tags or words" autocomplete="off" spellcheck="false">
     </label>
+    <button class="roomy-btn" type="button" aria-label="Larger view" aria-pressed="false" title="Larger view">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="out" d="M14.5 4.5h5v5M9.5 19.5h-5v-5M19.5 4.5 14 10M4.5 19.5 10 14" /><path class="in" d="M14 5v5h5M10 19v-5H5M14 10l5.5-5.5M10 14l-5.5 5.5" /></svg>
+    </button>
     <button class="theme" type="button" aria-label="Switch to night">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <defs><clipPath id="sky"><rect width="24" height="17.6" /></clipPath></defs>

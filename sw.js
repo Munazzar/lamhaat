@@ -4,6 +4,7 @@
 // this browser; signing out, or losing access, removes them.
 const STORE = 'lamhaat-keys';
 const keys = new Map(); // album id -> CryptoKey
+let driveKey = null; // for sealed photos kept in the owner's Google Drive
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
@@ -16,8 +17,10 @@ self.addEventListener('message', e => {
   e.waitUntil((async () => {
     // exactly this set: anything no longer shared is forgotten
     keys.clear();
+    driveKey = typeof e.data.driveKey === 'string' ? e.data.driveKey : '';
     await caches.delete(STORE);
     const c = await caches.open(STORE);
+    await c.put(keyUrl('_drive'), new Response(driveKey)); // kept, like the keys, for when the browser restarts the worker
     for (const [id, k] of Object.entries(e.data.keys || {})) {
       if (!/^[a-z0-9]{10}$/.test(id) || typeof k !== 'string') continue;
       keys.set(id, await importKey(k));
@@ -45,13 +48,15 @@ self.addEventListener('fetch', e => {
   e.respondWith((async () => {
     const key = await keyFor(m[1]);
     if (!key) return new Response('This album isn’t shared with you.', { status: 403 });
-    // @lamha-full-N: a full-size copy, from its own site next to this one
-    const r = await fetch(new URL(m[2][0] === '@' ? `../${m[2].slice(1)}/${m[3]}` : `media/${m[2]}/${m[3]}`, self.registration.scope));
+    // @drive: from the owner's Google Drive; @lamha-full-N: a full-size copy, from its own site next to this one
+    if (m[2] === '@drive' && driveKey == null) driveKey = await (await (await caches.open(STORE)).match(keyUrl('_drive')))?.text() ?? '';
+    const r = await fetch(m[2] === '@drive' ? `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(m[3].replace(/\.\w+$/, ''))}?alt=media&key=${encodeURIComponent(driveKey)}`
+      : new URL(m[2][0] === '@' ? `../${m[2].slice(1)}/${m[3]}` : `media/${m[2]}/${m[3]}`, self.registration.scope));
     if (!r.ok) return new Response('', { status: r.status });
     const buf = new Uint8Array(await r.arrayBuffer());
     try {
       const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.subarray(0, 12) }, key, buf.subarray(12));
-      return new Response(plain, { headers: { 'content-type': m[3].endsWith('.json') ? 'application/json' : m[2][0] === '@' ? 'image/jpeg' : 'image/avif', 'cache-control': 'private, max-age=86400' } });
+      return new Response(plain, { headers: { 'content-type': m[3].endsWith('.json') ? 'application/json' : m[3].endsWith('.avif') ? 'image/avif' : m[2][0] === '@' ? 'image/jpeg' : 'image/avif', 'cache-control': 'private, max-age=86400' } });
     } catch { return new Response('Locked with another key.', { status: 403 }); }
   })());
 });

@@ -1,10 +1,10 @@
-import { decode } from './vendor/blurhash.js?v=45d8f2a0c5';
-import * as data from './data.js?v=45d8f2a0c5';
-import * as auth from './auth.js?v=45d8f2a0c5';
-import { openViewer, closeViewer } from './viewer.js?v=45d8f2a0c5';
+import { decode } from './vendor/blurhash.js?v=c89378eedc';
+import * as data from './data.js?v=c89378eedc';
+import * as auth from './auth.js?v=c89378eedc';
+import { openViewer, closeViewer } from './viewer.js?v=c89378eedc';
 // the live dot grid only where there is a mouse to play with it; on phones it cost a full-screen layer every frame
-if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=45d8f2a0c5');
-import { openReel, reelSupported } from './reel.js?v=45d8f2a0c5';
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=c89378eedc');
+import { openReel, reelSupported } from './reel.js?v=c89378eedc';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -36,11 +36,15 @@ themeBtn.addEventListener('click', () => {
   // a phone or tablet: a short cross-fade between the two looks instead (the graphics card does it alone; the
   // widening circle made phones redraw the whole picture every frame)
   const touch = !matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // the few elements named for page changes (album covers) sit this one out, so the page changes as one picture
+  const named = [...document.querySelectorAll('[style*="view-transition-name"]')];
+  for (const el of named) { el._vt = el.style.viewTransitionName; el.style.viewTransitionName = 'none'; }
+  const restore = () => { for (const el of named) el.style.viewTransitionName = el._vt; };
   document.documentElement.classList.add('theming');
   document.documentElement.classList.toggle('theming-fade', touch);
   const t = document.startViewTransition(() => setTheme(next));
   if (touch) {
-    t.finished.finally(() => document.documentElement.classList.remove('theming', 'theming-fade'));
+    t.finished.finally(() => { document.documentElement.classList.remove('theming', 'theming-fade'); restore(); });
     setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } }, 1200); // never stuck
     return;
   }
@@ -48,10 +52,23 @@ themeBtn.addEventListener('click', () => {
   t.ready.then(() => document.documentElement.animate(
     { clipPath: [`circle(0% ${at})`, `circle(${end}% ${at})`] },
     { duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
-  t.finished.finally(() => document.documentElement.classList.remove('theming'));
+  t.finished.finally(() => { document.documentElement.classList.remove('theming'); restore(); });
   // if the browser can't finish the animation (a busy or hidden page), switch anyway rather than stay stuck
   setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } document.documentElement.classList.remove('theming'); }, 2000);
 });
+
+// A larger view, for big screens: the page uses more of the width, the grid more columns, the ribbon and the
+// reel's frame grow. Remembered on this device; the reel has the same switch.
+const roomyBtn = document.querySelector('.roomy-btn');
+try { document.documentElement.classList.toggle('roomy', localStorage.getItem('lamhaatLarge') === 'on'); } catch {}
+const paintRoomy = () => roomyBtn.setAttribute('aria-pressed', String(document.documentElement.classList.contains('roomy')));
+paintRoomy();
+roomyBtn.addEventListener('click', () => {
+  const on = !document.documentElement.classList.contains('roomy');
+  try { localStorage.setItem('lamhaatLarge', on ? 'on' : 'off'); } catch {}
+  transition(() => { document.documentElement.classList.toggle('roomy', on); dispatchEvent(new Event('lamhaat:roomy')); });
+});
+addEventListener('lamhaat:roomy', paintRoomy);
 
 const h = (tag, attrs = {}, ...kids) => {
   const el = document.createElement(tag);
@@ -151,51 +168,97 @@ function parallax(els) {
   cleanup.push(() => removeEventListener('scroll', on));
 }
 
+// ---------- opening a photo where it is ----------
+// on screen and showing: the viewer can fly the photo back into it
+function visibleEl(el) {
+  if (!el?.isConnected || el.style.visibility === 'hidden' || el.classList.contains('out')) return false;
+  const r = el.getBoundingClientRect();
+  return r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+}
+// Any photo on the home page opens right where it is, growing out of what was tapped, and flies back into
+// it (or wherever it shows now) when closed. The phone's back gesture closes it.
+function openHere(photos, index, from, places) {
+  const pop = () => { removeEventListener('popstate', pop); closeViewer(true); };
+  history.pushState({ viewer: true }, '', location.href);
+  addEventListener('popstate', pop);
+  const first = photos[index];
+  openViewer({
+    photos, index, from, fmtDate, onIndex: () => {},
+    tileFor: p => [p === first ? from : null, ...places.map(m => m.get(p))].find(visibleEl) || null,
+    onClose: () => { removeEventListener('popstate', pop); if (history.state?.viewer) history.back(); },
+  });
+}
+
+// Search in plain words: everything known about a photo (its words, people, tags, what the AI saw in it,
+// camera, month and year); every word must match, plurals match singulars, and small words ("at", "the",
+// "photos of") are left out, so "kids at the beach" just works. And by meaning: photos whose words are close
+// to the search's ("children by the sea" finds "kids at the beach"), once the small model is in (it loads on
+// the first search, then is kept). `onMeaning` runs when that second, slower answer is in.
+const STOP = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'into', 'me', 'my', 'of', 'on', 'or', 'our', 'the', 'to', 'with', 'show', 'photo', 'photos', 'picture', 'pictures', 'image', 'images', 'some', 'all']);
+const stem = w => w.replace(/(?<=..)(es|s)$/, '');
+function finder(photos, onMeaning) {
+  const known = new Map(photos.map(p => [p, [p.title, p.desc, p.src, ...(p.people || []), ...(p.tags || []), p.ai?.d, ...(p.ai?.t || []), p.camera, p.lens,
+    p.taken && new Date(p.taken).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })].filter(Boolean).join(' ').toLowerCase()]));
+  const withMeaning = photos.some(p => p.emb);
+  let words = [], close = new Set(), asked = 0, timer = 0;
+  return {
+    set(q) {
+      words = q.trim().toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(stem);
+      clearTimeout(timer);
+      const me = ++asked; // a newer search (or clearing it) makes any answer still on its way stale
+      close = new Set();
+      if (!withMeaning || !words.length) return;
+      timer = setTimeout(async () => {
+        try {
+          const m = await import('./meaning.js?v=c89378eedc');
+          const v = await m.embed(q);
+          if (me !== asked) return; // typed on meanwhile
+          close = new Set(photos.filter(p => p.emb && m.similarity(v, m.unpack(p.emb)) >= 0.4));
+          onMeaning();
+        } catch {} // the model couldn't load (offline): word search still works
+      }, 250);
+    },
+    has: p => !words.length || words.every(w => known.get(p)?.includes(w)) || close.has(p),
+    get active() { return words.length > 0; },
+  };
+}
+
 // ---------- home ----------
 async function renderHome() {
   leavePage();
   const cat = await getCatalog().catch(err => ({ error: err }));
   view.dataset.album = '';
   view.className = 'home';
-  back.hidden = true; search.hidden = true; barTitle.textContent = '';
+  back.hidden = true; search.hidden = false; searchInput.value = ''; barTitle.textContent = '';
   if (cat.error) return view.replaceChildren(message('Your library is not reachable right now.', String(cat.error.message || cat.error)));
 
   const albums = [...cat.albums].sort((a, b) => (b.dateEnd || '').localeCompare(a.dateEnd || ''));
   const total = albums.reduce((s, a) => s + a.count, 0);
   const first = albums[0];
-  const manifest = first ? await data.album(first).catch(() => null) : null;
-  const pool = manifest?.photos || [];
-  const byName = new Map(pool.map(p => [p.src, p]));
-  const slides = (manifest?.highlights || []).map(s => byName.get(s)).filter(Boolean);
+  // every album you can see (signed in, that includes the private ones shared with you), mixed together:
+  // each album's photos in its own order, dealt out in turn so no album crowds the others
+  const manifests = (await Promise.all(albums.map(a => data.album(a).catch(() => null)))).filter(Boolean);
+  const deal = lists => { const out = []; for (let i = 0; lists.some(l => i < l.length); i++) for (const l of lists) if (i < l.length) out.push(l[i]); return out; };
+  const pool = deal(manifests.map(m => [...m.photos].sort((x, y) => (x.n ?? 0) - (y.n ?? 0))));
+  const slides = deal(manifests.map(m => { const by = new Map(m.photos.map(p => [p.src, p])); return (m.highlights || []).map(s => by.get(s)).filter(Boolean); }));
   if (!slides.length) slides.push(...pool.slice(0, 6));
-  const albumId = first?.id;
 
   // 1. a curved ribbon of photographs that turns slowly and can be spun by hand
   const step = Math.max(1, Math.floor(pool.length / 20));
-  const ringPhotos = [...pool].sort((x, y) => (x.n ?? 0) - (y.n ?? 0)).filter((_, i) => i % step === 0).slice(0, phone ? 12 : 20);
+  const ringPhotos = pool.filter((_, i) => i % step === 0).slice(0, phone ? 12 : 20);
+  const cardOf = new Map(), floatOf = new Map(), tlOf = new Map(), hitOf = new Map();
+  const places = [cardOf, floatOf, tlOf, hitOf];
   const cards = ringPhotos.map(p => {
-    const img = h('img', { alt: p.title || '', decoding: 'async', draggable: false, src: data.src(p.v.thumb, albumId) });
-    const card = h('a', { className: 'card3d', href: `#/a/${albumId}/${p.h}`, draggable: false, 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
+    const img = h('img', { alt: p.title || '', decoding: 'async', draggable: false, src: data.src(p.v.thumb, p._a) });
+    const card = h('a', { className: 'card3d', href: `#/a/${p._a}/${p.h}`, draggable: false, 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
     whenReady(img, () => card.classList.add('ready'));
+    // tapping a card opens the photo right here rather than navigating first (a page swap under an
+    // opening photo is what made it flicker)
+    card.addEventListener('click', e => { e.preventDefault(); openHere(pool, pool.indexOf(p), card, places); });
+    cardOf.set(p, card);
     return card;
   });
   const stage = h('div', { className: 'ribbon' }, cards);
-  // Tapping a card opens the photo right here, growing out of the card, rather than navigating first
-  // (a page swap under an opening photo is what made it flicker). The phone's back gesture closes it.
-  const homePhotos = [...pool].sort((x, y) => (x.n ?? 0) - (y.n ?? 0));
-  const cardOf = new Map(ringPhotos.map((p, i) => [p.h, cards[i]]));
-  cards.forEach((card, i) => card.addEventListener('click', e => {
-    e.preventDefault();
-    const pop = () => { removeEventListener('popstate', pop); closeViewer(true); };
-    history.pushState({ viewer: true }, '', location.href);
-    addEventListener('popstate', pop);
-    openViewer({
-      photos: homePhotos, index: homePhotos.indexOf(ringPhotos[i]), from: card,
-      tileFor: p => (c => c && c.style.visibility !== 'hidden' ? c : null)(cardOf.get(p.h)),
-      onIndex: () => {}, fmtDate, albumId,
-      onClose: () => { removeEventListener('popstate', pop); if (history.state?.viewer) history.back(); },
-    });
-  }));
   const headline = h('h1', { className: 'headline' },
     h('span', { className: 'w' }, 'Every'), ' ', h('span', { className: 'w' }, 'moment,'), ' ', h('em', { className: 'w' }, 'kept.'));
   const cine = h('section', { className: 'stagehead' },
@@ -203,27 +266,30 @@ async function renderHome() {
     headline,
     stage,
     h('div', { className: 'ctas' },
-      first ? h('a', { className: 'btn accent', href: `#/a/${first.id}` }, 'Enter the portfolio') : null,
+      first ? h('a', { className: 'btn accent', href: `#/a/${first.id}` }, albums.length === 1 ? `Enter the ${first.title.toLowerCase()}` : `Open ${first.title}`) : null,
       h('a', { className: 'btn ghost', href: '#albums', onclick: e => { e.preventDefault(); view.querySelector('.albums')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' }); } }, 'All albums')),
-    h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn'));
+    h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn  ·  tap to open'));
   spin(stage, cards);
   if (slides[0]) ambient(avg(slides[0].blurhash));
 
-  // 3. a loose, layered scatter of photographs drifting at their own speeds
+  // 3. a loose, layered scatter of photographs drifting at their own speeds; each opens like any other
   const scatterPicks = slides.slice(0, 5); // the highlights, loosely pinned
   const floats = [];
-  const scatter = h('section', { className: 'scatter', 'aria-hidden': 'true' }, scatterPicks.map((p, i) => {
-    const img = h('img', { alt: '', loading: 'lazy', decoding: 'async', src: data.src(p.v.md, albumId) });
-    const inner = h('div', { className: 'float' }, blurCanvas(p.blurhash, 16, 16), img);
+  const scatter = h('section', { className: 'scatter' }, scatterPicks.map((p, i) => {
+    const img = h('img', { alt: '', loading: 'lazy', decoding: 'async', src: data.src(p.v.md, p._a),
+      srcset: [p.v.sm && `${data.src(p.v.sm, p._a)} 800w`, `${data.src(p.v.md, p._a)} 1600w`].filter(Boolean).join(', '), sizes: phone ? '52vw' : '34vw' });
+    const inner = h('button', { className: 'float', type: 'button', 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 16, 16), img);
     inner._speed = [0.12, -0.08, 0.2, -0.04, 0.1][i];
     inner.style.aspectRatio = `${p.w} / ${p.hgt}`;
+    inner.addEventListener('click', () => openHere(pool, pool.indexOf(p), inner, places));
+    floatOf.set(p, inner);
     floats.push(inner);
     whenReady(img, () => inner.classList.add('ready'));
     return h('div', { className: `spot s${i}` }, inner);
   }));
 
   // 4. albums: on shelves, as gallery walls, or as a plain list. The switch remembers your choice.
-  const [shelf, wall, line] = await Promise.all([shelves(albums), walls(albums), timeline(albums)]);
+  const [shelf, wall, line] = await Promise.all([shelves(albums), walls(albums), timeline(albums, (p, el, list) => openHere(list, list.indexOf(p), el, places), tlOf)]);
   const index = h('section', { className: 'index' },
     albums.map((a, i) => {
       const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', src: a.cover ? data.src(a.cover, a.id) : '' });
@@ -254,7 +320,32 @@ async function renderHome() {
   paint();
   const list = h('section', { className: 'albums' }, h('div', { className: 'albums-head' }, h('h2', { className: 'eyebrow' }, 'Albums'), seg), shelf, wall, index, line);
 
-  view.replaceChildren(cine, scatter, list);
+  // 5. search across every album: the page gives way to what was found, and comes back when it's cleared
+  const found = h('div', { className: 'found-grid' });
+  const foundHead = h('p', { className: 'eyebrow' });
+  const results = h('section', { className: 'found', hidden: true }, foundHead, found);
+  const hits = new Map(); // a tile per photo, made the first time it's found
+  const find = finder(pool, () => showFound());
+  const showFound = () => {
+    const on = find.active;
+    if (on !== view.classList.contains('searching')) { view.classList.toggle('searching', on); results.hidden = !on; scrollTo(0, 0); }
+    if (!on) return;
+    const list = pool.filter(find.has);
+    foundHead.textContent = list.length ? `${list.length} ${list.length === 1 ? 'photograph' : 'photographs'} found` : 'Nothing found yet';
+    found.replaceChildren(...list.map(p => {
+      if (!hits.has(p)) {
+        const img = h('img', { alt: p.title || '', loading: 'lazy', decoding: 'async', src: data.src(p.v.thumb, p._a) });
+        const el = h('button', { className: 'tl-photo', type: 'button', 'aria-label': p.title || 'Photo' }, blurCanvas(p.blurhash, 12, 12), img);
+        whenReady(img, () => el.classList.add('ready'));
+        el.addEventListener('click', () => { const now = pool.filter(find.has); openHere(now, now.indexOf(p), el, places); });
+        hits.set(p, el); hitOf.set(p, el);
+      }
+      return hits.get(p);
+    }));
+  };
+  searchInput.oninput = () => { find.set(searchInput.value); showFound(); };
+
+  view.replaceChildren(results, cine, scatter, list);
   const account = accountLine(await getCatalog());
   if (account) view.append(account);
   parallax(floats);
@@ -273,7 +364,8 @@ function spin(stage, cards) {
   let W, R, Z0, P, spacing, L, angle = 0, vel = drift, raf = 0, last = 0, drag = null, moved = false;
   const size = () => {
     const phone = innerWidth < 700;
-    W = phone ? innerWidth * 0.6 : Math.min(320, Math.max(150, innerWidth * 0.2));
+    const roomy = document.documentElement.classList.contains('roomy') && innerWidth >= 1280;
+    W = phone ? innerWidth * 0.6 : roomy ? Math.min(460, innerWidth * 0.21) : Math.min(320, Math.max(150, innerWidth * 0.2));
     const ring = ((W * 1.18) * N) / (2 * Math.PI);
     R = phone ? Math.min(ring, innerWidth * 0.95) : ring;
     spacing = R < ring ? (W * 1.12 / R) * (180 / Math.PI) : 360 / N;
@@ -303,13 +395,14 @@ function spin(stage, cards) {
     const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
     if (!drag) { angle += vel * dt; vel = drift + (vel - drift) * Math.exp(-dt * 1.6); }
     place();
-    const idle = !onScreen || scrolling || document.documentElement.classList.contains('viewing');
+    // at rest while a photo is open, and while night and day change (the page is a still picture then anyway)
+    const idle = !onScreen || scrolling || /\b(viewing|theming)\b/.test(document.documentElement.className);
     raf = stage.isConnected && !idle ? requestAnimationFrame(frame) : 0;
   };
   const resume = () => { if (!raf && stage.isConnected) raf = requestAnimationFrame(t => { last = t; frame(t); }); };
   const seen = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) resume(); });
   seen.observe(stage);
-  const afterView = new MutationObserver(() => { if (!document.documentElement.classList.contains('viewing')) resume(); });
+  const afterView = new MutationObserver(() => { if (!/\b(viewing|theming)\b/.test(document.documentElement.className)) resume(); });
   afterView.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   cleanup.push(() => { seen.disconnect(); afterView.disconnect(); });
   size(); place();
@@ -336,8 +429,10 @@ function spin(stage, cards) {
   stage.addEventListener('pointerup', end);
   stage.addEventListener('pointercancel', end);
   stage.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
-  addEventListener('resize', size);
-  cleanup.push(() => { cancelAnimationFrame(raf); removeEventListener('resize', size); });
+  const resized = () => { size(); place(); };
+  addEventListener('resize', resized);
+  addEventListener('lamhaat:roomy', resized);
+  cleanup.push(() => { cancelAnimationFrame(raf); removeEventListener('resize', resized); removeEventListener('lamhaat:roomy', resized); });
 }
 
 // Elements rise into place the first time they scroll into view.
@@ -376,7 +471,8 @@ async function shelves(albums) {
     const hi = new Set(m.highlights || []);
     const books = chaptersOf(m, a).used.map((c, ci) => {
       const cover = c.photos.find(p => hi.has(p.src)) || c.photos[0];
-      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.md, a.id) });
+      // the 800 px copy: a book is under 260 px wide, and the 1600 px one cost a big decode per book
+      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.sm || cover.v.md, a.id) });
       const book = h('button', { className: 'book', type: 'button', 'aria-label': `${c.title}, ${c.photos.length} photographs` },
         h('span', { className: 'face' }, blurCanvas(cover.blurhash, 16, 16), img,
           h('span', { className: 'b-title' }, h('em', {}, ROMAN[ci]), c.title)));
@@ -385,16 +481,25 @@ async function shelves(albums) {
       return book;
     });
     return h('section', { className: 'shelf', id: `shelf-${a.id}` },
-      h('header', { className: 'shelf-head' },
-        h('span', { className: 'num' }, pad(si + 1)),
-        h('h3', {}, a.title),
-        h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`)),
+      albumHead('shelf-head', a, si),
       slider(h('div', { className: 'track' }, books)));
   });
   const go = a => e => { e.preventDefault(); document.getElementById(`shelf-${a.id}`)?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'center' }); };
   const timeline = h('nav', { className: 'timeline', 'aria-label': 'Albums by year' },
     loaded.map(({ a }) => h('a', { href: `#shelf-${a.id}`, onclick: go(a) }, h('span', {}, years(a)), h('b', {}, a.title))));
   return h('section', { className: 'shelves' }, shelvesEl, timeline);
+}
+
+// an album's name over its shelf or wall: the name opens the album, and so does the button beside it
+const ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4" /></svg>';
+function albumHead(cls, a, i) {
+  const visit = h('a', { className: 'visit', href: `#/a/${a.id}` }, 'Visit album');
+  visit.insertAdjacentHTML('beforeend', ARROW);
+  return h('header', { className: cls },
+    h('span', { className: 'num' }, pad(i + 1)),
+    h('h3', {}, h('a', { href: `#/a/${a.id}` }, a.title)),
+    h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`),
+    visit);
 }
 
 // A shelf slides sideways by touch, trackpad, Shift + wheel, dragging with the mouse, or the arrows at
@@ -461,7 +566,8 @@ async function openMap(photos, albumId) {
 }
 
 // ---------- timeline: every photo you can see, month by month across all albums ----------
-async function timeline(albums) {
+// a photo opens right here, in the order the timeline shows them
+async function timeline(albums, onOpen, tlOf) {
   const loaded = (await Promise.all(albums.map(a => data.album(a).then(m => ({ a, m }), () => null)))).filter(Boolean);
   const months = new Map();
   for (const { a, m } of loaded) for (const p of m.photos) {
@@ -471,18 +577,23 @@ async function timeline(albums) {
     months.get(k).push({ a, p });
   }
   const keys = [...months.keys()].sort().reverse(); // the newest first
-  return h('section', { className: 'timeline-view' }, keys.map(k => {
+  const order = [];
+  const el = h('section', { className: 'timeline-view' }, keys.map(k => {
     const items = months.get(k).sort((x, y) => x.p.taken.localeCompare(y.p.taken));
     const label = new Date(`${k}-15T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
     return h('div', { className: 'tl-month' },
       h('h3', {}, label, h('span', { className: 'mono' }, `${items.length} ${items.length === 1 ? 'photograph' : 'photographs'}`)),
       h('div', { className: 'tl-strip' }, items.map(({ a, p }) => {
+        order.push(p);
         const img = h('img', { alt: p.title || '', loading: 'lazy', decoding: 'async', src: data.src(p.v.thumb, a.id) });
         const el = h('a', { className: 'tl-photo', href: `#/a/${a.id}/${p.h}`, 'aria-label': p.title || a.title }, blurCanvas(p.blurhash, 12, 12), img);
+        el.addEventListener('click', e => { e.preventDefault(); onOpen(p, el, order); });
+        tlOf.set(p, el);
         whenReady(img, () => el.classList.add('ready'));
         return el;
       })));
   }));
+  return el;
 }
 
 async function walls(albums) {
@@ -492,7 +603,7 @@ async function walls(albums) {
     const hi = new Set(m.highlights || []);
     const frames = chaptersOf(m, a).used.map((c, ci) => {
       const cover = c.photos.find(p => hi.has(p.src)) || c.photos[0];
-      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.md, a.id) });
+      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', draggable: false, src: data.src(cover.v.sm || cover.v.md, a.id) });
       const pic = h('span', { className: 'pic' }, blurCanvas(cover.blurhash, 16, 16), img);
       pic.style.aspectRatio = `${cover.w} / ${cover.hgt}`;
       const cord = document.createRange().createContextualFragment('<svg class="cord" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 40 50 2 94 40" /></svg>');
@@ -512,10 +623,7 @@ async function walls(albums) {
       return hang;
     });
     return h('section', { className: 'wall', id: `wall-${a.id}` },
-      h('header', { className: 'plaque' },
-        h('span', { className: 'num' }, pad(wi + 1)),
-        h('h3', {}, a.title),
-        h('span', { className: 'meta' }, `${years(a)}  ·  ${a.count} photographs`)),
+      albumHead('plaque', a, wi),
       h('div', { className: 'hangs' }, frames));
   });
   swayLoop(pendulums);
@@ -563,9 +671,11 @@ function pull(book, { album, chapter, index, cover, img }) {
     h('span', { className: 'b-title' }, h('em', {}, ROMAN[index]), chapter.title));
   const card = h('div', { className: 'pb-card' }, front, backFace);
   const flip = h('button', { className: 'pill-btn', type: 'button' }, 'Flip');
-  const openBtn = h('button', { className: 'pill-btn dark', type: 'button' }, 'Open');
+  const openBtn = h('button', { className: 'pill-btn dark', type: 'button' }, 'Open chapter');
+  const visit = h('button', { className: 'pill-btn', type: 'button' }, 'Visit album');
+  visit.insertAdjacentHTML('beforeend', ARROW);
   const layer = h('div', { className: 'pullout', role: 'dialog', 'aria-modal': 'true', 'aria-label': chapter.title },
-    h('div', { className: 'pb-stage' }, card), h('div', { className: 'pb-actions' }, flip, openBtn));
+    h('div', { className: 'pb-stage' }, card), h('div', { className: 'pb-actions' }, flip, openBtn, visit));
   document.body.append(layer);
   book.classList.add('lifted');
 
@@ -604,6 +714,7 @@ function pull(book, { album, chapter, index, cover, img }) {
   flip.onclick = () => card.classList.toggle('flipped');
   // opening: the card stays in place while the album page fades in over it (the page change removes it)
   openBtn.onclick = card.onclick = () => { if (closing) return; closing = true; pendingChapter = index; location.hash = `#/a/${album.id}`; };
+  visit.onclick = () => { if (closing) return; closing = true; pendingChapter = null; location.hash = `#/a/${album.id}`; };
   cleanup.push(() => layer.isConnected && finish());
 }
 
@@ -667,11 +778,8 @@ async function renderAlbum(id) {
     return c.el;
   });
 
-  // Reel: the album one photograph at a time, travelling up through a fixed frame.
-  function reelBtn() {
-    return reelSupported ? h('button', { className: 'btn ghost', type: 'button', onclick: () => openReel({ photos: current.photos, index: 0, src: v => data.src(v, id), title: entry.title }) }, 'Reel') : null;
-  }
-  // It opens like the home page: a ribbon of the album's photographs. "Expand into grid" lays them all out.
+  // It opens like the home page, a ribbon of the album's photographs, and every photograph is laid out just
+  // under it, ready to scroll into.
   const step = Math.max(1, Math.floor(ordered.length / 30));
   const ringPhotos = ordered.filter((_, i) => i % step === 0).slice(0, phone ? 14 : 30);
   const cards = new Map(ringPhotos.map(p => {
@@ -683,44 +791,37 @@ async function renderAlbum(id) {
   }));
   const ribbon = h('div', { className: 'ribbon' }, [...cards.values()]);
   const title = h('h1', { className: 'headline' }, entry.title);
+  const toGrid = () => view.querySelector('.contents')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
+  // Reel: the album one photograph at a time, travelling up through a fixed frame.
   const stage = h('section', { className: 'stagehead' },
     h('p', { className: 'mono kicker' }, `${years(entry)}  ·  ${entry.count} photographs`),
     title,
     ribbon,
     h('div', { className: 'ctas' },
-      h('button', { className: 'btn accent', type: 'button', onclick: () => setMode(true) }, 'Expand into grid'),
-      reelBtn(),
+      reelSupported ? h('button', { className: 'btn accent', type: 'button', onclick: () => openReel({ photos: current.photos, index: 0, src: v => data.src(v, id), title: entry.title }) }, 'Reel') : null,
+      ordered.some(p => p.geo) ? h('button', { className: 'btn ghost', type: 'button', onclick: () => openMap(ordered, id) }, 'Map') : null,
       h('a', { className: 'btn ghost', href: '#/' }, 'All albums')),
-    h('p', { className: 'mono hint', 'aria-hidden': 'true' }, 'drag to turn  ·  tap to open'));
+    h('button', { className: 'mono hint scrollcue', type: 'button', onclick: toGrid }, `drag to turn  ·  tap to open  ·  scroll for all ${ordered.length}`));
   spin(ribbon, [...cards.values()]);
 
-  const gridView = h('div', { className: 'gridview', hidden: true },
-    h('div', { className: 'gridtop' },
-      h('h1', { className: 'gridtitle' }, entry.title),
-      h('div', { className: 'ctas tight' }, reelBtn(), ordered.some(p => p.geo) ? h('button', { className: 'btn ghost', type: 'button', onclick: () => openMap(ordered, id) }, 'Map') : null, h('button', { className: 'btn ghost', type: 'button', onclick: () => setMode(false) }, 'Back to ribbon'))),
+  view.replaceChildren(stage,
     h('section', { className: 'contents' }, h('p', { className: 'eyebrow' }, 'Contents'), toc),
     chips,
     refine,
     ...sections,
     h('p', { className: 'empty', hidden: true }, 'No photographs match.'));
-  view.replaceChildren(stage, gridView);
-
-  // The viewer flies back to whatever the photo is showing as right now: its tile, or its card if it's on the ribbon.
-  current.tileFor = p => current.grid ? current.tiles.get(p.h) : (c => c?.style.visibility !== 'hidden' ? c : null)(cards.get(p.h));
-  const setMode = grid => transition(() => {
-    current.grid = grid;
-    stage.hidden = grid; gridView.hidden = !grid; search.hidden = !grid;
-    scrollTo(0, 0);
-    if (grid) { layout(); reveal(view.querySelectorAll('.contents, .ch-head')); }
-    watchBar(grid ? gridView.querySelector('.gridtitle') : title, entry.title);
-  });
-  search.hidden = true;
+  current.grid = true;
+  layout();
+  reveal(view.querySelectorAll('.contents, .ch-head'));
   watchBar(title, entry.title);
+
+  // The viewer flies back to wherever the photo shows right now: the photo it was opened from, its tile in
+  // the grid, or its card on the ribbon. Neither on screen: it fades where it is (the page doesn't jump).
+  const opened = { p: null, el: null };
+  current.opened = opened;
+  current.tileFor = p => [p === opened.p ? opened.el : null, current.tiles.get(p.h), cards.get(p.h)].find(visibleEl) || null;
   if (pendingChapter != null) {
     const c = used[pendingChapter]; pendingChapter = null;
-    current.grid = true; stage.hidden = true; gridView.hidden = false; search.hidden = false;
-    layout(); reveal(view.querySelectorAll('.contents, .ch-head'));
-    watchBar(gridView.querySelector('.gridtitle'), entry.title);
     requestAnimationFrame(() => c?.el.scrollIntoView({ behavior: 'instant', block: 'start' }));
   }
 
@@ -732,35 +833,13 @@ async function renderAlbum(id) {
   cleanup.push(() => amb.disconnect());
 
   let tag = 'All';
-  // search in plain words, like in the app: everything known about a photo (its words, people, tags, what
-  // the AI saw in it, camera, month and year); every word must match, plurals match singulars, and small
-  // words ("at", "the", "photos of") are left out, so "kids at the beach" just works
-  const STOP = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'into', 'me', 'my', 'of', 'on', 'or', 'our', 'the', 'to', 'with', 'show', 'photo', 'photos', 'picture', 'pictures', 'image', 'images', 'some', 'all']);
-  const stem = w => w.replace(/(?<=..)(es|s)$/, '');
-  const known = new Map(ordered.map(p => [p.h, [p.title, p.desc, p.src, ...(p.people || []), ...(p.tags || []), p.ai?.d, ...(p.ai?.t || []), p.camera, p.lens,
-    p.taken && new Date(p.taken).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })].filter(Boolean).join(' ').toLowerCase()]));
-  // and by meaning: photos whose words are close to the search's ("children by the sea" finds "kids at the
-  // beach"), once the small model is in (it loads on the first search, then is kept)
-  let close = new Set(), asked = 0, meaningTimer = 0;
-  const withMeaning = ordered.some(p => p.emb);
-  const apply = () => {
-    const q = searchInput.value.trim(), words = q.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(stem);
-    const match = p => refined(p) && (tag === 'All' || (tag === '♥ Favourites' ? favs.has(`${id}/${p.h}`) : p.tags?.includes(tag))) && (words.every(w => known.get(p.h).includes(w)) || close.has(p.h));
+  const find = finder(ordered, () => apply(false));
+  const apply = (fresh = true) => {
+    const match = p => refined(p) && (tag === 'All' || (tag === '♥ Favourites' ? favs.has(`${id}/${p.h}`) : p.tags?.includes(tag))) && find.has(p);
     for (const c of used) c.shown = c.photos.filter(match);
     layout(true);
-    clearTimeout(meaningTimer);
-    const me = ++asked; // a newer search (or clearing it) makes any answer still on its way stale
-    if (!withMeaning || words.length === 0) { close = new Set(); return; }
-    meaningTimer = setTimeout(async () => {
-      try {
-        const m = await import('./meaning.js?v=45d8f2a0c5');
-        const v = await m.embed(q);
-        if (me !== asked) return; // typed on meanwhile
-        close = new Set(ordered.filter(p => p.emb && m.similarity(v, m.unpack(p.emb)) >= 0.4).map(p => p.h));
-        for (const c of used) c.shown = c.photos.filter(match);
-        layout(true);
-      } catch {} // the model couldn't load (offline): word search still works
-    }, 250);
+    // the first letters typed at the top of the page: bring the photos up to meet them
+    if (fresh && find.active && view.querySelector('.contents').getBoundingClientRect().top > innerHeight * 0.6) toGrid();
   };
   chips.addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
@@ -768,14 +847,14 @@ async function renderAlbum(id) {
     for (const c of chips.children) c.setAttribute('aria-pressed', String(c === b));
     apply();
   });
-  searchInput.oninput = apply;
+  searchInput.oninput = () => { find.set(searchInput.value); apply(); };
 }
 
 function tile(p) {
   const img = h('img', { alt: p.title || '', decoding: 'async', loading: 'lazy' });
-  img.src = data.src(p.v.thumb);
+  img.src = data.src(p.v.thumb, p._a);
   // an 800 px copy in between, so a phone's grid doesn't decode 1600 px photos for 200 px tiles
-  img.srcset = [`${data.src(p.v.thumb)} 400w`, p.v.sm && `${data.src(p.v.sm)} 800w`, `${data.src(p.v.md)} 1600w`].filter(Boolean).join(', ');
+  img.srcset = [`${data.src(p.v.thumb, p._a)} 400w`, p.v.sm && `${data.src(p.v.sm, p._a)} 800w`, `${data.src(p.v.md, p._a)} 1600w`].filter(Boolean).join(', ');
   const inner = h('span', { className: 'ph' }, blurCanvas(p.blurhash, 24, 24), img);
   // people and a few tags on the photo, as in the app (the # button in the large view hides them, here too)
   const words = [...(p.people || []).map(n => h('i', { className: 'person' }, n)), ...(p.tags || []).slice(0, 3).map(t => h('i', {}, '#' + t))];
@@ -827,7 +906,7 @@ function layout(animate = false) {
   if (!width) return;
   const small = width < 640;
   const gap = small ? 4 : 12;
-  const cols = small ? 2 : width < 1100 ? 3 : 4;
+  const cols = small ? 2 : width < 1100 ? 3 : width < 1700 ? 4 : width < 2200 ? 5 : 6; // the wider ones only in the larger view
   current.photos = [];
   for (const c of current.chapters) {
     const shown = c.shown || c.photos;
@@ -855,6 +934,7 @@ new ResizeObserver(() => layout()).observe(view);
 
 // ---------- viewer hookup ----------
 function open(i, fromEl) {
+  Object.assign(current.opened, { p: current.photos[i], el: fromEl });
   history.pushState({ viewer: true }, '', `#/a/${current.entry.id}/${current.photos[i].h}`);
   openViewer({
     photos: current.photos, index: i, from: fromEl,

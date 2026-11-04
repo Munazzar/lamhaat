@@ -4,16 +4,17 @@
 // (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
 // they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
 // to the service worker (sw.js), which unseals each photo in the browser as it loads.
-import { idToken, user } from './auth.js?v=45d8f2a0c5';
+import { idToken, user } from './auth.js?v=c89378eedc';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 let cfg = null;
+let driveKey = ''; // for photos an album keeps in the owner's Google Drive (the key only reads files shared with anyone)
 const albums = new Map();
 const sealed = new Set(); // private albums: their files come through the service worker
 let currentAlbum = null;
 
 export async function config() {
-  try { const r = await fetch('config.json', { cache: 'no-cache' }); if (r.ok) { const c = await r.json(); if (c.firebase) cfg = c; } } catch {}
+  try { const r = await fetch('config.json', { cache: 'no-cache' }); if (r.ok) { const c = await r.json(); if (c.firebase) cfg = c; driveKey = typeof c.driveKey === 'string' ? c.driveKey : ''; } } catch {}
   // always: it makes the site installable as an app, and unseals private albums once signed in
   if ('serviceWorker' in navigator) await navigator.serviceWorker.register('sw.js').catch(() => {});
   return cfg;
@@ -41,7 +42,7 @@ async function keysToWorker(keys) {
   const reg = await navigator.serviceWorker.ready;
   const ch = new MessageChannel();
   const done = new Promise(r => { ch.port1.onmessage = r; setTimeout(r, 3000); });
-  reg.active?.postMessage({ type: 'keys', keys }, [ch.port2]);
+  reg.active?.postMessage({ type: 'keys', keys, driveKey }, [ch.port2]);
   await done;
 }
 export const forgetKeys = () => keysToWorker({});
@@ -74,6 +75,7 @@ export async function album(entry) {
       .then(r => { if (!r.ok) throw new Error(r.status === 403 ? 'This album isn’t shared with you (any more).' : 'album unavailable'); return r.json(); })
       .then(m => {
         if (m.schema !== 1) throw new Error(`This album needs a newer version of Lamhaat (schema ${m.schema}).`);
+        for (const p of m.photos) p._a = entry.id; // each photo knows its album, so photos from several albums can mix
         return m;
       });
     p.catch(() => albums.delete(entry.id));
@@ -84,7 +86,10 @@ export async function album(entry) {
 
 // a private album's files are asked for under p/<album>/..., which the service worker unseals
 // full-size copies live in their own small sites next to this one (lamha-full-N, same address): ../lamha-full-N/...
-export const src = (v, albumId = currentAlbum) => v.site
+const DRIVE = id => `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?alt=media&key=${encodeURIComponent(driveKey)}`;
+export const src = (v, albumId = currentAlbum) => v.drive // kept in Google Drive: straight from there (a sealed one through the service worker)
+  ? (sealed.has(albumId) ? `p/${albumId}/@drive/${v.drive}${v.type === 'image/jpeg' ? '.jpg' : '.avif'}` : DRIVE(v.drive))
+  : v.site
   ? (sealed.has(albumId) ? `p/${albumId}/@${v.site}/${v.path}` : `../${v.site}/${v.path}`)
   : sealed.has(albumId) ? `p/${albumId}/${v.repo}/${v.path}` : `${MEDIA}/${v.repo}/${v.path}`;
 

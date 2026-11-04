@@ -29,7 +29,9 @@ function build() {
   }
 }
 
+let painted = '';
 function colors() {
+  painted = root.dataset.theme;
   const cs = getComputedStyle(root);
   dot = cs.getPropertyValue('--dot').trim();
   accent = cs.getPropertyValue('--accent').trim();
@@ -40,7 +42,8 @@ let raf = 0, busyUntil = 0, moving = false;
 function wake(ms = 1400) { busyUntil = Math.max(busyUntil, performance.now() + ms); if (!raf) raf = requestAnimationFrame(frame); }
 function frame(t) {
   raf = 0;
-  if (root.classList.contains('viewing')) { busyUntil = 0; return; } // the photo viewer covers everything
+  // the photo viewer covers everything; while night and day change the page is a still picture (it wakes after)
+  if (root.classList.contains('viewing') || root.classList.contains('theming')) { busyUntil = 0; return; }
   moving = false;
   const off = 0; // scrolling moves the canvas itself (slide() below), not the dots
 
@@ -115,7 +118,13 @@ addEventListener('pointerdown', e => {
   wake(3500);
 });
 addEventListener('resize', () => { build(); wake(); });
-new MutationObserver(() => { colors(); wake(); }).observe(root, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+// a new theme's colours are read once night and day have finished changing, in a frame of their own: reading them
+// mid-change forced the whole page to be restyled at the worst moment. Then one still frame, not a second of ripples.
+let stale = false;
+new MutationObserver(() => {
+  if (root.classList.contains('theming') || root.classList.contains('viewing')) { stale ||= root.dataset.theme !== painted; return; }
+  if (stale || root.dataset.theme !== painted) { stale = false; requestAnimationFrame(() => { colors(); wake(0); }); }
+}).observe(root, { attributes: true, attributeFilter: ['data-theme', 'class'] });
 
 build();
 colors();

@@ -1,9 +1,9 @@
 // Full-screen photo viewer. Every motion is a spring that starts from what is on screen, so the
 // photo can be grabbed mid-flight: it rises out of its tile, follows the finger 1:1, and is
 // thrown back into its place in the grid when dismissed.
-import { Spring, project, rubberband, reducedMotion } from './spring.js?v=45d8f2a0c5';
-import * as data from './data.js?v=45d8f2a0c5';
-import { decode } from './vendor/blurhash.js?v=45d8f2a0c5';
+import { Spring, project, rubberband, reducedMotion } from './spring.js?v=c89378eedc';
+import * as data from './data.js?v=c89378eedc';
+import { decode } from './vendor/blurhash.js?v=c89378eedc';
 
 const root = document.getElementById('lb');
 const GAP = 28, MAX_ZOOM = 5;
@@ -30,6 +30,7 @@ function fit(p) {
   return { w, h, left: (W() - w) / 2, top: (H() - h) / 2, cx: W() / 2, cy: H() / 2 };
 }
 const photo = () => S.photos[S.index];
+const aid = p => p._a || S.albumId; // photos from several albums can share one viewer
 const bounds = s => { const f = fit(photo()); return { x: Math.max(0, (f.w * s - W()) / 2), y: Math.max(0, (f.h * s - H()) / 2) }; };
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
@@ -69,14 +70,14 @@ function build() {
   S.tagBtn = el('button', 'lb-btn lb-tagbtn', '#'); S.tagBtn.setAttribute('aria-label', 'Show or hide tags');
   const right = el('div', 'lb-right'); right.append(S.tagBtn, S.infoBtn);
   // signed in: a favourite, and comments (saved through Firestore; its rules decide who may)
-  if (data.social() && S.albumId) {
+  if (data.social()) {
     S.favBtn = el('button', 'lb-btn lb-fav', icon.heart); S.favBtn.setAttribute('aria-label', 'Favourite');
     S.comBtn = el('button', 'lb-btn lb-com', icon.talk); S.comBtn.setAttribute('aria-label', 'Comments');
     right.prepend(S.favBtn, S.comBtn);
     S.favBtn.onclick = async () => {
       const on = !S.favBtn.classList.contains('on');
       S.favBtn.classList.toggle('on', on); // at once; put back if saving fails
-      try { await data.toggleFavourite(S.albumId, photo().h); } catch { S.favBtn.classList.toggle('on', !on); }
+      try { await data.toggleFavourite(aid(photo()), photo().h); } catch { S.favBtn.classList.toggle('on', !on); }
     };
     S.comBtn.onclick = () => root.classList.toggle('talking');
   }
@@ -112,25 +113,36 @@ function slide(i) {
   s.style.transform = `translate3d(${i * step()}px,0,0)`;
   const frame = el('div', 'lb-frame');
   Object.assign(frame.style, { left: `${f.left}px`, top: `${f.top}px`, width: `${f.w}px`, height: `${f.h}px` });
-  const lo = new Image(); lo.src = data.src(p.v.thumb); lo.alt = '';
+  const lo = new Image(); lo.src = data.src(p.v.thumb, aid(p)); lo.alt = '';
   const hi = new Image(); hi.decoding = 'async'; hi.alt = p.title || '';
-  hi.src = data.src(p.v.md);
+  hi.src = data.src(p.v.md, aid(p));
   hi.decode().then(() => hi.classList.add('ready')).catch(() => {});
   frame.append(lo, hi);
   s.append(frame);
-  return { el: s, frame, p, full: null };
+  return { el: s, frame, p, level: 0 };
 }
 
-// the photo being looked at, at its own full size (the 3000 px copy if it has none, or it can't be had);
-// only that one: the neighbours wait until they are the one being looked at
-function loadFull(sl) {
-  if (!sl || sl.full) return;
+// Sharper copies of the photo being looked at, and only once it has come to rest: the 3200 px copy when the
+// screen shows more than the 1600 px one holds, the original when zoomed in. Never while the strip moves:
+// decoding and drawing a 24-megapixel photo mid-slide is what made going to the next photo stutter.
+function loadFull(sl, orig = false) {
+  if (!sl) return;
+  const want = orig && sl.p.v.orig ? 2 : 1;
+  if (sl.level >= want) return;
+  if (want === 1) { const f = fit(sl.p); if (!sl.p.v.full || Math.max(f.w, f.h) * (devicePixelRatio || 1) <= 1700) return; }
+  sl.level = want;
   const img = new Image(); img.decoding = 'async'; img.alt = '';
-  const show = () => img.decode().then(() => img.classList.add('ready')).catch(() => {});
-  img.onerror = () => { if (sl.p.v.orig && !img.dataset.fallback) { img.dataset.fallback = '1'; img.src = data.src(sl.p.v.full); show(); } };
-  img.src = data.src(sl.p.v.orig || sl.p.v.full);
-  show();
-  sl.full = img; sl.frame.append(img);
+  img.onerror = () => { img.remove(); if (want === 2) { sl.level = 0; loadFull(sl); } };
+  img.src = data.src(want === 2 ? sl.p.v.orig : sl.p.v.full, aid(sl.p));
+  img.decode().then(() => img.classList.add('ready')).catch(() => {});
+  sl.frame.append(img);
+}
+// a moment after the photo settles, bring in its sharper copy (a newer move cancels it)
+let settleTimer = 0;
+function settle() {
+  clearTimeout(settleTimer);
+  const s0 = S;
+  settleTimer = setTimeout(() => { if (S === s0 && !S.closing && !S.track.moving && !g) loadFull(S.slides.get(S.index), S.zs.value > 1.3); }, 140);
 }
 
 function ensureSlides() {
@@ -159,22 +171,27 @@ function glow(p) {
   setTimeout(() => old.forEach(o => o.remove()), 1600);
 }
 
-function caption() {
+function caption(moved = false) {
   const p = photo();
+  // the words change with the photo: a quick fade, not a jump
+  if (moved && !reducedMotion.matches) S.caption.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-out' });
   glow(p);
   S.count.textContent = `${S.index + 1} of ${S.photos.length}`;
   const settings = [p.f && `ƒ/${p.f}`, p.shutter, p.iso && `ISO ${p.iso}`].filter(Boolean).join('  ·  ');
   const rows = [['Camera', p.camera], ['Lens', p.lens], ['Exposure', settings], ['Size', `${p.w} × ${p.hgt}`]].filter(r => r[1]);
   const chips = [...(p.people || []).map(n => `<span class="chip person">${esc(n)}</span>`), ...(p.tags || []).map(t => `<span class="chip">#${esc(t)}</span>`)];
-  S.caption.innerHTML = (p.title ? `<h2>${esc(p.title)}</h2>` : '') + (p.desc ? `<p class="desc">${esc(p.desc)}</p>` : '') +
-    `<p>${esc(S.fmtDate(p.taken))}${p.camera ? ` · ${esc(p.camera)}` : ''}</p>` +
+  // the owner's own words, or else what the AI saw in it (said so, quietly)
+  const desc = p.desc ? esc(p.desc) : p.ai?.d ? `${esc(p.ai.d)} <span class="by-ai">described by AI</span>` : '';
+  const when = [p.taken && S.fmtDate(p.taken), p.camera].filter(Boolean).map(esc).join(' · ');
+  S.caption.innerHTML = (p.title ? `<h2>${esc(p.title)}</h2>` : '') + (desc ? `<p class="desc">${desc}</p>` : '') +
+    (when ? `<p>${when}</p>` : '') +
     `<dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` +
     (chips.length ? `<p class="tags">${chips.join('')}</p>` : '');
   S.tagBtn.hidden = !chips.length;
   fitCaption();
   S.prevBtn.hidden = S.index === 0;
   S.nextBtn.hidden = S.index === S.photos.length - 1;
-  if (S.favBtn) { S.favBtn.classList.remove('on'); data.favourites().then(f => { if (S && photo() === p) S.favBtn.classList.toggle('on', f.has(`${S.albumId}/${p.h}`)); }); }
+  if (S.favBtn) { S.favBtn.classList.remove('on'); data.favourites().then(f => { if (S && photo() === p) S.favBtn.classList.toggle('on', f.has(`${aid(p)}/${p.h}`)); }); }
   if (S.comBtn) talk(p);
 }
 
@@ -194,19 +211,19 @@ async function talk(p) {
     send.onclick = async () => {
       if (!input.value.trim()) return;
       send.disabled = true;
-      try { draw(await data.addComment(S.albumId, p.h, input.value)); } catch { send.disabled = false; send.textContent = 'Couldn’t post. Try again'; }
+      try { draw(await data.addComment(aid(p), p.h, input.value)); } catch { send.disabled = false; send.textContent = 'Couldn’t post. Try again'; }
     };
     box.replaceChildren(
       el('p', 'lb-talk-head', mine.length ? `${mine.length} ${mine.length === 1 ? 'comment' : 'comments'}` : 'No comments yet'),
       ...mine.map(c => {
         const row = el('div', 'lb-talk-row', `<b>${esc(c.name || c.by)}</b><span>${esc(S.fmtDate(c.at))}</span><p>${esc(c.text)}</p>`);
-        if (c.by === data.myEmail()) { const del = el('button', 'lb-talk-del', 'Delete'); del.onclick = async () => draw(await data.deleteComment(S.albumId, c.id)); row.append(del); }
+        if (c.by === data.myEmail()) { const del = el('button', 'lb-talk-del', 'Delete'); del.onclick = async () => draw(await data.deleteComment(aid(p), c.id)); row.append(del); }
         return row;
       }),
       input, send);
   };
   box.replaceChildren(el('p', 'lb-talk-head', 'Comments…'));
-  try { draw(await data.comments(S.albumId)); } catch { box.replaceChildren(el('p', 'lb-talk-head', 'Comments can’t be reached right now.')); }
+  try { draw(await data.comments(aid(p))); } catch { box.replaceChildren(el('p', 'lb-talk-head', 'Comments can’t be reached right now.')); }
 }
 
 // everything under the photo stays readable and whole: the text gets smaller rather than cut off
@@ -221,6 +238,7 @@ function fitCaption() {
 export function openViewer(opts) {
   if (S) { if (!S.closing) goTo(opts.index); return; }
   S = { ...opts, slides: new Map(), closing: false };
+  swipe = null;
   S.track = new Spring(-S.index * step(), { precision: 0.2, onUpdate: render });
   S.zx = new Spring(0, { precision: 0.2, onUpdate: render });
   S.zy = new Spring(0, { precision: 0.2, onUpdate: render });
@@ -230,7 +248,7 @@ export function openViewer(opts) {
   S.ci = { x: 0, y: 0, r: 0 };
   build();
   root.classList.remove('bare', 'details', 'talking');
-  ensureSlides(); caption(); loadFull(S.slides.get(S.index));
+  ensureSlides(); caption();
   S.returnFocus = document.activeElement;
   const s0 = S;
   const first = S.slides.get(S.index).frame.querySelector('img');
@@ -254,7 +272,7 @@ function rise() {
     if (S !== s0 || S.closing) return;
     tile?.classList.add('away');
     // A slow, settled rise — no overshoot on something the user didn't throw. The crop opens with it.
-    S.zx.to(0, { response: 0.55 }); S.zy.to(0, { response: 0.55 }); S.zs.to(1, { response: 0.55 });
+    S.zx.to(0, { response: 0.55 }); S.zy.to(0, { response: 0.55 }); S.zs.to(1, { response: 0.55, onRest: settle });
     S.clip.to(0, { response: 0.55 });
     S.scrim.to(1, { response: 0.5 });
   });
@@ -270,10 +288,10 @@ function goTo(i, velocity = 0) {
     S.index = i;
     S.tileFor(photo())?.classList.add('away');
     S.zx.set(0); S.zy.set(0); S.zs.set(1); S.clip.set(0);
-    ensureSlides(); caption(); loadFull(S.slides.get(S.index));
+    ensureSlides(); caption(true);
     S.onIndex(photo());
-    S.track.to(-i * step(), { velocity, response: 0.5, onRest: () => old && (old.frame.style.transform = '') });
-  } else S.track.to(-i * step(), { velocity, response: 0.5 });
+    S.track.to(-i * step(), { velocity, response: 0.5, onRest: () => { if (old) old.frame.style.transform = ''; settle(); } });
+  } else S.track.to(-i * step(), { velocity, response: 0.5, onRest: settle });
 }
 
 export function closeViewer(animated, velocity = {}) {
@@ -326,7 +344,7 @@ function zoomTo(scale, px, py, response = 0.45) {
   const b = bounds(scale);
   x = clamp(x, -b.x, b.x); y = clamp(y, -b.y, b.y);
   S.zs.to(scale, { response }); S.zx.to(x, { response }); S.zy.to(y, { response });
-  if (scale > 1.3) loadFull(S.slides.get(S.index));
+  if (scale > 1.3) loadFull(S.slides.get(S.index), true);
 }
 function toggleZoom(px, py) {
   if (S.zs.target > 1.01) return zoomTo(1, W() / 2, H() / 2);
@@ -354,7 +372,7 @@ function pinchStart() {
   const f = fit(photo());
   g = { mode: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y), s0: S.zs.value, moved: true,
     u: { x: ((a.x + b.x) / 2 - (f.cx + S.zx.value)) / S.zs.value, y: ((a.y + b.y) / 2 - (f.cy + S.zy.value)) / S.zs.value } };
-  loadFull(S.slides.get(S.index));
+  loadFull(S.slides.get(S.index), true);
 }
 
 root.addEventListener('pointerdown', e => {
@@ -459,14 +477,38 @@ function tap(e) {
   tapTimer = setTimeout(() => { lastTap = null; root.classList.toggle('bare'); }, 280);
 }
 
+// A two-finger sideways swipe on a trackpad: the strip follows the fingers, up to one photo either way, then
+// settles centred on the nearer photo (or the next one, once it has gone a third of the way or was flicked).
+// The trackpad's own coasting afterwards is ignored, so one swipe is always exactly one photo.
+let swipe = null;
+function wheelSwipe(e) {
+  const now = performance.now();
+  if (swipe?.done) { if (now - swipe.t < 240) { swipe.t = now; return; } swipe = null; } // the coasting tail
+  if (!e.deltaX) return;
+  if (!swipe) { S.track.stop(); swipe = { x0: -S.index * step(), dx: 0, t: now, v: 0, timer: 0 }; }
+  const d = -e.deltaX * (e.deltaMode === 1 ? 16 : 1), dt = Math.max(1, now - swipe.t);
+  swipe.v = swipe.v * 0.6 + (d / dt) * 1000 * 0.4; // px/s, smoothed
+  swipe.dx = clamp(swipe.dx + d, -step(), step()); swipe.t = now;
+  const lo = -(S.photos.length - 1) * step();
+  let x = swipe.x0 + swipe.dx;
+  if (x > 0) x = rubberband(x, W()); else if (x < lo) x = lo - rubberband(lo - x, W());
+  S.track.set(x);
+  const commit = () => {
+    clearTimeout(swipe.timer);
+    swipe.done = true; swipe.t = performance.now();
+    const far = Math.abs(swipe.dx) > step() * 0.33 || Math.abs(swipe.v) > 900;
+    goTo(far ? S.index - Math.sign(swipe.dx) : S.index, swipe.v * 0.5);
+  };
+  if (Math.abs(swipe.dx) > step() * 0.6) return commit(); // far enough: go now, don't wait for the fingers
+  clearTimeout(swipe.timer);
+  swipe.timer = setTimeout(commit, 90); // the fingers have stopped
+}
+
 root.addEventListener('wheel', e => {
   if (!S || S.closing || e.target.closest?.('.lb-talk')) return; // the comments scroll on their own
   e.preventDefault();
-  if (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY) && S.zs.target <= 1.01) {
-    // Two-finger horizontal swipe on a trackpad pages through photos.
-    if (Math.abs(e.deltaX) > 30 && !S.track.moving) goTo(S.index + Math.sign(e.deltaX));
-    return;
-  }
+  if (swipe?.done && performance.now() - swipe.t >= 240) swipe = null;
+  if (swipe || (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY) && S.zs.target <= 1.01)) return wheelSwipe(e);
   const scale = S.zs.target * Math.exp(-e.deltaY * (e.ctrlKey ? 0.012 : 0.0025));
   zoomTo(scale, e.clientX, e.clientY, 0.25);
 }, { passive: false });
@@ -493,5 +535,5 @@ addEventListener('resize', () => {
   if (!S || S.closing) return;
   for (const [i, sl] of S.slides) { sl.el.remove(); S.slides.delete(i); }
   S.zx.set(0); S.zy.set(0); S.zs.set(1); S.track.set(-S.index * step());
-  ensureSlides(); loadFull(S.slides.get(S.index)); render();
+  ensureSlides(); render(); settle();
 });
