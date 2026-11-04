@@ -4,7 +4,7 @@
 // (config.json carries the Firebase web settings), a signed-in viewer asks Firestore which private albums
 // they may open; Firestore's rules hand out those albums' details and keys and nothing else. The keys go
 // to the service worker (sw.js), which unseals each photo in the browser as it loads.
-import { idToken, user } from './auth.js?v=c89378eedc';
+import { idToken, user } from './auth.js?v=fcc31c20a8';
 
 const MEDIA = 'media'; // relative: works at / locally and under /lamhaat/ on Pages
 let cfg = null;

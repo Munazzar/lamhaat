@@ -1,10 +1,10 @@
-import { decode } from './vendor/blurhash.js?v=c89378eedc';
-import * as data from './data.js?v=c89378eedc';
-import * as auth from './auth.js?v=c89378eedc';
-import { openViewer, closeViewer } from './viewer.js?v=c89378eedc';
+import { decode } from './vendor/blurhash.js?v=fcc31c20a8';
+import * as data from './data.js?v=fcc31c20a8';
+import * as auth from './auth.js?v=fcc31c20a8';
+import { openViewer, closeViewer } from './viewer.js?v=fcc31c20a8';
 // the live dot grid only where there is a mouse to play with it; on phones it cost a full-screen layer every frame
-if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=c89378eedc');
-import { openReel, reelSupported } from './reel.js?v=c89378eedc';
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) import('./mesh.js?v=fcc31c20a8');
+import { openReel, reelSupported } from './reel.js?v=fcc31c20a8';
 
 const view = document.getElementById('view');
 const bar = document.getElementById('bar');
@@ -24,9 +24,25 @@ function setTheme(next) {
   themeBtn.setAttribute('aria-label', next === 'dark' ? 'Switch to day' : 'Switch to night');
 }
 setTheme(document.documentElement.dataset.theme || 'light');
-themeBtn.addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  if (!document.startViewTransition || reduced.matches) return setTheme(next);
+// Clicks during a change don't start a second one on top (that used to flip the page back to the wrong look):
+// they're remembered, and once this change has landed the page turns again only if it should end the other way.
+let want = null, turning = false;
+const flipTheme = () => {
+  want = (want ?? document.documentElement.dataset.theme) === 'dark' ? 'light' : 'dark';
+  if (!turning) turnTheme();
+};
+themeBtn.addEventListener('click', flipTheme);
+// while the page changes the browser hands every click to the page itself, not the button under it
+document.documentElement.addEventListener('click', e => {
+  if (!turning || e.target !== document.documentElement) return;
+  const r = themeBtn.getBoundingClientRect();
+  if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) flipTheme();
+});
+function turnTheme() {
+  const root = document.documentElement, next = want;
+  if (!next || next === root.dataset.theme) { want = null; return; }
+  if (!document.startViewTransition || reduced.matches || document.hidden) { want = null; return setTheme(next); }
+  turning = true;
   // Percentages, not px: the transition snapshot can be scaled on high-density screens, so px would land off the button.
   const r = themeBtn.getBoundingClientRect(), W = innerWidth, H = innerHeight;
   const x = r.left + r.width / 2, y = r.top + r.height / 2, at = `at ${(x / W) * 100}% ${(y / H) * 100}%`;
@@ -40,22 +56,27 @@ themeBtn.addEventListener('click', () => {
   const named = [...document.querySelectorAll('[style*="view-transition-name"]')];
   for (const el of named) { el._vt = el.style.viewTransitionName; el.style.viewTransitionName = 'none'; }
   const restore = () => { for (const el of named) el.style.viewTransitionName = el._vt; };
-  document.documentElement.classList.add('theming');
-  document.documentElement.classList.toggle('theming-fade', touch);
+  root.classList.add('theming');
+  root.classList.toggle('theming-fade', touch);
   const t = document.startViewTransition(() => setTheme(next));
-  if (touch) {
-    t.finished.finally(() => { document.documentElement.classList.remove('theming', 'theming-fade'); restore(); });
-    setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } }, 1200); // never stuck
-    return;
-  }
-  // quick to start, gentle to land: the page is a still picture while it runs, so it stays short
-  t.ready.then(() => document.documentElement.animate(
+  // quick to start, gentle to land
+  if (!touch) t.ready.then(() => root.animate(
     { clipPath: [`circle(0% ${at})`, `circle(${end}% ${at})`] },
-    { duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
-  t.finished.finally(() => { document.documentElement.classList.remove('theming'); restore(); });
-  // if the browser can't finish the animation (a busy or hidden page), switch anyway rather than stay stuck
-  setTimeout(() => { if (document.documentElement.dataset.theme !== next) { t.skipTransition?.(); setTheme(next); } document.documentElement.classList.remove('theming'); }, 2000);
-});
+    { duration: 900, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    if (root.dataset.theme !== next) setTheme(next);
+    root.classList.remove('theming', 'theming-fade');
+    restore();
+    turning = false;
+    if (want && want !== root.dataset.theme) setTimeout(turnTheme, 80); else want = null;
+  };
+  t.finished.finally(finish);
+  // if the browser can't finish the animation (a busy or hidden page), land anyway rather than stay stuck
+  setTimeout(() => { if (!done) { t.skipTransition?.(); finish(); } }, 2400);
+}
 
 // A larger view, for big screens: the page uses more of the width, the grid more columns, the ribbon and the
 // reel's frame grow. Remembered on this device; the reel has the same switch.
@@ -210,7 +231,7 @@ function finder(photos, onMeaning) {
       if (!withMeaning || !words.length) return;
       timer = setTimeout(async () => {
         try {
-          const m = await import('./meaning.js?v=c89378eedc');
+          const m = await import('./meaning.js?v=fcc31c20a8');
           const v = await m.embed(q);
           if (me !== asked) return; // typed on meanwhile
           close = new Set(photos.filter(p => p.emb && m.similarity(v, m.unpack(p.emb)) >= 0.4));

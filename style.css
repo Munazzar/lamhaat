@@ -692,8 +692,8 @@ html.tagsoff .twords { display: none; }
 .lb-talk-in { width: 100%; resize: vertical; border: 0; border-radius: 10px; padding: 10px 12px; background: rgb(255 255 255 / 0.08); color: #fff; font: 0.9rem/1.4 var(--sans); }
 .lb-talk-send { align-self: flex-end; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--accent); color: #fff; font: 600 0.82rem var(--sans); }
 /* night and day on a phone: a quick cross-fade of the two pictures */
-html.theming-fade::view-transition-old(root) { animation: 260ms ease both lamhaat-fade-out; mix-blend-mode: normal; }
-html.theming-fade::view-transition-new(root) { animation: 260ms ease both lamhaat-fade-in; mix-blend-mode: normal; }
+html.theming-fade::view-transition-old(root) { animation: 420ms ease both lamhaat-fade-out; mix-blend-mode: normal; }
+html.theming-fade::view-transition-new(root) { animation: 420ms ease both lamhaat-fade-in; mix-blend-mode: normal; }
 @keyframes lamhaat-fade-out { to { opacity: 0; } }
 @keyframes lamhaat-fade-in { from { opacity: 0; } }
 
